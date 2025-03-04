@@ -49,7 +49,7 @@ if (!$schedule) {
             <hr />
         </div>
 
-               <div id="nav-content">
+        <div id="nav-content">
             <!-- Dashboard -->
             <div class="nav-button">
                 <a href="admin-index.php">
@@ -146,7 +146,7 @@ if (!$schedule) {
             <!-- Kiosk -->
             <div class="nav-button">
                 <a href="admin-kiosk.php">
-                <i class="fas bi bi-tv"></i>
+                    <i class="fas bi bi-tv"></i>
                     <span>Kiosk</span>
                 </a>
             </div>
@@ -382,12 +382,12 @@ if (!$schedule) {
 
         function toggleFields() {
             if (typeSelect.value === "Break" || typeSelect.value === "Consultation Time") {
-                // Clear values before hiding
-                roomInput.value = "";
-                sectionInput.value = "";
-                subjectInput.value = "";
+                // Set values to "N/A"
+                roomInput.value = "N/A";
+                sectionInput.value = "N/A";
+                subjectInput.value = "N/A";
 
-                // Hide fields
+                // Hide fields visually
                 roomField.style.display = "none";
                 sectionField.style.display = "none";
                 subjectField.style.display = "none";
@@ -395,6 +395,11 @@ if (!$schedule) {
                 locationHr.style.display = "none";
                 classTitle.style.display = "none";
                 classHr.style.display = "none";
+
+                // Ensure hidden inputs are still submitted
+                roomInput.setAttribute("readonly", true);
+                sectionInput.setAttribute("readonly", true);
+                subjectInput.setAttribute("readonly", true);
             } else {
                 // Show fields
                 roomField.style.display = "";
@@ -404,6 +409,11 @@ if (!$schedule) {
                 locationHr.style.display = "";
                 classTitle.style.display = "";
                 classHr.style.display = "";
+
+                // Allow editing when fields are visible
+                roomInput.removeAttribute("readonly");
+                sectionInput.removeAttribute("readonly");
+                subjectInput.removeAttribute("readonly");
             }
         }
 
@@ -411,6 +421,7 @@ if (!$schedule) {
         toggleFields(); // Call on page load to set correct state
     });
 </script>
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("rfid_no").value = "<?= $schedule['rfid_no'] ?>";

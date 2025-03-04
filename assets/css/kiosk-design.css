@@ -671,19 +671,19 @@ input[type="radio"] {
 }
 
 input[type="radio"]:checked + .fac-card {
-  border: 2px solid #183153;
+  border: 3px solid #183153;
   box-shadow: 0 0 10px rgba(70, 219, 93, 0.6);
   background-color: #ffc52d;
 }
 
 input[type="radio"]:checked + .time-card {
-  border: 2px solid #183153;
+  border: 3px solid #183153;
   box-shadow: 0 0 10px rgba(70, 219, 93, 0.6);
   background-color: #ffc52d;
 }
 
 input[type="radio"]:checked + .agenda-card {
-  border: 2px solid #183153;
+  border: 3px solid #183153;
   box-shadow: 0 0 10px rgba(70, 219, 93, 0.6);
   background-color: #ffc52d;
 }

@@ -464,9 +464,9 @@ $admin_rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
         function toggleFields() {
             if (typeSelect.value === "Break" || typeSelect.value === "Consultation Time") {
                 // Clear values before hiding
-                roomInput.value = "";
-                sectionInput.value = "";
-                subjectInput.value = "";
+                roomInput.value = "N/A";
+                sectionInput.value = "N/A";
+                subjectInput.value = "N/A";
 
                 // Hide fields
                 roomField.style.display = "none";
@@ -496,9 +496,14 @@ $admin_rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const typeSelect = document.getElementById("type");
-        const roomField = document.getElementById("room_id").closest("div");
-        const sectionField = document.getElementById("section_id").closest("div");
-        const subjectField = document.getElementById("subject_code").closest("div");
+        const roomInput = document.getElementById("room_id");
+        const sectionInput = document.getElementById("section_id");
+        const subjectInput = document.getElementById("subject_code");
+
+        const roomField = roomInput.closest("div");
+        const sectionField = sectionInput.closest("div");
+        const subjectField = subjectInput.closest("div");
+
         const locationTitle = document.getElementById("location");
         const locationHr = document.getElementById("location-hr");
         const classTitle = document.getElementById("class-dtl");
@@ -506,6 +511,12 @@ $admin_rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
 
         function toggleFields() {
             if (typeSelect.value === "Break" || typeSelect.value === "Consultation Time") {
+                // Set values to "N/A"
+                roomInput.value = "N/A";
+                sectionInput.value = "N/A";
+                subjectInput.value = "N/A";
+
+                // Hide fields visually
                 roomField.style.display = "none";
                 sectionField.style.display = "none";
                 subjectField.style.display = "none";
@@ -513,7 +524,13 @@ $admin_rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
                 locationHr.style.display = "none";
                 classTitle.style.display = "none";
                 classHr.style.display = "none";
+
+                // Ensure hidden inputs are still submitted
+                roomInput.setAttribute("readonly", true);
+                sectionInput.setAttribute("readonly", true);
+                subjectInput.setAttribute("readonly", true);
             } else {
+                // Show fields
                 roomField.style.display = "";
                 sectionField.style.display = "";
                 subjectField.style.display = "";
@@ -521,6 +538,11 @@ $admin_rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
                 locationHr.style.display = "";
                 classTitle.style.display = "";
                 classHr.style.display = "";
+
+                // Allow editing when fields are visible
+                roomInput.removeAttribute("readonly");
+                sectionInput.removeAttribute("readonly");
+                subjectInput.removeAttribute("readonly");
             }
         }
 

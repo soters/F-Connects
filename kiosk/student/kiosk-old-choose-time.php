@@ -38,11 +38,11 @@ try {
         $faculty_name = $row['fname'] . ' ' . $row['mname'] . ' ' . $row['lname'] . ' ' . $row['suffix'];
     }
 
-    // SQL Server query to get the faculty's consultation schedule for today
+    // SQL Server query to get the faculty's schedule for today
     $query_schedule = "
         SELECT start_time, end_time
         FROM Schedules
-        WHERE rfid_no = ? AND start_date = ? AND type = 'Consultation Time'
+        WHERE rfid_no = ? AND start_date = ?
     ";
 
     // Prepare and execute the query
@@ -53,23 +53,20 @@ try {
         die(print_r(sqlsrv_errors(), true));
     }
 
-    // Fetch consultation schedule for the selected faculty
-    $consultationTimes = [];
-    if ($row = sqlsrv_fetch_array($stmt_schedule, SQLSRV_FETCH_ASSOC)) {
-        $consultationTimes[] = [
-            'start' => $row['start_time']->format('H:i'),
-            'end' => $row['end_time']->format('H:i')
-        ];
+    // Fetch all schedules for the selected faculty
+    $schedules = [];
+    while ($row = sqlsrv_fetch_array($stmt_schedule, SQLSRV_FETCH_ASSOC)) {
+        $schedules[] = $row;
     }
 
     // SQL Server query to get the faculty's appointments for today
     $query_appointments = "
-        SELECT start_time, end_time
-        FROM Appointments
-        WHERE prof_rfid_no = ? 
-        AND date_logged = ? 
-        AND status IN ('Pending', 'Accepted')
-    ";
+    SELECT start_time, end_time
+    FROM Appointments
+    WHERE prof_rfid_no = ? 
+    AND date_logged = ? 
+    AND status IN ('Pending', 'Accepted')
+";
 
     // Prepare and execute the query
     $stmt_appointments = sqlsrv_query($conn, $query_appointments, array($selected_rfid, $today));
@@ -82,42 +79,61 @@ try {
     // Fetch all appointments for the selected faculty
     $appointments = [];
     while ($row = sqlsrv_fetch_array($stmt_appointments, SQLSRV_FETCH_ASSOC)) {
-        $appointments[] = [
-            'start' => $row['start_time']->format('H:i'),
-            'end' => $row['end_time']->format('H:i')
-        ];
+        $appointments[] = $row;
     }
 
-    // Generate available time slots within the consultation schedule
+    // Create an array to store the unavailable time intervals (from both schedules and appointments)
+    $unavailableTimes = [];
+    foreach ($schedules as $schedule) {
+        $start_time = $schedule['start_time']->format('H:i'); // Convert to 24-hour format
+        $end_time = $schedule['end_time']->format('H:i'); // Convert to 24-hour format
+        $unavailableTimes[] = ['start' => $start_time, 'end' => $end_time];
+    }
+
+    foreach ($appointments as $appointment) {
+        $start_time = $appointment['start_time']->format('H:i'); // Convert to 24-hour format
+        $end_time = $appointment['end_time']->format('H:i'); // Convert to 24-hour format
+        $unavailableTimes[] = ['start' => $start_time, 'end' => $end_time];
+    }
+
+    // Generate available time slots
     $availableTimes = [];
-    foreach ($consultationTimes as $consultation) {
-        $start = strtotime($consultation['start']);
-        $end = strtotime($consultation['end']);
+    $startOfDay = strtotime("07:00 AM"); // Start time of the day (7:00 AM)
+    $endOfDay = strtotime("08:00 PM"); // End time of the day (8:00 PM)
 
-        for ($currentSlot = $start; $currentSlot < $end; $currentSlot = strtotime("+1 hour", $currentSlot)) {
-            $slotStart = date("H:i", $currentSlot);
-            $slotEnd = date("H:i", strtotime("+1 hour", $currentSlot));
+    // Get the current time
+    $currentTime = time(); // Get current timestamp
 
-            // Check if the time slot overlaps with any appointment
-            $isAvailable = true;
-            foreach ($appointments as $appointment) {
-                if (
-                    ($slotStart >= $appointment['start'] && $slotStart < $appointment['end']) ||
-                    ($slotEnd > $appointment['start'] && $slotEnd <= $appointment['end'])
-                ) {
-                    $isAvailable = false;
-                    break;
-                }
+    // Loop through the time slots and check availability
+    for ($currentTimeSlot = $startOfDay; $currentTimeSlot < $endOfDay; $currentTimeSlot = strtotime("+1 hour", $currentTimeSlot)) {
+        $slotStart = date("H:i", $currentTimeSlot);
+        $slotEnd = date("H:i", strtotime("+1 hour", $currentTimeSlot));
+
+        // Check if the current time slot is in the past
+        if ($currentTimeSlot < $currentTime) {
+            continue; // Skip this slot if it's already in the past
+        }
+
+        // Check if the current time slot overlaps with any unavailable time
+        $isAvailable = true;
+        foreach ($unavailableTimes as $unavailable) {
+            // Exclude time slots that are within the range of the schedule (start_time to end_time)
+            if (
+                ($slotStart >= $unavailable['start'] && $slotStart < $unavailable['end']) ||
+                ($slotEnd > $unavailable['start'] && $slotEnd <= $unavailable['end'])
+            ) {
+                $isAvailable = false;
+                break;
             }
+        }
 
-            // Add available time slots
-            if ($isAvailable) {
-                $availableTimes[] = [
-                    'formatted' => convertTo12HourFormat($slotStart) . ' - ' . convertTo12HourFormat($slotEnd),
-                    'start_time' => $slotStart,
-                    'end_time' => $slotEnd
-                ];
-            }
+        // If the time slot is available, add it to the availableTimes array
+        if ($isAvailable) {
+            $availableTimes[] = [
+                'formatted' => convertTo12HourFormat($slotStart) . ' - ' . convertTo12HourFormat($slotEnd),
+                'start_time' => $slotStart,
+                'end_time' => $slotEnd
+            ];
         }
     }
 } catch (Exception $e) {
@@ -194,7 +210,7 @@ try {
                     <div class="code-card">
                         <img src="../../assets/images/time_slot.png" alt="" class="faculty-icon-2">
                         <p class="code-message">
-                            No consultation slots available for today.
+                            No time slots available for today.
                         </p>
                         <!-- OKAY Button -->
                         <a href="kiosk-student.php?rfid_no=<?= isset($stud_rf) ? urlencode($stud_rf) : '' ?>"
