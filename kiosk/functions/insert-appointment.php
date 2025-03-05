@@ -13,8 +13,8 @@ try {
         $selected_agenda = htmlspecialchars($_POST['selected_agenda']);
 
         // Get today's date in the format YYYY-MM-DD
+        $today_date = date('Y-m-d'); // Define today's date before queries
      
-
         // Check if the user already has two appointments for today
         $count_sql = "SELECT COUNT(*) AS appointment_count FROM Appointments 
                       WHERE stud_rfid_no = ? 
