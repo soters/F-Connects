@@ -3,7 +3,8 @@ declare(strict_types=1);
 session_start();
 require_once('../../connection/connection.php');
 
-$appointment_code = isset($_GET['appointment_code']) ? htmlspecialchars($_GET['appointment_code']) : null;
+$rfid_no = isset($_GET['rfid_no']) ? htmlspecialchars($_GET['rfid_no']) : '';
+$appointment_code = isset($_GET['appointment_code']) ? htmlspecialchars($_GET['appointment_code']) : '';
 
 ?>
 
@@ -14,8 +15,9 @@ $appointment_code = isset($_GET['appointment_code']) ? htmlspecialchars($_GET['a
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="view-transition" content="same-origin" />
-    <!-- Custom Links -->   
-    <link rel="stylesheet" href="../../assets/css/kiosk-design.css"/>
+    <!-- Custom Links -->
+    <link rel="stylesheet" href="../../assets/css/kiosk-design.css" />
+    <link rel="shortcut icon" href="../../assets/images/F-Connect.ico" type="image/x-icon" />
     <title>F - Connect</title>
 
 </head>
@@ -37,7 +39,7 @@ $appointment_code = isset($_GET['appointment_code']) ? htmlspecialchars($_GET['a
     </nav>
 
     <div id="appointment-container">
-        <p id="action-message-info">Appointment Submitted!</p>
+        <p id="action-message-info-2">Appointment Submitted!</p>
         <br>
         <br>
         <div class="code-card">
@@ -46,7 +48,7 @@ $appointment_code = isset($_GET['appointment_code']) ? htmlspecialchars($_GET['a
                 Your appointment has been submitted! Use our mobile app to track it or check its status with your
                 appointment code.
             </p>
-            <div class="appointment-code">
+            <!--<div class="appointment-code">
                 <p>
                     <?php
                     if ($appointment_code) {
@@ -57,32 +59,34 @@ $appointment_code = isset($_GET['appointment_code']) ? htmlspecialchars($_GET['a
                     }
                     ?>
                 </p>
-            </div>
+            </div>-->
         </div>
 
         <!-- Submit Button -->
-        <button class="appoint-btn" type="button" onclick="window.location.href='../kiosk-index.php';">
+        <button class="appoint-btn" type="button"
+            onclick="window.location.href='kiosk-student.php?rfid_no=<?= urlencode($rfid_no) ?>';">
             <span class="btn-text">DONE</span>
         </button>
+
     </div>
 
-      <!--div id="top-right-button">
+    <!--div id="top-right-button">
             <button type="button" class="small-button" data-bs-toggle="tooltip" title="Need help?"
                 data-bs-placement="left">
                 <i class="bi bi-question-lg"></i>
         </div>-->
 
     <div id="top-left-button">
-        <a href="kiosk-student.php" class="no-underline">
+        <a href="kiosk-student.php?rfid_no=<?= urlencode($rfid_no) ?>" class="no-underline">
             <button type="button" class="small-button" data-bs-toggle="tooltip" title="Back" data-bs-placement="right">
                 <i class="bi bi-arrow-left-short"></i>
             </button>
         </a>
     </div>
-    
-    <footer>
+
+    <!--<footer>
         <p id="collaboration-text">In collaboration with Colegio de Sta. Teresa de Avila</p>
-    </footer>
+    </footer> -->
 
     <!-- Scripts -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">

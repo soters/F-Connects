@@ -4,10 +4,10 @@ date_default_timezone_set('Asia/Manila');
 
 try {
     // Database credentials
-    $serverName = "f-connect.database.windows.net";       // Your local SQL Server hostname (e.g., ".", "localhost", or "J5L")
+    $serverName = "DESKTOP-SQ1PDO1";       // Your local SQL Server hostname (e.g., ".", "localhost", or "J5L")
     $database = "faconnect_db"; // Your database name
-    $username = "fconnect";           // SQL Server username
-    $password = "CSTA_2025";    // SQL Server password
+    $username = "sa";           // SQL Server username
+    $password = "root12345";    // SQL Server password
 
     // Connection options for SQL Server Authentication
     $connectionOptions = [

@@ -30,7 +30,7 @@ try {
         $count_result = sqlsrv_fetch_array($count_stmt, SQLSRV_FETCH_ASSOC);
         if ($count_result && $count_result['appointment_count'] >= 2) {
             $_SESSION['error_message'] = 'You can only create up to 2 appointments per day. Please try again tomorrow.';
-            header("Location: ../student/kiosk-rfid.php");
+            header("Location: ../student/kiosk-student.php?rfid_no=" . urlencode($stud_rf));
             exit;
         }
 
@@ -128,7 +128,7 @@ try {
             throw new Exception("Failed to insert appointment. " . print_r(sqlsrv_errors(), true));
         } else {
             // Redirect to a success page with the appointment_code
-            header("Location: ../student/kiosk-code.php?appointment_code=" . urlencode($appointment_code));
+            header("Location: ../student/kiosk-code.php?rfid_no=" . urlencode($stud_rf) . "&appointment_code=" . urlencode($appointment_code));
             exit;
         }
     } else {

@@ -150,7 +150,7 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="view-transition" content="same-origin" />
     <!-- Custom Links -->
-    <link rel="stylesheet" href="../../assets/css/kiosk-design.css"/>
+    <link rel="stylesheet" href="../../assets/css/kiosk-design.css" />
     <link rel="shortcut icon" href="../../assets/images/F-Connect.ico" type="image/x-icon" />
     <title>F - Connect</title>
 </head>
@@ -208,37 +208,46 @@ try {
                     <input type="hidden" name="end_time" id="end_time">
                 <?php else: ?>
                     <div class="code-card">
-                    <img src="../../assets/images/no_faculty.png" alt="" class="faculty-icon">
-                    <p class="code-message">
-                        No time slots available for today.
-                    </p>
-                    <!-- OKAY Button -->
-                    <button class="appoint-btn" type="button" onclick="window.location.href='kiosk-student.php'">
-                        <span class="btn-text">OKAY</span>
-                    </button>
-                </div>
+                        <img src="../../assets/images/time_slot.png" alt="" class="faculty-icon-2">
+                        <p class="code-message">
+                            No time slots available for today.
+                        </p>
+                        <!-- OKAY Button -->
+                        <a href="kiosk-student.php?rfid_no=<?= isset($stud_rf) ? urlencode($stud_rf) : '' ?>"
+                            class="no-underline">
+                            <button class="appoint-btn" type="button">
+                                <span class="btn-text">OKAY</span>
+                            </button>
+                        </a>
+                    </div>
+                    <script>
+                        document.getElementById("action-message-info").style.display = "none";
+                        document.getElementById("action-message-info-small").style.display = "none";
+                    </script>
                 <?php endif; ?>
             </div>
         </form>
     </div>
 
-      <!--div id="top-right-button">
+
+    <!--div id="top-right-button">
             <button type="button" class="small-button" data-bs-toggle="tooltip" title="Need help?"
                 data-bs-placement="left">
                 <i class="bi bi-question-lg"></i>
         </div>-->
 
     <div id="top-left-button">
-        <a href="kiosk-student.php" class="no-underline">
+        <a href="kiosk-personal-info.php?rfid_no=<?= isset($stud_rf) ? urlencode($stud_rf) : '' ?>"
+            class="no-underline">
             <button type="button" class="small-button" data-bs-toggle="tooltip" title="Back" data-bs-placement="right">
                 <i class="bi bi-arrow-left-short"></i>
             </button>
         </a>
     </div>
 
-    <footer>
+    <!--<footer>
         <p id="collaboration-text">In collaboration with Colegio de Sta. Teresa de Avila</p>
-    </footer>
+    </footer>-->
 
     <!-- Scripts -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -297,4 +306,5 @@ try {
         });
     </script>
 </body>
+
 </html>

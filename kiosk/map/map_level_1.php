@@ -87,16 +87,16 @@ $otherRooms = getOtherRooms($floor, $room_id);
         <button class="org-buttons" onclick="loadMap(2)">2</button>
         <a href="../kiosk-sched.php?rfid_no=<?= $rfid_no ?>" class="no-underline">
             <button type="button" class="org-buttons" name="back">
-                <i class="bi bi-arrow-left"></i>
+            <i class="bi bi-arrow-left-short"></i>
             </button>
         </a>
         <div id="map"></div>
 
     </div>
 
-    <footer>
+    <!--<footer>
         <p id="collaboration-text">In collaboration with Colegio de Sta. Teresa de Avila</p>
-    </footer>
+    </footer>-->    
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">

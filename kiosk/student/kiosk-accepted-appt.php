@@ -140,8 +140,8 @@ sqlsrv_close($conn);
                             <p class="professor-title">(<?= htmlspecialchars($professor_acc_type) ?>)</p>
                         </div>
                     </div>
-                    <p class="appointment-code-small"><strong>Appointment Code:</strong>
-                        <?= htmlspecialchars($appointment_code) ?></p>
+                    <!--<p class="appointment-code-small"><strong>Appointment Code:</strong>
+                        <?= htmlspecialchars($appointment_code) ?></p>-->
                 </div>
             </div>
 
@@ -157,9 +157,10 @@ sqlsrv_close($conn);
 
             <!-- Hidden input to pass the appointment code -->
             <input type="hidden" name="appointment_code" value="<?= htmlspecialchars($appointment_code) ?>">
+            <input type="hidden" name="rfid_no" value="<?= htmlspecialchars($stud_rfid_no) ?>">
 
-            <a href="kiosk-student.php" class="no-underline">
-                <button class="appoint-btn okay-btn" type="button">
+            <a href="kiosk-student.php?rfid_no=<?= isset($stud_rfid_no) ? urlencode($stud_rfid_no) : '' ?>" class="no-underline">
+                <button class="appoint-btn" type="button">
                     <span class="btn-text">OKAY</span>
                 </button>
             </a>
@@ -174,17 +175,18 @@ sqlsrv_close($conn);
                 <i class="bi bi-question-lg"></i>
         </div>-->
 
-    <div id="top-left-button">
-        <a href="kiosk-student.php" class="no-underline">
+ <div id="top-left-button">
+    <a href="kiosk-personal-info.php?rfid_no=<?= isset($stud_rfid_no) ? urlencode($stud_rfid_no) : '' ?>"
+            class="no-underline">
             <button type="button" class="small-button" data-bs-toggle="tooltip" title="Back" data-bs-placement="right">
                 <i class="bi bi-arrow-left-short"></i>
             </button>
         </a>
     </div>
 
-    <footer>
+    <!--<footer>
         <p id="collaboration-text">In collaboration with Colegio de Sta. Teresa de Avila</p>
-    </footer>
+    </footer>-->
 
     <!-- Scripts -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">

@@ -121,40 +121,40 @@ try {
 
 
 
-      <!--div id="top-right-button">
-            <button type="button" class="small-button" data-bs-toggle="tooltip" title="Need help?"
-                data-bs-placement="left">
-                <i class="bi bi-question-lg"></i>
-        </div>-->
+    <!--<div id="top-right-button">
+        <button type="button" class="small-button" data-bs-toggle="tooltip" title="Need help?" data-bs-placement="left">
+            <i class="bi bi-question-lg"></i>
+    </div>-->
 
-    <footer>
+
+    <!--<footer>
         <p id="collaboration-text">In collaboration with Colegio de Sta. Teresa de Avila</p>
-    </footer>
+    </footer>-->
 
 
     <!-- Scripts -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-
+    <script type="text/javascript" src="../../assets/js/custom-javascript.js"></script>
 
     <script>
-        $(do cument).ready(function () {
+        $(document).ready(function () {
             $('[data-bs-toggle="tooltip"]').tooltip();
         });
     </script>
     <script>
-                // Automatically hide the error message after 2 seconds
-                setT imeout(() => {
-                    const errorMessage = document.getElementById('error-message');
-                    if (errorMessage) {
-                        errorMessage.style.transition = 'opacity 0.5s ease';
-                        errorMessage.style.opacity = '0';
-                setT imeout(() => {
-                            errorMessage.remove(); // Remove the element completely after fade-out
-                        }, 500); // Delay to match the fade-out duration
-                    }
-                }, 3000); // 2 seconds delay before hiding
+        // Automatically hide the error message after 2 seconds
+        setTimeout(() => {
+            const errorMessage = document.getElementById('error-message');
+            if (errorMessage) {
+                errorMessage.style.transition = 'opacity 0.5s ease';
+                errorMessage.style.opacity = '0';
+                setTimeout(() => {
+                    errorMessage.remove(); // Remove the element completely after fade-out
+                }, 500); // Delay to match the fade-out duration
+            }
+        }, 3000); // 2 seconds delay before hiding
     </script>
 
 

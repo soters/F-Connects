@@ -62,31 +62,33 @@ if (!$image_path) {
     </nav>
 
     <div id="body-container">
-        <p id="action-message-rfid">Position your face on the camera</p>
-        <p id="action-message-small">Remain still to ensure accurate recognition</p>
-        <br>
-        <!-- Video element for live camera feed -->
-        <video id="video" width="640" height="480" autoplay muted></video>
-        <canvas id="canvas" width="640" height="480"></canvas>
+        <div class="camera-holder">
+            <p id="action-message-rfid">Position your face on the camera</p>
+            <p id="action-message-small">Remain still to ensure accurate recognition</p>
+            <!-- Video element for live camera feed -->
+            <br>
+            <video id="video" width="600" height="450" autoplay muted></video>
+            <canvas id="canvas" width="600" height="450"></canvas>
+        </div>
     </div>
 
-      <!--div id="top-right-button">
-            <button type="button" class="small-button" data-bs-toggle="tooltip" title="Need help?"
-                data-bs-placement="left">
-                <i class="bi bi-question-lg"></i>
-        </div>-->
+    <div id="top-right-button">
+        <button type="button" class="small-button" onclick="refreshPage()">
+            <i class="bi bi-arrow-clockwise"></i>
+        </button>
+    </div>
 
     <div id="top-left-button">
         <a href="kiosk-faculty.php?rfid_no=<?php echo urlencode($rfid_no); ?>" class="no-underline">
             <button type="button" class="small-button" title="Back">
-                <i class="bi bi-arrow-left"></i>
+                <i class="bi bi-arrow-left-short"></i>
             </button>
         </a>
     </div>
 
-    <footer>
+    <!--<footer>
         <p id="collaboration-text">In collaboration with Colegio de Sta. Teresa de Avila</p>
-    </footer>
+    </footer>-->
 
     <div id="noFaceModal" class="modal">
         <div class="modal-content">
@@ -205,6 +207,11 @@ if (!$image_path) {
             }
 
             return labeledFaceDescriptors;
+        }
+    </script>
+    <script>
+        function refreshPage() {
+            window.location.reload(); // Reloads the current page
         }
     </script>
 

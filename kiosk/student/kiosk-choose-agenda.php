@@ -20,7 +20,7 @@ $end_time = filter_input(INPUT_POST, 'end_time', FILTER_SANITIZE_STRING);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="view-transition" content="same-origin" />
     <!-- Custom Links -->
-    <link rel="stylesheet" href="../../assets/css/kiosk-design.css"/>
+    <link rel="stylesheet" href="../../assets/css/kiosk-design.css" />
     <link rel="shortcut icon" href="../../assets/images/F-Connect.ico" type="image/x-icon" />
     <title>F - Connect</title>
 
@@ -97,6 +97,17 @@ $end_time = filter_input(INPUT_POST, 'end_time', FILTER_SANITIZE_STRING);
                         </div>
                     </div>
                 </label>
+                <label>
+                    <input type="radio" name="selected_agenda" value="Others" required>
+                    <div class="agenda-card">
+                        <div class="agenda-logo">
+                        <i class="bi bi-chat-left-dots"></i>
+                        </div>
+                        <div class="info">
+                            <p class="agenda-name">Others</p>
+                        </div>
+                    </div>
+                </label>
             </div>
 
             <!-- Hidden Inputs to pass the values -->
@@ -113,23 +124,24 @@ $end_time = filter_input(INPUT_POST, 'end_time', FILTER_SANITIZE_STRING);
 
     </div>
 
-        <!--div id="top-right-button">
+    <!--div id="top-right-button">
             <button type="button" class="small-button" data-bs-toggle="tooltip" title="Need help?"
                 data-bs-placement="left">
                 <i class="bi bi-question-lg"></i>
         </div>-->
-    
+
     <div id="top-left-button">
-        <a href="kiosk-student.php" class="no-underline">
+        <a href="kiosk-personal-info.php?rfid_no=<?= isset($stud_rf) ? urlencode($stud_rf) : '' ?>"
+            class="no-underline">
             <button type="button" class="small-button" data-bs-toggle="tooltip" title="Back" data-bs-placement="right">
                 <i class="bi bi-arrow-left-short"></i>
             </button>
         </a>
     </div>
 
-    <footer>
+    <!--<footer>
         <p id="collaboration-text">In collaboration with Colegio de Sta. Teresa de Avila</p>
-    </footer>
+    </footer>-->
 
     <!-- Scripts -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">

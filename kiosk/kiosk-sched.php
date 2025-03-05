@@ -128,7 +128,12 @@ if ($rfid_no) {
             <!-- Display message and image when no schedules and appointments -->
             <div class="no-schedules-appointments">
                 <img src="../assets/images/calendar_3.png" alt="No schedules or appointments" class="no-sched-img">
-                <p class="no-sched-app">No schedules and appointments for today.</p>
+                <br>
+                <br>
+                <br>
+                <p class="code-message">
+                    No schedules and appointments for today.
+                </p>
             </div>
         <?php else: ?>
             <!-- Display action message -->
@@ -235,7 +240,7 @@ if ($rfid_no) {
         <?php endif; ?>
     </div>
 
-      <!--div id="top-right-button">
+    <!--div id="top-right-button">
             <button type="button" class="small-button" data-bs-toggle="tooltip" title="Need help?"
                 data-bs-placement="left">
                 <i class="bi bi-question-lg"></i>
@@ -249,9 +254,9 @@ if ($rfid_no) {
         </a>
     </div>
 
-    <footer>
+    <!--<footer>
         <p id="collaboration-text">In collaboration with Colegio de Sta. Teresa de Avila</p>
-    </footer>
+    </footer>-->
 
     <!-- Scripts -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">

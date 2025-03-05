@@ -122,25 +122,30 @@ $status_classes = [
                         <h4><?= htmlspecialchars($appointment['agenda']) ?></h4>
                         <p class="with">With</p>
                         <div class="professor-info">
-                        <img src="<?php echo htmlspecialchars($appointment['professor_picture_path']); ?>" alt="Professor Picture" class="professor-img">
+                            <img src="<?php echo htmlspecialchars($appointment['professor_picture_path']); ?>"
+                                alt="Professor Picture" class="professor-img">
                             <div>
                                 <p class="professor-name"><?= htmlspecialchars($appointment['professor_full_name']) ?></p>
                                 <p class="professor-title">(<?= htmlspecialchars($appointment['professor_acc_type']) ?>)</p>
                             </div>
                         </div>
-                        <p class="appointment-code-small"><strong>Appointment Code:</strong>
-                            <?= htmlspecialchars($appointment['appointment_code']) ?></p>
+                        <!--<p class="appointment-code-small"><strong>Appointment Code:</strong>
+                            <?= htmlspecialchars($appointment['appointment_code']) ?></p>-->
 
                         <!-- Cancel Button Form -->
                         <?php if ($appointment['status'] === 'Pending'): ?>
                             <form action="kiosk-cancel-appt.php" method="POST" class="cancel-form">
                                 <input type="hidden" name="appointment_code"
                                     value="<?= htmlspecialchars($appointment['appointment_code']) ?>">
+                                <input type="hidden" name="rfid_no" value="<?= htmlspecialchars($stud_rfid_no) ?>">
+                                <!-- Add the rfid_no -->
                                 <button type="submit" class="cancel-button">
                                     Cancel Appointment
                                 </button>
                             </form>
                         <?php endif; ?>
+
+
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -151,30 +156,32 @@ $status_classes = [
                     No appointments found for today. Try to create one
                 </p>
                 <!-- OKAY Button -->
-                <button class="appoint-btn" type="button" onclick="window.location.href='kiosk-student.php'">
+                <button class="appoint-btn" type="button"
+                    onclick="window.location.href='kiosk-student.php?rfid_no=<?= urlencode($stud_rfid_no) ?>'">
                     <span class="btn-text">OKAY</span>
                 </button>
+
             </div>
         <?php endif; ?>
     </div>
 
-      <!--div id="top-right-button">
+    <!--div id="top-right-button">
             <button type="button" class="small-button" data-bs-toggle="tooltip" title="Need help?"
                 data-bs-placement="left">
                 <i class="bi bi-question-lg"></i>
         </div>-->
 
     <div id="top-left-button">
-        <a href="kiosk-student.php" class="no-underline">
+        <a href="kiosk-student.php?rfid_no=<?php echo urlencode($stud_rfid_no); ?>" class="no-underline">
             <button type="button" class="small-button" data-bs-toggle="tooltip" title="Back" data-bs-placement="right">
                 <i class="bi bi-arrow-left-short"></i>
             </button>
         </a>
     </div>
 
-    <footer>
+    <!--<footer>
         <p id="collaboration-text">In collaboration with Colegio de Sta. Teresa de Avila</p>
-    </footer>
+    </footer>-->
 
     <!-- Scripts -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">

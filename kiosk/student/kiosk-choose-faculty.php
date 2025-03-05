@@ -91,8 +91,17 @@ try {
         <a id="live-date"></a>
     </nav>
 
-    <div id="appointment-container">
-        <p id="action-message-info">Book Appointment</p>
+    <div id="appointment-container">    
+        <?php if (empty($attendanceRecords)): ?>
+            <style>
+                #action-message-info,
+                #action-message-info-small {
+                    display: none;
+                }
+            </style>
+        <?php endif; ?>
+
+        <p id="action-message-info">Book an Appointment</p>
         <i>
             <p id="action-message-info-small">Select a Faculty Member</p>
         </i>
@@ -133,33 +142,37 @@ try {
                     <p class="code-message">
                         No faculty members are available at the moment. Feel free to try again later.
                     </p>
-                    <!-- OKAY Button -->
-                    <button class="appoint-btn" type="button" onclick="window.location.href='kiosk-student.php'">
-                        <span class="btn-text">OKAY</span>
-                    </button>
+                    <!-- OKAY Button -->    
+                    <a href="kiosk-student.php?rfid_no=<?= isset($stud_rf) ? urlencode($stud_rf) : '' ?>"
+                        class="no-underline">
+                        <button class="appoint-btn" type="button">
+                            <span class="btn-text">OKAY</span>
+                        </button>
+                    </a>
                 </div>
             <?php endif; ?>
-
         </form>
     </div>
-    
-      <!--div id="top-right-button">
+
+
+    <!--div id="top-right-button">
             <button type="button" class="small-button" data-bs-toggle="tooltip" title="Need help?"
                 data-bs-placement="left">
                 <i class="bi bi-question-lg"></i>
         </div>-->
 
     <div id="top-left-button">
-        <a href="kiosk-student.php" class="no-underline">
+        <a href="kiosk-personal-info.php?rfid_no=<?= isset($stud_rf) ? urlencode($stud_rf) : '' ?>"
+            class="no-underline">
             <button type="button" class="small-button" data-bs-toggle="tooltip" title="Back" data-bs-placement="right">
                 <i class="bi bi-arrow-left-short"></i>
             </button>
         </a>
     </div>
 
-    <footer>
+    <!--<footer>
         <p id="collaboration-text">In collaboration with Colegio de Sta. Teresa de Avila</p>
-    </footer>
+    </footer>-->
 
     <!-- Scripts -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">

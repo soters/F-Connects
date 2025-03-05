@@ -57,6 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -69,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <body class="fade-out">
 
-<?php
+    <?php
     if (!empty($_SESSION['error_message'])) {
         echo '<div id="error-message" class="error-message alert alert-danger" role="alert">';
         echo '<i class="bi bi-exclamation-triangle"></i> ';
@@ -80,64 +81,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     ?>
 
-<nav class="navi-bar" role="banner">
+    <nav class="navi-bar" role="banner">
         <a id="current-time"></a>
         <a id="live-date"></a>
     </nav>
 
     <p id="action-message-medium">Are you sure you want to time out before your scheduled end time?</p>
-<div class="action-box-small">
-    <form method="POST">
-        <a class="no-underline"><button type="submit" class="yesBtn1" name="choice" value="yes">Yes</button></a>
-        <br>
-    <a class="no-underline"><button type="submit" class="noBtn1" name="choice" value="no">No</button></a>
-       
-    </form>
-</div>
+    <div class="action-box-small">
+        <form method="POST">
+            <a class="no-underline"><button type="submit" class="yesBtn1" name="choice" value="yes">Yes</button></a>
+            <br>
+            <a class="no-underline"><button type="submit" class="noBtn1" name="choice" value="no">No</button></a>
+        </form>
+    </div>
 
-      <!--div id="top-right-button">
+    <!--div id="top-right-button">
             <button type="button" class="small-button" data-bs-toggle="tooltip" title="Need help?"
                 data-bs-placement="left">
                 <i class="bi bi-question-lg"></i>
         </div>-->
 
-        <div id="top-left-button">
+    <!--<div id="top-left-button">
             <a href="../kiosk-index.php" class="no-underline">
                 <button type="button" class="small-button" data-bs-toggle="tooltip" title="Back"
                     data-bs-placement="right">
                     <i class="bi bi-arrow-left"></i>
                 </button>
             </a>
-        </div>
+        </div>-->
 
-    <footer>
+    <!--<footer>
             <p id="collaboration-text">In collaboration with Colegio de Sta. Teresa de Avila</p>
-        </footer>
+        </footer>--
 
         <!-- Scripts -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <script type="text/javascript" src="../../assets/js/custom-javascript.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script type="text/javascript" src="../../assets/js/custom-javascript.js"></script>
 
-        <script>
-            $(document).ready(function () {
-                $('[data-bs-toggle="tooltip"]').tooltip();
-            });
-        </script>
-        <script>
-            // Automatically hide the error message after 2 seconds
-            setTimeout(() => {
-                const errorMessage = document.getElementById('error-message');
-                if (errorMessage) {
-                    errorMessage.style.transition = 'opacity 0.5s ease';
-                    errorMessage.style.opacity = '0';
-                    setTimeout(() => {
-                        errorMessage.remove(); // Remove the element completely after fade-out
-                    }, 500); // Delay to match the fade-out duration
-                }
-            }, 3000); // 2 seconds delay before hiding
-        </script>
+    <script>
+        $(document).ready(function () {
+            $('[data-bs-toggle="tooltip"]').tooltip();
+        });
+    </script>
+    <script>
+        // Automatically hide the error message after 2 seconds
+        setTimeout(() => {
+            const errorMessage = document.getElementById('error-message');
+            if (errorMessage) {
+                errorMessage.style.transition = 'opacity 0.5s ease';
+                errorMessage.style.opacity = '0';
+                setTimeout(() => {
+                    errorMessage.remove(); // Remove the element completely after fade-out
+                }, 500); // Delay to match the fade-out duration
+            }
+        }, 3000); // 2 seconds delay before hiding
+    </script>
 
-    </body>
+</body>
+
 </html>

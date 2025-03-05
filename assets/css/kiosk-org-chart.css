@@ -40,7 +40,7 @@ body {
     font-family: "DM Sans", sans-serif;
     background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAIAAACRXR/mAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAIGNIUk0AAHolAACAgwAA+f8AAIDpAAB1MAAA6mAAADqYAAAXb5JfxUYAAABnSURBVHja7M5RDYAwDEXRDgmvEocnlrQS2SwUFST9uEfBGWs9c97nbGtDcquqiKhOImLs/UpuzVzWEi1atGjRokWLFi1atGjRokWLFi1atGjRokWLFi1af7Ukz8xWp8z8AAAA//8DAJ4LoEAAlL1nAAAAAElFTkSuQmCC")
       repeat 0 0;
-    /*animation: bg-scrolling-reverse 0.92s infinite linear;*/
+    animation: bg-scrolling-reverse 0.92s infinite linear;
     height: 100vh;
     margin: 0;
     display: flex;
@@ -223,8 +223,8 @@ footer {
   background-color: transparent;
   border: 4px solid transparent;
   border-radius: 10px;
-  overflow-x: auto; /* Ensures horizontal scrolling */
-  overflow-y: auto;
+  /* overflow-x: auto; Ensures horizontal scrolling */
+  /* overflow-y: auto; */
   padding: 20px;
   box-sizing: border-box;
   white-space: nowrap; /* Prevents content from wrapping */
@@ -344,7 +344,7 @@ footer {
   border: none;
   border-radius: 7px; /* Circular buttons */
   font-size: 1.5rem; /* Adjust icon size */
-  font-family: "DM Sans", sans-serif;
+  font-family: "Poppins", sans-serif;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.5s ease, color 0.5s ease; /* Smooth transition */

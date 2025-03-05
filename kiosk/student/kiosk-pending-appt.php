@@ -117,7 +117,6 @@ sqlsrv_close($conn);
                     <b><?= htmlspecialchars($professor_full_name) ?></b> today.
                 </p>
             </i>
-            <p id="action-message-info-medium">Kindly check your existing appointment below before proceeding.</p>
 
             <br>
             <div class="schedule-card">
@@ -133,14 +132,14 @@ sqlsrv_close($conn);
                     <h4><?= htmlspecialchars($agenda) ?></h4>
                     <p class="with">With</p>
                     <div class="professor-info">
-                    <img src="<?php echo htmlspecialchars($professor_picture_path); ?>" alt="Professor's Picture" class="professor-img">
+                        <!--<img src="<?php echo htmlspecialchars($professor_picture_path); ?>" alt="Professor's Picture" class="professor-img">-->
                         <div>
                             <p class="professor-name"><?= htmlspecialchars($professor_full_name) ?></p>
                             <p class="professor-title">(<?= htmlspecialchars($professor_acc_type) ?>)</p>
                         </div>
                     </div>
-                    <p class="appointment-code-small"><strong>Appointment Code:</strong>
-                        <?= htmlspecialchars($appointment_code) ?></p>
+                    <!--<p class="appointment-code-small"><strong>Appointment Code:</strong>
+                        <?= htmlspecialchars($appointment_code) ?></p>-->
                 </div>
             </div>
 
@@ -155,6 +154,7 @@ sqlsrv_close($conn);
             </div>
 
             <!-- Hidden input to pass the appointment code -->
+            <input type="hidden" name="rfid_no" value="<?= htmlspecialchars($stud_rfid_no) ?>">
             <input type="hidden" name="appointment_code" value="<?= htmlspecialchars($appointment_code) ?>">
 
             <div class="button-container">
@@ -162,31 +162,31 @@ sqlsrv_close($conn);
                     <span class="btn-text">CANCEL APPOINTMENT</span>
                 </button>
             </div>
-            <a href="kiosk-student.php" class="no-underline">
-                <button class="appoint-btn okay-btn" type="button">
+            <a href="kiosk-student.php?rfid_no=<?= isset($stud_rfid_no) ? urlencode($stud_rfid_no) : '' ?>" class="no-underline">
+                <button class="appoint-btn" type="button">
                     <span class="btn-text">OKAY</span>
                 </button>
             </a>
-        </form>
     </div>
 
-      <!--div id="top-right-button">
+    <!--div id="top-right-button">
             <button type="button" class="small-button" data-bs-toggle="tooltip" title="Need help?"
                 data-bs-placement="left">
                 <i class="bi bi-question-lg"></i>
         </div>-->
 
     <div id="top-left-button">
-        <a href="kiosk-student.php" class="no-underline">
+    <a href="kiosk-personal-info.php?rfid_no=<?= isset($stud_rfid_no) ? urlencode($stud_rfid_no) : '' ?>"
+            class="no-underline">
             <button type="button" class="small-button" data-bs-toggle="tooltip" title="Back" data-bs-placement="right">
                 <i class="bi bi-arrow-left-short"></i>
             </button>
         </a>
     </div>
 
-    <footer>
+    <!--<footer>
         <p id="collaboration-text">In collaboration with Colegio de Sta. Teresa de Avila</p>
-    </footer>
+    </footer>-->
 
     <!-- Scripts -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">

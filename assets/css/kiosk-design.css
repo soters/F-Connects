@@ -41,7 +41,7 @@ body {
   font-family: "DM Sans", sans-serif;
   background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAIAAACRXR/mAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAIGNIUk0AAHolAACAgwAA+f8AAIDpAAB1MAAA6mAAADqYAAAXb5JfxUYAAABnSURBVHja7M5RDYAwDEXRDgmvEocnlrQS2SwUFST9uEfBGWs9c97nbGtDcquqiKhOImLs/UpuzVzWEi1atGjRokWLFi1atGjRokWLFi1atGjRokWLFi1af7Ukz8xWp8z8AAAA//8DAJ4LoEAAlL1nAAAAAElFTkSuQmCC")
     repeat 0 0;
-  /*animation: bg-scrolling-reverse 0.92s infinite linear;*/
+  animation: bg-scrolling-reverse 0.92s infinite linear;
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -131,16 +131,22 @@ body {
   margin-right: 10px; /* Optional spacing from the edge */
 }
 
+.camera-holder{
+  margin-top: 40px;
+  text-align: center;
+}
+
 /* APPOINTMENT CONTAINER */
 #appointment-container {
-  padding: 50px;
+  margin-top: 60px;
+  padding: 40px;
   border-radius: 10px;
   border: solid 5px #2b5876;
   background-color: #fbf9fb;
   width: 75%;
-  height: 75%; /* Automatically adjusts height based on content */
-  overflow-y: auto; /* Enables vertical scrolling if content overflows */
-  max-height: 75vh; /* Optional: Restrict the maximum height to 90% of the viewport */
+  height: 80%; /* Automatically adjusts height based on content */
+  overflow-y: auto; 
+  max-height: 80vh; /* Optional: Restrict the maximum height to 90% of the viewport */
 }
 
 /* CUSTOM SCROLL BAR STYLING OF APPOINTMENT CONTAINER */
@@ -225,26 +231,29 @@ body {
   opacity: 0%;
 }
 
+
 /* ERROR_MESSAGE */
 #error-message {
+  margin-top: 50px;
   font-size: 1rem;
-  font-family: "Nunito", sans-serif;
-  font-weight: 700;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
   color: #b22b2b;
   background-color: #ead9d8;
-  border: solid 1px #f85149;
+  border: solid 3px #f85149;
   padding: 15px;
   border-radius: 4px;
 }
 
 /* SUCCESS_MESSAGE */
 #success-message {
+  margin-top: 50px;
   font-size: 1rem;
-  font-family: "Nunito", sans-serif;
+  font-family: "Poppins", sans-serif;
   font-weight: 700;
   color: #2b7a2b; /* Dark green for text */
   background-color: #d8ead9; /* Light green for background */
-  border: solid 1px #49f851; /* Bright green for border */
+  border: solid 3px #49f851; /* Bright green for border */
   padding: 15px;
   border-radius: 4px;
 }
@@ -280,7 +289,7 @@ body {
 /* ACTION MESSAGE */
 #action-message {
   letter-spacing: 1.82px;
-  font-size: 2.5rem;
+  font-size: 2.4rem;
   background-color: transparent;
   text-transform: uppercase;
   padding: 0.8em 1.8em;
@@ -348,6 +357,20 @@ body {
   animation: typing 3s linear forwards, cursor 0.5s step-end infinite;
 }
 
+#action-message-info-2 {
+  font-size: 2.5rem;
+  background-color: transparent;
+  text-transform: uppercase;
+  color: #ff790d;
+  font-weight: 700;
+  font-family: "Poppins", serif;
+  white-space: nowrap;
+  text-align: center;
+  overflow: hidden;
+  width: 0; /* Start with no text visible */
+  animation: typing 3s linear forwards, cursor 0.5s step-end infinite;
+}
+
 #action-message-info-small {
   font-size: 0.9rem;
   background-color: transparent;
@@ -409,18 +432,19 @@ body {
 }
 
 .cancel-button {
-  background-color: #ff4d4d;
-  color: white;
-  border: none;
+  background-color: none;
+  color: #ff4d4d;
+  border: solid 3px  #ff4d4d;
   padding: 16px 24px;
   border-radius: 7px;
   cursor: pointer;
   margin-top: 15px;
-  font-family: "DM Sans", sans-serif;
-  font-weight: 700;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
 }
 .cancel-button:hover {
   background-color: #cc0000;
+  color: white;
 }
 
 /* APPOINTMENT INPUTS INFO*/
@@ -445,7 +469,7 @@ body {
   font-weight: 700;
   font-family: "Poppins", serif;
   color: #2b5876;
-  border: solid 2px #a0a0a0;
+  border: solid 3px #a0a0a0;
   border-radius: 7px;
 }
 
@@ -465,6 +489,7 @@ body {
   cursor: pointer;
   border: none;
 }
+
 
 .appoint-btn:after {
   content: " ";
@@ -537,7 +562,7 @@ body {
   display: flex;
   align-items: center;
   padding: 16px 12px 12px 20px;
-  border: 2px solid #a0a0a0;
+  border: 3px solid #a0a0a0;
   border-radius: 8px;
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -551,7 +576,7 @@ body {
   align-items: center;
   text-align: center;
   padding: 25px;
-  border: 2px solid #a0a0a0;
+  border: 3px solid #a0a0a0;
   border-radius: 8px;
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -561,8 +586,10 @@ body {
 }
 
 .how {
-  margin-top: 10px;
+  bottom: 20px;
+  left: 20px;
   font-size: 14px;
+  font-weight: 500;
   background-color: #2b5876;
   padding: 10px;
   color: #fff;
@@ -584,7 +611,7 @@ body {
   justify-content: center;
   text-align: center;
   padding: 37px;
-  border: 2px solid #a0a0a0;
+  border: 3px solid #a0a0a0;
   border-radius: 8px;
   background-color: #fff;
   height: 100%; /* Ensure all cards fill the available height */
@@ -746,13 +773,25 @@ input[type="radio"]:checked + .temp {
 .personal-info-card {
   cursor: pointer;
   padding: 25px;
-  border: 2px solid #a0a0a0;
+  border: 3px solid #a0a0a0;
   border-radius: 8px;
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
   max-width: 100%;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
+}
+
+.personal-info-card-2 {
+  cursor: pointer;
+  padding: 25px;
+  border: 3px solid #a0a0a0;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  max-width: 100%;
+  margin-bottom: 20px;
 }
 
 .schedule-card:hover {
@@ -848,11 +887,18 @@ input[type="radio"]:checked + .temp {
 }
 
 .code-icon {
-  width: 180px;
+  margin-top: 20px;
+  width: 250px;
 }
 
 .faculty-icon {
+  margin-top: 20px;
   width: 170px;
+}
+
+.faculty-icon-2{
+  margin-top: 20px;
+  width: 330px;
 }
 
 .faculty-icon-big {
@@ -860,15 +906,34 @@ input[type="radio"]:checked + .temp {
 }
 
 .code-message {
+  font-family: "Poppins", sans-serif;
   font-size: 16px;
   font-weight: 600;
   color: #6c757d;
-  margin-top: 20px;
+  border: solid 3px #6c757d;
+  background-color: #dedede;
+  padding: 20px;
+  margin-top: 50px;
   margin-bottom: 40px;
+  border-radius: 8px;
+}
+
+
+.code-message-2{
+  font-family: "Poppins", sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #6c757d;
+  border: solid 3px #6c757d;
+  background-color: #dedede;
+  padding: 20px;
+  margin-top: 80px;
+  margin-bottom: 40px;
+  border-radius: 8px;
 }
 
 .appointment-code {
-  border: 2px solid #a0a0a0;
+  border: 3px solid #a0a0a0;
   background-color: #f2f2f2;
   border-radius: 10px;
   padding: 20px;
@@ -884,7 +949,7 @@ input[type="radio"]:checked + .temp {
 
 .appointment-code-small {
   margin-top: 15px;
-  border: 2px solid #a0a0a0;
+  border: 3px solid #a0a0a0;
   background-color: #faf9f6;
   color: #1d1d1d;
   border-radius: 10px;
@@ -1268,7 +1333,7 @@ input[type="radio"]:checked + .temp {
 /* HELP BUTTON */
 #top-right-button {
   position: fixed;
-  top: 75px; /* Adjusted to avoid overlap with the navbar */
+  bottom: 20px; /* Adjusted to avoid overlap with the navbar */
   right: 20px; /* Distance from the right edge */
   z-index: 1000; /* Ensures it stays on top of other content */
 }
@@ -1312,20 +1377,103 @@ input[type="radio"]:checked + .temp {
   transform: translateX(0); /* Return it to its normal position */
 }
 
-/* FOOTER */
+/*GET THE APP BUTTON*/
+
+.get {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 10px;
+}
+
+.footer-button {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  background-color: #2b5876;
+  padding: 10px;
+  color: #fff;
+  border-radius: 7px;
+  font-family: "Poppins", sans-serif;
+  transition: all 0.3s ease-in-out;
+}
+
+.footer-button:hover {
+  background-color: #1e3c56;
+  transform: scale(1.05);
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.scan-me{
+  margin-top: 5px;
+  text-align: center;
+  font-size: 18px;
+  font-family: "Poppins", sans-serif;
+  color: #111;
+  font-weight: 600;
+}
+
+.custom-modal {
+  border: #2b5876 solid 3px;
+  position: fixed;
+  bottom: 80px;
+  left: 20px;
+  width: 220px;
+  padding: 10px;
+  background-color: white;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+  display: none;
+  border-radius: 8px;
+  z-index: 1001;
+}
+
+.qr-image{
+  width: 200px;
+  height: 200px;
+}
+
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Dimming effect */
+  z-index: 1000;
+}
+
+.close-btn {
+  background-color: #d9534f;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  float: right;
+  border-radius: 3px;
+}
+
+.close-btn:hover {
+  background-color: #c9302c;
+}
+
+/* FOOTER 
 footer {
   background-color: #2b5876;
   border-top: 2px solid #ffc52d;
   padding: 20px;
-  display: flex; /* Enables flexbox layout */
-  justify-content: space-between; /* Ensures space between the elements */
-  align-items: center; /* Vertically centers content */
-  position: fixed; /* Fixes the footer at the bottom */
-  bottom: 0; /* Ensures it sticks to the bottom */
+  display: flex;
+  justify-content: space-between;
+  align-items: center; 
+  position: fixed; 
+  bottom: 0; 
   width: 100%;
-  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* Optional shadow for appeal */
-  z-index: 9999; /* Ensures footer is above other content */
-}
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); 
+  z-index: 9999; 
+} */
 
 #collaboration-text {
   text-align: center;
@@ -1890,9 +2038,24 @@ t-container {
   padding: 4px;
   width: 125px;
   font-weight: 900;
-  border-radius: 10px;
+  border-radius: 5px;
   font-size: 1rem;
   padding-left: 10px;
+  padding-right: 10px;
+  text-transform:  uppercase;
+  margin-bottom: 10px;;
+}
+
+.status-pending {
+  background-color: #fff8e1;
+  color: #ffc107;
+  border: solid 2px #ffc107;
+  padding: 4px;
+  width: 125px;
+  font-weight: 900;
+  border-radius: 5px;
+  font-size: 1rem;
+  padding-left: 7px;
   padding-right: 10px;
   text-transform:  uppercase;
   margin-bottom: 10px;;
@@ -1905,7 +2068,7 @@ t-container {
   padding: 4px;
   width: 115px;
   font-weight: 900;
-  border-radius: 10px;
+  border-radius: 5px;
   font-size: 1rem;
   padding-left: 10px;
   padding-right: 10px;
@@ -1966,8 +2129,8 @@ t-container {
 }
 
 .no-sched-img {
-  max-width: 35%;
-  margin-top: 10px;
+  max-width: 36%;
+  margin-top: 4 0px;
   opacity: 0.8;
 }
 

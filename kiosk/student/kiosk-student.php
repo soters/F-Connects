@@ -2,6 +2,7 @@
 declare(strict_types=1);
 session_start();
 require_once('../../connection/connection.php');
+$rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
 ?>
 
 <!DOCTYPE html>
@@ -12,7 +13,7 @@ require_once('../../connection/connection.php');
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="view-transition" content="same-origin" />
     <!-- Custom Links -->
-    <link rel="stylesheet" href="../../assets/css/kiosk-design.css"/>
+    <link rel="stylesheet" href="../../assets/css/kiosk-design.css" />
     <link rel="shortcut icon" href="../../assets/images/F-Connect.ico" type="image/x-icon" />
     <title>F - Connect</title>
 </head>
@@ -55,13 +56,14 @@ require_once('../../connection/connection.php');
                     Department Overview
                 </button>
             </a>
-            <a href="kiosk-rfid.php" class="no-underline">
+            <a href="kiosk-personal-info.php?rfid_no=<?= urlencode($rfid_no) ?>" class="no-underline">
                 <button class="buttonDesign">
                     <i class="bi bi-journal-text custom-icon"></i>
                     Book Appointment
                 </button>
             </a>
-            <a href="kiosk-rfid-2.php" class="no-underline">
+
+            <a href="kiosk-manage-appt.php?rfid_no=<?= urlencode($rfid_no) ?>"" class="no-underline">
                 <button class="buttonDesign">
                     <i class="bi bi-card-heading"></i>
                     Manage Appointment
@@ -79,14 +81,14 @@ require_once('../../connection/connection.php');
             <a href="../kiosk-index.php" class="no-underline">
                 <button type="button" class="small-button" data-bs-toggle="tooltip" title="Back"
                     data-bs-placement="right">
-                    <i class="bi bi-arrow-left"></i>
+                    <i class="bi bi-arrow-left-short"></i>
                 </button>
             </a>
         </div>
 
-        <footer>
+        <!--<footer>
             <p id="collaboration-text">In collaboration with Colegio de Sta. Teresa de Avila</p>
-        </footer>
+        </footer>-->
 
         <!-- Scripts -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">

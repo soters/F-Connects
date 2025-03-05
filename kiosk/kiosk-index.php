@@ -49,7 +49,8 @@ date_default_timezone_set('Asia/Manila');
 
     <div id="top-right-button">
         <button type="button" class="how" title="Need help?" data-bs-placement="left">
-            <a href="../../manual/manual-index.php" style="text-decoration: none; color: inherit;">How to use the kiosk?</a>
+            <a href="../../manual/manual-index.php" style="text-decoration: none; color: inherit;">How to use the
+                kiosk?</a>
         </button>
 
         <!--<button type="button" class="how" data-bs-toggle="tooltip" title="Need help?" data-bs-placement="left">
@@ -57,9 +58,33 @@ date_default_timezone_set('Asia/Manila');
         </button>
     </div>
 
+    <div class="overlay" id="overlay" onclick="toggleModal()"></div>
+
+
     <footer>
-        <p id="collaboration-text">In collaboration with Colegio de Sta. Teresa de Avila</p>
+        <button class="footer-button" onclick="toggleModal()">Get the app <i
+                class="custom-i bi bi-cloud-arrow-down-fill"></i></button>
     </footer>
+
+    <div class="custom-modal" id="customModal">
+        <p class="scan-me">Scan Me</p>
+        <img class="qr-image" src="../assets/images/bit.ly_4bq5MUR.png" alt="QR Code">
+    </div>
+
+    <script>
+        function toggleModal() {
+            var modal = document.getElementById("customModal");
+            var overlay = document.getElementById("overlay");
+
+            if (modal.style.display === "block") {
+                modal.style.display = "none";
+                overlay.style.display = "none";
+            } else {
+                modal.style.display = "block";
+                overlay.style.display = "block";
+            }
+        }
+    </script>
 
     <!-- Scripts -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">

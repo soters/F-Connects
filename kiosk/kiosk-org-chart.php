@@ -34,7 +34,7 @@ require_once('../connection/connection.php');
 
         <a href="kiosk-index.php" class="no-underline">
             <button type="button" class="org-buttons">
-                <i class="bi bi-arrow-left"></i>
+            <i class="bi bi-arrow-left-short"></i>
             </button>
         </a>
 
@@ -224,166 +224,162 @@ require_once('../connection/connection.php');
     </div>
 </div>
 
-    <!-- For List View Collapse -->
+        <!-- For Org Chart Collapse -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script>
+            $(function () {
+                var toggleSwitch = document.getElementById('toggle');
+                var genealogyTree = document.querySelector('.genealogy-tree');
 
-    </div>
-
-    <!-- For Org Chart Collapse -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script>
-        $(function () {
-            var toggleSwitch = document.getElementById('toggle');
-            var genealogyTree = document.querySelector('.genealogy-tree');
-
-            toggleSwitch.addEventListener('change', function () {
-                if (this.checked) {
-                    $(".genealogy-tree ul").hide();
-                    $(".genealogy-tree>ul").show();
-                    $(".genealogy-tree ul.active").show();
-                    $(".genealogy-tree li").on("click", function (e) {
-                        var children = $(this).find("> ul");
-                        if (children.is(":visible"))
-                            children.hide("fast").removeClass("active");
-                        else children.show("fast").addClass("active");
-                        e.stopPropagation();
-                    });
-                } else {
-                    // Disable genealogy tree functionality
-                    $(".genealogy-tree li").off("click");
-                }
+                toggleSwitch.addEventListener('change', function () {
+                    if (this.checked) {
+                        $(".genealogy-tree ul").hide();
+                        $(".genealogy-tree>ul").show();
+                        $(".genealogy-tree ul.active").show();
+                        $(".genealogy-tree li").on("click", function (e) {
+                            var children = $(this).find("> ul");
+                            if (children.is(":visible"))
+                                children.hide("fast").removeClass("active");
+                            else children.show("fast").addClass("active");
+                            e.stopPropagation();
+                        });
+                    } else {
+                        // Disable genealogy tree functionality
+                        $(".genealogy-tree li").off("click");
+                    }
+                });
             });
-        });
-    </script>
+        </script>
 
 
 
 
-    <script>
-        function redirectToSchedule(rfid_no) {
-            // Construct the URL with the rfid_no as a query parameter
-            var url = 'kiosk-sched.php?rfid_no=' + encodeURIComponent(rfid_no);
-            // Redirect to the new URL
-            window.location.href = url;
-        }
-    </script>
-
-
-    <footer>
-        <p id="collaboration-text">In collaboration with Colegio de Sta. Teresa de Avila</p>
-    </footer>
-
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script type="text/javascript" src="../../assets/js/custom-javascript.js"></script>
-
-    <script>
-        $(document).ready(function () {
-            $('[data-bs-toggle="tooltip"]').tooltip();
-        });
-    </script>
-
-    <script>
-        $(function () {
-            // Variables for zoom and drag
-            let scale = 1;
-            let translateX = 0;
-            let translateY = 0;
-            let isDragging = false;
-            let startX, startY;
-            let isZoomEnabled = false; // For zoom toggle
-            let isDragEnabled = false; // For drag toggle
-
-            const container = document.querySelector('#org-chart-body-container');
-            const genealogyBody = container.querySelector('.genealogy-body');
-
-            // Function to reset transformations
-            function resetTransformations() {
-                scale = 1;
-                translateX = 0;
-                translateY = 0;
-                genealogyBody.style.transform = `scale(${scale}) translate(${translateX}px, ${translateY}px)`;
+        <script>
+            function redirectToSchedule(rfid_no) {
+                // Construct the URL with the rfid_no as a query parameter
+                var url = 'kiosk-sched.php?rfid_no=' + encodeURIComponent(rfid_no);
+                // Redirect to the new URL
+                window.location.href = url;
             }
+        </script>
 
-            // Zoom functionality
-            function handleZoom(event) {
-                if (!isZoomEnabled) return; // Exit if zoom is disabled
-                event.preventDefault();
-                const zoomIntensity = 0.1;
-                scale += event.deltaY < 0 ? zoomIntensity : -zoomIntensity;
-                scale = Math.min(Math.max(scale, 0.5), 3); // Limit zoom between 0.5x and 3x
-                genealogyBody.style.transform = `scale(${scale}) translate(${translateX}px, ${translateY}px)`;
-            }
 
-            // Drag functionality
-            function handleDragStart(event) {
-                if (!isDragEnabled) return; // Exit if drag is disabled
-                isDragging = true;
-                startX = event.clientX - translateX;
-                startY = event.clientY - translateY;
-                container.style.cursor = 'grabbing';
-            }
+        <!--<footer>
+            <p id="collaboration-text">In collaboration with Colegio de Sta. Teresa de Avila</p>
+        </footer>-->
 
-            function handleDragMove(event) {
-                if (isDragging && isDragEnabled) {
-                    translateX = event.clientX - startX;
-                    translateY = event.clientY - startY;
+        <!-- Scripts -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script type="text/javascript" src="../../assets/js/custom-javascript.js"></script>
+
+        <script>
+            $(document).ready(function () {
+                $('[data-bs-toggle="tooltip"]').tooltip();
+            });
+        </script>
+
+        <script>
+            $(function () {
+                // Variables for zoom and drag
+                let scale = 1;
+                let translateX = 0;
+                let translateY = 0;
+                let isDragging = false;
+                let startX, startY;
+                let isZoomEnabled = false; // For zoom toggle
+                let isDragEnabled = false; // For drag toggle
+
+                const container = document.querySelector('#org-chart-body-container');
+                const genealogyBody = container.querySelector('.genealogy-body');
+
+                // Function to reset transformations
+                function resetTransformations() {
+                    scale = 1;
+                    translateX = 0;
+                    translateY = 0;
                     genealogyBody.style.transform = `scale(${scale}) translate(${translateX}px, ${translateY}px)`;
                 }
-            }
 
-            function handleDragEnd() {
-                isDragging = false;
-                container.style.cursor = 'grab';
-            }
-
-            // Event listeners for zoom and drag
-            container.addEventListener('wheel', handleZoom);
-            container.addEventListener('mousedown', handleDragStart);
-            container.addEventListener('mousemove', handleDragMove);
-            container.addEventListener('mouseup', handleDragEnd);
-            container.addEventListener('mouseleave', handleDragEnd);
-
-            // Toggle button logic
-            const toggleZoom = document.getElementById('enable-zoom');
-            const toggleDrag = document.getElementById('enable-drag');
-
-            toggleZoom.addEventListener('change', () => {
-                isZoomEnabled = toggleZoom.checked;
-                if (!isZoomEnabled) {
-                    resetTransformations(); // Reset zoom when disabled
+                // Zoom functionality
+                function handleZoom(event) {
+                    if (!isZoomEnabled) return; // Exit if zoom is disabled
+                    event.preventDefault();
+                    const zoomIntensity = 0.1;
+                    scale += event.deltaY < 0 ? zoomIntensity : -zoomIntensity;
+                    scale = Math.min(Math.max(scale, 0.5), 3); // Limit zoom between 0.5x and 3x
+                    genealogyBody.style.transform = `scale(${scale}) translate(${translateX}px, ${translateY}px)`;
                 }
+
+                // Drag functionality
+                function handleDragStart(event) {
+                    if (!isDragEnabled) return; // Exit if drag is disabled
+                    isDragging = true;
+                    startX = event.clientX - translateX;
+                    startY = event.clientY - translateY;
+                    container.style.cursor = 'grabbing';
+                }
+
+                function handleDragMove(event) {
+                    if (isDragging && isDragEnabled) {
+                        translateX = event.clientX - startX;
+                        translateY = event.clientY - startY;
+                        genealogyBody.style.transform = `scale(${scale}) translate(${translateX}px, ${translateY}px)`;
+                    }
+                }
+
+                function handleDragEnd() {
+                    isDragging = false;
+                    container.style.cursor = 'grab';
+                }
+
+                // Event listeners for zoom and drag
+                container.addEventListener('wheel', handleZoom);
+                container.addEventListener('mousedown', handleDragStart);
+                container.addEventListener('mousemove', handleDragMove);
+                container.addEventListener('mouseup', handleDragEnd);
+                container.addEventListener('mouseleave', handleDragEnd);
+
+                // Toggle button logic
+                const toggleZoom = document.getElementById('enable-zoom');
+                const toggleDrag = document.getElementById('enable-drag');
+
+                toggleZoom.addEventListener('change', () => {
+                    isZoomEnabled = toggleZoom.checked;
+                    if (!isZoomEnabled) {
+                        resetTransformations(); // Reset zoom when disabled
+                    }
+                });
+
+                toggleDrag.addEventListener('change', () => {
+                    isDragEnabled = toggleDrag.checked;
+                    container.style.cursor = isDragEnabled ? 'grab' : 'default'; // Update cursor style
+                });
             });
+        </script>
 
-            toggleDrag.addEventListener('change', () => {
-                isDragEnabled = toggleDrag.checked;
-                container.style.cursor = isDragEnabled ? 'grab' : 'default'; // Update cursor style
+        <script>
+            function refreshPage() {
+                window.location.reload(); // Reloads the current page
+            }
+        </script>
+
+        <script>
+            document.querySelectorAll('a.no-underline').forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault(); // Prevent immediate navigation
+                    const targetUrl = this.href; // Store the URL
+
+                    // Add the 'hidden' class to start the fade-out effect
+                    document.body.classList.add('hidden');
+
+                    // Wait for the transition to complete before navigating
+                    setTimeout(() => {
+                        window.location.href = targetUrl;
+                    }, 500); // Match the CSS transition duration
+                });
             });
-        });
-    </script>
-
-    <script>
-        function refreshPage() {
-            window.location.reload(); // Reloads the current page
-        }
-    </script>
-
-    <script>
-        document.querySelectorAll('a.no-underline').forEach(link => {
-            link.addEventListener('click', function (e) {
-                e.preventDefault(); // Prevent immediate navigation
-                const targetUrl = this.href; // Store the URL
-
-                // Add the 'hidden' class to start the fade-out effect
-                document.body.classList.add('hidden');
-
-                // Wait for the transition to complete before navigating
-                setTimeout(() => {
-                    window.location.href = targetUrl;
-                }, 500); // Match the CSS transition duration
-            });
-        });
-    </script>
+        </script>
 </body>
 
 </html>

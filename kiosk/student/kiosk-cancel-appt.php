@@ -4,6 +4,7 @@ session_start();
 require_once('../../connection/connection.php');
 
 $appointment_code = $_POST['appointment_code'];
+$rfid_no = $_POST['rfid_no'];
 
 ?>
 
@@ -38,79 +39,80 @@ $appointment_code = $_POST['appointment_code'];
         <a id="live-date"></a>
     </nav>
 
-        <p id="action-message-medium">Are you sure you want to cancel this appointment?</p>
-        <div class="action-box-small">
-            <a href="../functions/cancel-appointment.php?appointment_code=<?= urlencode($appointment_code) ?>"
-                class="no-underline">
-                <button class="yesBtn">Yes</button>
-            </a>
+    <p id="action-message-medium">Are you sure you want to cancel this appointment?</p>
+    <div class="action-box-small">
+        <a href="../functions/cancel-appointment.php?appointment_code=<?= urlencode($appointment_code) ?>&rfid_no=<?= urlencode($rfid_no) ?>"
+            class="no-underline">
+            <button class="yesBtn">Yes</button>
+        </a>
 
-            <a href="kiosk-student.php" class="no-underline">
-                <button class="noBtn">No</button>
-            </a>
-        </div>
-        
-      <!--div id="top-right-button">
+
+        <a href="kiosk-student.php?rfid_no=<?php echo urlencode($rfid_no); ?>" class="no-underline">
+            <button class="noBtn">No</button>
+        </a>
+
+    </div>
+
+    <!--div id="top-right-button">
             <button type="button" class="small-button" data-bs-toggle="tooltip" title="Need help?"
                 data-bs-placement="left">
                 <i class="bi bi-question-lg"></i>
         </div>-->
 
-        <div id="top-left-button">
-            <a href="../kiosk-index.php" class="no-underline">
-                <button type="button" class="small-button" data-bs-toggle="tooltip" title="Back"
-                    data-bs-placement="right">
-                    <i class="bi bi-arrow-left"></i>
-                </button>
-            </a>
-        </div>
+    <div id="top-left-button">
+        <a href="kiosk-student.php?rfid_no=<?= isset($rfid_no) ? urlencode($rfid_no) : '' ?>" class="no-underline">
+            <button type="button" class="small-button" data-bs-toggle="tooltip" title="Back" data-bs-placement="right">
+                <i class="bi bi-arrow-left-short"></i>
+            </button>
+        </a>
+    </div>
 
-        <footer>
+    <!-- <footer>
             <p id="collaboration-text">In collaboration with Colegio de Sta. Teresa de Avila</p>
-        </footer>
+        </footer>-->
 
-        <!-- Scripts -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <script type="text/javascript" src="../../assets/js/custom-javascript.js"></script>
+    <!-- Scripts -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script type="text/javascript" src="../../assets/js/custom-javascript.js"></script>
 
-        <script>
-            $(document).ready(function () {
-                $('[data-bs-toggle="tooltip"]').tooltip();
+    <script>
+        $(document).ready(function () {
+            $('[data-bs-toggle="tooltip"]').tooltip();
+        });
+    </script>
+    <script>
+        // Automatically hide the error message after 2 seconds
+        setTimeout(() => {
+            const errorMessage = document.getElementById('error-message');
+            if (errorMessage) {
+                errorMessage.style.transition = 'opacity 0.5s ease';
+                errorMessage.style.opacity = '0';
+                setTimeout(() => {
+                    errorMessage.remove(); // Remove the element completely after fade-out
+                }, 500); // Delay to match the fade-out duration
+            }
+        }, 3000); // 2 seconds delay before hiding
+    </script>
+
+    <script>
+        document.querySelectorAll('a.no-underline').forEach(link => {
+            link.addEventListener('click', function (e) {
+                e.preventDefault(); // Prevent immediate navigation
+                const targetUrl = this.href; // Store the URL
+
+                // Add the 'hidden' class to start the fade-out effect
+                document.body.classList.add('hidden');
+
+                // Wait for the transition to complete before navigating
+                setTimeout(() => {
+                    window.location.href = targetUrl;
+                }, 500); // Match the CSS transition duration
             });
-        </script>
-        <script>
-            // Automatically hide the error message after 2 seconds
-            setTimeout(() => {
-                const errorMessage = document.getElementById('error-message');
-                if (errorMessage) {
-                    errorMessage.style.transition = 'opacity 0.5s ease';
-                    errorMessage.style.opacity = '0';
-                    setTimeout(() => {
-                        errorMessage.remove(); // Remove the element completely after fade-out
-                    }, 500); // Delay to match the fade-out duration
-                }
-            }, 3000); // 2 seconds delay before hiding
-        </script>
+        });
 
-        <script>
-            document.querySelectorAll('a.no-underline').forEach(link => {
-                link.addEventListener('click', function (e) {
-                    e.preventDefault(); // Prevent immediate navigation
-                    const targetUrl = this.href; // Store the URL
-
-                    // Add the 'hidden' class to start the fade-out effect
-                    document.body.classList.add('hidden');
-
-                    // Wait for the transition to complete before navigating
-                    setTimeout(() => {
-                        window.location.href = targetUrl;
-                    }, 500); // Match the CSS transition duration
-                });
-            });
-
-        </script>
+    </script>
 </body>
 
 </html>
