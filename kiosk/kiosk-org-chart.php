@@ -92,208 +92,137 @@ require_once('../connection/connection.php');
 
         <!-- Org Chart Content -->
         <div class="org-chart-content">
-        <div class="body genealogy-body genealogy-scroll">
-            <div class="genealogy-tree" id="tree-view">
-                <ul>
-                    <?php
-                    // Query to fetch the Dean
-                    $dean_query = "SELECT * FROM Faculty WHERE acc_type = 'Dean'";
-                    $stmt = sqlsrv_query($conn, $dean_query);
+       <div class="body genealogy-body genealogy-scroll">
+    <div class="genealogy-tree" id="tree-view">
+        <ul>
+            <?php
+            // Query to fetch the Dean
+            $dean_query = "SELECT * FROM Faculty WHERE acc_type = 'Dean'";
+            $stmt = sqlsrv_query($conn, $dean_query);
 
-                    if ($stmt === false) {
-                        die(print_r(sqlsrv_errors(), true));
-                    }
+            if ($stmt === false) {
+                die(print_r(sqlsrv_errors(), true));
+            }
 
-                    $dean_row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+            $dean_row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
 
-                    if ($dean_row) {
-                        // Check attendance for the Dean
-                        $attendance_query = "SELECT * FROM AttendanceToday 
-                        WHERE rfid_no = ? AND CONVERT(DATE, date_logged) = CONVERT(DATE, GETDATE())";
-                        $attendance_stmt = sqlsrv_prepare($conn, $attendance_query, [$dean_row['rfid_no']]);
-                        sqlsrv_execute($attendance_stmt);
+            if ($dean_row) {
+                // Check attendance for the Dean
+                $attendance_query = "SELECT * FROM AttendanceToday 
+                WHERE rfid_no = ? AND CONVERT(DATE, date_logged) = CONVERT(DATE, GETDATE())";
+                $attendance_stmt = sqlsrv_prepare($conn, $attendance_query, [$dean_row['rfid_no']]);
+                sqlsrv_execute($attendance_stmt);
 
-                        $is_present = sqlsrv_fetch_array($attendance_stmt, SQLSRV_FETCH_ASSOC) ? true : false;
-                        $status_color = $is_present ? "green" : "red";
+                $is_present = sqlsrv_fetch_array($attendance_stmt, SQLSRV_FETCH_ASSOC) ? true : false;
+                $status_color = $is_present ? "green" : "red";
 
-                        ?>
-                        <li>
-                            <a href="javascript:void(0);">
-                                <div class="card-header-holder">Dean</div>
-                                <div class="member-view-box">
-                                    <div class="avatar-container">
-                                        <div class="avatar">
-                                            <img src="<?= $dean_row["picture_path"] ?>" alt="Member" />
+                ?>
+                <li>
+                    <a href="javascript:void(0);">
+                        <div class="card-header-holder">Dean</div>
+                        <div class="member-view-box">
+                            <div class="avatar-container">
+                                <div class="avatar">
+                                    <img src="<?= $dean_row["picture_path"] ?>" alt="Member" />
+                                </div>
+                                <div class="status" style="background-color: <?= $status_color; ?>;"></div>
+                            </div>
+                            <div class="member-details">
+                                <h6 class="name-des">
+                                    <?= $dean_row["fname"] ?>     <?= $dean_row["mname"] ?>
+                                    <?= $dean_row["lname"] ?>     <?= $dean_row["suffix"] ?>
+                                </h6>
+                            </div>
+                            <div class="new-container">
+                                <button data-bs-toggle="modal" data-bs-target="#exampleModal" class="dept-assign">
+                                    College of Computer Studies
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-footer-holder">
+                            <button class="btn-view" onclick="redirectToSchedule('<?= $dean_row["rfid_no"] ?>');">
+                                <i class="bi bi-three-dots"></i>
+                            </button>
+                        </div>
+                    </a>
+                    <ul class="active">
+                        <?php
+                        // Query to fetch Professors directly under the Dean
+                        $professor_query = "
+                            SELECT 
+                                f.rfid_no AS professor_id,
+                                f.fname,
+                                f.mname,
+                                f.lname,
+                                f.suffix,
+                                f.picture_path,
+                                d.department_name
+                            FROM 
+                                Faculty f
+                            INNER JOIN 
+                                UserDepartment ud ON f.rfid_no = ud.rfid_no
+                            INNER JOIN 
+                                Department d ON ud.dept_id = d.dept_id
+                            WHERE 
+                                f.acc_type = 'Professor'
+                            ";
+                        $prof_stmt = sqlsrv_query($conn, $professor_query);
+
+                        if ($prof_stmt === false) {
+                            die(print_r(sqlsrv_errors(), true));
+                        }
+
+                        while ($professor = sqlsrv_fetch_array($prof_stmt, SQLSRV_FETCH_ASSOC)) {
+                            // Check attendance for the Professor
+                            $attendance_stmt = sqlsrv_prepare($conn, $attendance_query, [$professor['professor_id']]);
+                            sqlsrv_execute($attendance_stmt);
+
+                            $is_present = sqlsrv_fetch_array($attendance_stmt, SQLSRV_FETCH_ASSOC) ? true : false;
+                            $status_color = $is_present ? "green" : "red";
+                            ?>
+                            <li>
+                                <a href="javascript:void(0);">
+                                    <div class="card-header-holder">Professor</div>
+                                    <div class="member-view-box">
+                                        <div class="avatar-container">
+                                            <div class="avatar">
+                                                <img src="<?= $professor["picture_path"] ?>" alt="Member" />
+                                            </div>
+                                            <div class="status" style="background-color: <?= $status_color; ?>;"></div>
                                         </div>
-                                        <div class="status" style="background-color: <?= $status_color; ?>;"></div>
+                                        <div class="member-details">
+                                            <h6 class="name-des">
+                                                <?= $professor["fname"] ?>             <?= $professor["mname"] ?>
+                                                <?= $professor["lname"] ?>             <?= $professor["suffix"] ?>
+                                            </h6>
+                                        </div>
+                                        <div class="new-container">
+                                            <button class="dept-assign">
+                                                <?= $professor["department_name"] ?>
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div class="member-details">
-                                        <h6 class="name-des">
-                                            <?= $dean_row["fname"] ?>     <?= $dean_row["mname"] ?>
-                                            <?= $dean_row["lname"] ?>     <?= $dean_row["suffix"] ?>
-                                        </h6>
-                                    </div>
-                                    <div class="new-container">
-                                        <button data-bs-toggle="modal" data-bs-target="#exampleModal" class="dept-assign">
-                                            College of Computer Studies
+                                    <div class="card-footer-holder">
+                                        <button class="btn-view"
+                                            onclick="redirectToSchedule('<?= $professor["professor_id"] ?>');">
+                                            <i class="bi bi-three-dots"></i>
                                         </button>
                                     </div>
-                                </div>
-                                <div class="card-footer-holder">
-                                    <button class="btn-view" onclick="redirectToSchedule('<?= $dean_row["rfid_no"] ?>');">
-                                        <i class="bi bi-three-dots"></i>
-                                    </button>
-                                </div>
-                            </a>
-                            <ul class="active">
-                                <?php
-                                // Query to fetch Program Chairs
-                                $program_chair_query = "
-                        SELECT 
-                            f.rfid_no AS program_chair_id,
-                            f.fname,
-                            f.mname,
-                            f.lname,
-                            f.suffix,
-                            f.picture_path,
-                            d.dept_id,
-                            d.department_name
-                        FROM 
-                            Faculty f
-                        INNER JOIN 
-                            UserDepartment ud ON f.rfid_no = ud.rfid_no
-                        INNER JOIN 
-                            Department d ON ud.dept_id = d.dept_id
-                        WHERE 
-                            f.acc_type = 'Program Chair'
-                        ORDER BY 
-                            d.department_name;
-                        ";
-                                $stmt = sqlsrv_query($conn, $program_chair_query);
-
-                                if ($stmt === false) {
-                                    die(print_r(sqlsrv_errors(), true));
-                                }
-
-                                while ($program_chair = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
-                                    // Check attendance for the Program Chair
-                                    $attendance_stmt = sqlsrv_prepare($conn, $attendance_query, [$program_chair['program_chair_id']]);
-                                    sqlsrv_execute($attendance_stmt);
-
-                                    $is_present = sqlsrv_fetch_array($attendance_stmt, SQLSRV_FETCH_ASSOC) ? true : false;
-                                    $status_color = $is_present ? "green" : "red";
-                                    ?>
-                                    <li>
-                                        <a href="javascript:void(0);">
-                                            <div class="card-header-holder">Program Chair</div>
-                                            <div class="member-view-box">
-                                                <div class="avatar-container">
-                                                    <div class="avatar">
-                                                        <img src="<?= $program_chair["picture_path"] ?>" alt="Member" />
-                                                    </div>
-                                                    <div class="status" style="background-color: <?= $status_color; ?>;"></div>
-                                                </div>
-                                                <div class="member-details">
-                                                    <h6 class="name-des">
-                                                        <?= $program_chair["fname"] ?>         <?= $program_chair["mname"] ?>
-                                                        <?= $program_chair["lname"] ?>         <?= $program_chair["suffix"] ?>
-                                                    </h6>
-                                                </div>
-                                                <div class="new-container">
-                                                    <button data-bs-toggle="modal" data-bs-target="#exampleModal"
-                                                        class="dept-assign">
-                                                        <?= $program_chair["department_name"] ?>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div class="card-footer-holder">
-                                                <button class="btn-view"
-                                                    onclick="redirectToSchedule('<?= $program_chair["program_chair_id"] ?>');">
-                                                    <i class="bi bi-three-dots"></i>
-                                                </button>
-                                            </div>
-                                        </a>
-                                        <ul class="active">
-                                            <?php
-                                            // Query to fetch Professors under the current Program Chair's department
-                                            $professor_query = "
-                                    SELECT 
-                                        f.rfid_no AS professor_id,
-                                        f.fname,
-                                        f.mname,
-                                        f.lname,
-                                        f.suffix,
-                                        f.picture_path,
-                                        d.department_name
-                                    FROM 
-                                        Faculty f
-                                    INNER JOIN 
-                                        UserDepartment ud ON f.rfid_no = ud.rfid_no
-                                    INNER JOIN 
-                                        Department d ON ud.dept_id = d.dept_id
-                                    WHERE 
-                                        f.acc_type = 'Professor' AND d.dept_id = ?
-                                    ";
-                                            $prof_stmt = sqlsrv_prepare($conn, $professor_query, [$program_chair['dept_id']]);
-                                            sqlsrv_execute($prof_stmt);
-
-                                            while ($professor = sqlsrv_fetch_array($prof_stmt, SQLSRV_FETCH_ASSOC)) {
-                                                // Check attendance for the Professor
-                                                $attendance_stmt = sqlsrv_prepare($conn, $attendance_query, [$professor['professor_id']]);
-                                                sqlsrv_execute($attendance_stmt);
-
-                                                $is_present = sqlsrv_fetch_array($attendance_stmt, SQLSRV_FETCH_ASSOC) ? true : false;
-                                                $status_color = $is_present ? "green" : "red";
-                                                ?>
-                                                <li>
-                                                    <a href="javascript:void(0);">
-                                                        <div class="card-header-holder">Professor</div>
-                                                        <div class="member-view-box">
-                                                            <div class="avatar-container">
-                                                                <div class="avatar">
-                                                                    <img src="<?= $professor["picture_path"] ?>" alt="Member" />
-                                                                </div>
-                                                                <div class="status"
-                                                                    style="background-color: <?= $status_color; ?>;"></div>
-                                                            </div>
-                                                            <div class="member-details">
-                                                                <h6 class="name-des">
-                                                                    <?= $professor["fname"] ?>             <?= $professor["mname"] ?>
-                                                                    <?= $professor["lname"] ?>             <?= $professor["suffix"] ?>
-                                                                </h6>
-                                                            </div>
-                                                            <div class="new-container">
-                                                                <button class="dept-assign">
-                                                                    <?= $professor["department_name"] ?>
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                        <div class="card-footer-holder">
-                                                            <button class="btn-view"
-                                                                onclick="redirectToSchedule('<?= $professor["professor_id"] ?>');">
-                                                                <i class="bi bi-three-dots"></i>
-                                                            </button>
-                                                        </div>
-                                                    </a>
-                                                </li>
-                                                <?php
-                                            }
-                                            ?>
-                                        </ul>
-                                    </li>
-                                    <?php
-                                }
-                                ?>
-                            </ul>
-                        </li>
-                        <?php
-                    } else {
-                        echo "Error fetching dean data.";
-                    }
-                    ?>
-                </ul>
-            </div>
-        </div>
+                                </a>
+                            </li>
+                            <?php
+                        }
+                        ?>
+                    </ul>
+                </li>
+                <?php
+            } else {
+                echo "Error fetching dean data.";
+            }
+            ?>
+        </ul>
+    </div>
+</div>
 
     <!-- For List View Collapse -->
 
