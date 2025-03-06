@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $picture_path = null;
     $image_binary = null;
     if (isset($_FILES['picture_path']) && $_FILES['picture_path']['error'] === UPLOAD_ERR_OK) {
-        $target_dir = "../../uploads/admin_images";
+        $target_dir = "../../uploads/admin_images/";
         $file_name = basename($_FILES['picture_path']['name']);
         $target_file = $target_dir . $file_name;
 

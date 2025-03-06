@@ -28,7 +28,7 @@ if (isset($_POST['login'])) {
             die(print_r(sqlsrv_errors(), true));
         }
 
-        if (sqlsrv_has_rows($stmt)) {
+        if (sqlsrv_has_rows($stmt)) {   
             $fetch = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
 
             // Step 3: Verify the entered password
