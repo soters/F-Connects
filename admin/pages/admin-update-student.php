@@ -164,7 +164,7 @@ if ($stmtSections !== false) {
             <!-- Kiosk -->
             <div class="nav-button">
                 <a href="admin-kiosk.php">
-                <i class="fas bi bi-tv"></i>
+                    <i class="fas bi bi-tv"></i>
                     <span>Kiosk</span>
                 </a>
             </div>
@@ -227,7 +227,7 @@ if ($stmtSections !== false) {
                     <button class="pass-btn" type="button">Account Information</button>
                 </div>
                 <div class="faculty-container-2">
-                    <div class="picture-container">
+                    <!--<div class="picture-container">
                         <div id="image-preview">
                             <img id="preview"
                                 src="<?= htmlspecialchars($data['picture_path']) ?: '../../assets/images/add-image.jpg' ?>"
@@ -236,9 +236,8 @@ if ($stmtSections !== false) {
                         <label for="picture_path" class="custom-file-upload">Choose Image</label>
                         <input type="file" id="picture_path" name="picture_path" accept="image/*"
                             onchange="previewImage(event)">
-                    </div>
-
-                    <br>
+                                      <br>
+                    </div>-->
                     <div class="faculty-name-container">
                         <div>
                             <label for="rfid_no">RFID No.</label>
@@ -291,6 +290,7 @@ if ($stmtSections !== false) {
                             <select id="sex" name="sex" class="name-input">
                                 <option value="Male" <?= $data['sex'] == "Male" ? 'selected' : '' ?>>Male</option>
                                 <option value="Female" <?= $data['sex'] == "Female" ? 'selected' : '' ?>>Female</option>
+                                <option value="Others" <?= $data['sex'] == "Others" ? 'selected' : '' ?>>Others</option>
                             </select>
                         </div>
                         <div>

@@ -86,23 +86,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 
-    // Handle picture upload
-    $picture_path = null;
-    if (isset($_FILES['picture_path']) && $_FILES['picture_path']['error'] === UPLOAD_ERR_OK) {
-        $target_dir = "../../uploads/student_images/";
-        $file_name = basename($_FILES['picture_path']['name']);
-        $target_file = $target_dir . $file_name;
-
-        // Check if the directory exists, create if it doesn't
-        if (!is_dir($target_dir)) {
-            mkdir($target_dir, 0755, true);
-        }
-
-        if (move_uploaded_file($_FILES['picture_path']['tmp_name'], $target_file)) {
-            $picture_path = $target_file;
-        }
-    }
-
     // Update Students table
     $sqlUpdateStudents = "
         UPDATE Students 
@@ -115,7 +98,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             phone_no = ?, 
             dob = ?, 
             email = ?,  
-            picture_path = ISNULL(?, picture_path),
             section_id = ?
         WHERE rfid_no = ?";
     $paramsStudents = [
@@ -128,7 +110,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $phone_no,
         $dob,
         $email,
-        $picture_path,
         $section_id,
         $rfid_no
     ];

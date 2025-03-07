@@ -5,7 +5,7 @@ date_default_timezone_set('Asia/Manila');
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Sanitize inputs
     $rfid_no = filter_input(INPUT_POST, 'rfid_no', FILTER_SANITIZE_STRING);
-    $student_number = filter_input(INPUT_POST, 'student_number', FILTER_SANITIZE_STRING); // Added field
+    $student_number = filter_input(INPUT_POST, 'student_number', FILTER_SANITIZE_STRING);
     $fname = filter_input(INPUT_POST, 'fname', FILTER_SANITIZE_STRING);
     $mname = filter_input(INPUT_POST, 'mname', FILTER_SANITIZE_STRING);
     $lname = filter_input(INPUT_POST, 'lname', FILTER_SANITIZE_STRING);
@@ -14,33 +14,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $dob = filter_input(INPUT_POST, 'dob', FILTER_SANITIZE_STRING);
     $phone_no = filter_input(INPUT_POST, 'phone_no', FILTER_SANITIZE_STRING);
     $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
-    $acc_type = 'Student'; // Set to "Student" or based on your logic
+    $acc_type = 'Student';
     $section_id = filter_input(INPUT_POST, 'section_id', FILTER_SANITIZE_NUMBER_INT);
     $region = filter_input(INPUT_POST, 'region', FILTER_SANITIZE_STRING);
     $province = filter_input(INPUT_POST, 'province', FILTER_SANITIZE_STRING);
     $city = filter_input(INPUT_POST, 'city', FILTER_SANITIZE_STRING);
     $zip_code = filter_input(INPUT_POST, 'zip_code', FILTER_SANITIZE_STRING);
     $address_dtl = filter_input(INPUT_POST, 'address_dtl', FILTER_SANITIZE_STRING);
-
-    // File upload handling
-    $picture_path = null;
-    $image_binary = null;
-
-    if (isset($_FILES['picture_path']) && $_FILES['picture_path']['error'] === UPLOAD_ERR_OK) {
-        $target_dir = '../../uploads/student_images/';
-        $picture_path = $target_dir . basename($_FILES['picture_path']['name']);
-
-        // Move uploaded file
-        if (move_uploaded_file($_FILES['picture_path']['tmp_name'], $picture_path)) {
-            // Read the binary content of the uploaded file
-            $image_binary = file_get_contents($picture_path);
-        } else {
-            $message = "Failed to upload image.";
-            $type = "error";
-            header("Location: ../pages/admin-new-student.php?message=" . urlencode($message) . "&type=" . urlencode($type));
-            exit();
-        }
-    }
 
     // Begin transaction
     sqlsrv_begin_transaction($conn);
@@ -83,9 +63,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Insert into Students table
-        $sql_student = "INSERT INTO Students (rfid_no, student_number, fname, mname, lname, suffix, sex, dob, phone_no, email, acc_type, picture_path, image_binary, section_id) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CONVERT(VARBINARY(MAX), ?), ?)";
-        $params_student = [$rfid_no, $student_number, $fname, $mname, $lname, $suffix, $sex, $dob, $phone_no, $email, $acc_type, $picture_path, $image_binary, $section_id];
+        $sql_student = "INSERT INTO Students (rfid_no, student_number, fname, mname, lname, suffix, sex, dob, phone_no, email, acc_type, section_id) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $params_student = [$rfid_no, $student_number, $fname, $mname, $lname, $suffix, $sex, $dob, $phone_no, $email, $acc_type, $section_id];
         $stmt_student = sqlsrv_query($conn, $sql_student, $params_student);
 
         if ($stmt_student === false) {

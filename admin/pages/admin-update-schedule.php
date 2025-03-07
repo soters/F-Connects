@@ -211,6 +211,7 @@ if (!$schedule) {
                                         Laboratory</option>
                                     <option value="Break" <?= $schedule['type'] == 'Break' ? 'selected' : '' ?>>Break
                                     </option>
+                                    <option value="Consultation Time" <?= $schedule['type'] == 'Consultation Time' ? 'selected' : '' ?>>Consultation Time</option>
                                 </select>
                             </div>
                         </div>
@@ -253,8 +254,8 @@ if (!$schedule) {
                         </div>
                     </div>
 
-                    <h1 class="info-title">Location Details</h1>
-                    <hr>
+                    <h1 id="location" class="info-title">Location Details</h1>
+                    <hr id="location-hr">
 
                     <div class="faculty-name-container">
                         <div>
@@ -267,8 +268,8 @@ if (!$schedule) {
                         </div>
                     </div>
 
-                    <h1 class="info-title">Class Details</h1>
-                    <hr>
+                    <h1 id="class-dtl" class="info-title">Class Details</h1>
+                    <hr id="class-dtl-hr">
 
                     <div class="faculty-name-container">
                         <div>
@@ -366,23 +367,43 @@ if (!$schedule) {
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const typeSelect = document.getElementById("type");
-        const roomSelect = document.getElementById("room_id");
-        const sectionSelect = document.getElementById("section_id");
-        const subjectSelect = document.getElementById("subject_code");
+        const roomInput = document.getElementById("room_id");
+        const sectionInput = document.getElementById("section_id");
+        const subjectInput = document.getElementById("subject_code");
+
+        const roomField = roomInput.closest("div");
+        const sectionField = sectionInput.closest("div");
+        const subjectField = subjectInput.closest("div");
+
+        const locationTitle = document.getElementById("location");
+        const locationHr = document.getElementById("location-hr");
+        const classTitle = document.getElementById("class-dtl");
+        const classHr = document.getElementById("class-dtl-hr");
 
         function toggleFields() {
-            if (typeSelect.value === "Break") {
-                roomSelect.value = "";
-                sectionSelect.value = "";
-                subjectSelect.value = "";
+            if (typeSelect.value === "Break" || typeSelect.value === "Consultation Time") {
+                // Clear values before hiding
+                roomInput.value = "";
+                sectionInput.value = "";
+                subjectInput.value = "";
 
-                roomSelect.disabled = true;
-                sectionSelect.disabled = true;
-                subjectSelect.disabled = true;
+                // Hide fields
+                roomField.style.display = "none";
+                sectionField.style.display = "none";
+                subjectField.style.display = "none";
+                locationTitle.style.display = "none";
+                locationHr.style.display = "none";
+                classTitle.style.display = "none";
+                classHr.style.display = "none";
             } else {
-                roomSelect.disabled = false;
-                sectionSelect.disabled = false;
-                subjectSelect.disabled = false;
+                // Show fields
+                roomField.style.display = "";
+                sectionField.style.display = "";
+                subjectField.style.display = "";
+                locationTitle.style.display = "";
+                locationHr.style.display = "";
+                classTitle.style.display = "";
+                classHr.style.display = "";
             }
         }
 

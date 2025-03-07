@@ -26,6 +26,7 @@ $sql_paginated = "SELECT
                     Students.lname, 
                     Students.email, 
                     Students.picture_path, 
+                    Students.sex,
                     Students.acc_type AS role, 
                     Sections.section_name
                 FROM Students
@@ -48,6 +49,7 @@ $sql_table = "SELECT
                 Students.fname, 
                 Students.lname, 
                 Students.email, 
+                Students.sex,
                 Students.acc_type AS student_role, 
                 Sections.section_name AS student_section
             FROM Students
@@ -184,7 +186,7 @@ if ($stmt_table === false) {
             <!-- Kiosk -->
             <div class="nav-button">
                 <a href="admin-kiosk.php">
-                <i class="fas bi bi-tv"></i>
+                    <i class="fas bi bi-tv"></i>
                     <span>Kiosk</span>
                 </a>
             </div>
@@ -207,7 +209,7 @@ if ($stmt_table === false) {
 
             <div id="nav-content-highlight"></div>
         </div>
-        
+
         <div id="nav-footer">
             <div id="nav-footer-heading">
                 <div id="nav-footer-avatar"><img src="../../assets/images/Male_PF.jpg" />
@@ -271,14 +273,17 @@ if ($stmt_table === false) {
         <div class="faculty-container">
             <div class="faculty-grid">
                 <?php while ($student = sqlsrv_fetch_array($stmt_paginated, SQLSRV_FETCH_ASSOC)): ?>
+                    <?php
+                    $initial = strtoupper(substr($student['fname'], 0, 1));
+                    $sexClass = strtolower($student['sex']); // Assuming values are 'Male', 'Female', or 'Others'
+                    ?>
                     <div class="faculty-card" data-rfid="<?= htmlspecialchars($student['rfid_no']) ?>">
-                        <img src="<?= htmlspecialchars($student['picture_path']) ?>" alt="Student Image"
-                            class="faculty-img">
+                        <div class="faculty-initial <?= $sexClass ?>"><?= htmlspecialchars($initial) ?></div>
                         <div class="faculty-info">
                             <h3><?= htmlspecialchars($student['fname'] . ' ' . $student['lname']) ?></h3>
                             <p class="email"><?= htmlspecialchars($student['email']) ?></p>
-                            <p class="section" id="section-2"><?= htmlspecialchars($student['section_name'] ?: 'No Section Assigned') ?>
-                            </p>
+                            <p class="section" id="section-2">
+                                <?= htmlspecialchars($student['section_name'] ?: 'No Section Assigned') ?></p>
                         </div>
                     </div>
                 <?php endwhile; ?>
@@ -288,8 +293,6 @@ if ($stmt_table === false) {
                 <img class="no-data-image" src="../../assets/images/data-not-found.png" alt="No Data Found">
                 <h1 class="not-found-message">No Data found.</h1>
             </div>
-
-
         </div>
 
         <div class="faculty-table-container" id="faculty-table" style="display: none;">

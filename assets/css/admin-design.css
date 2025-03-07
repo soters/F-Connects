@@ -3015,6 +3015,33 @@ label {
   border-radius: 10px;
   border: solid 2px #ededed;
 }
+
+.faculty-initial {
+  width: 65px;
+  height: 65px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: bold;
+  color: white;
+  border-radius: 7px;
+  margin-right: 10px;
+  text-transform: uppercase;
+}
+
+.male {
+  background-color: #3498db; /* Blue */
+}
+
+.female {
+  background-color: #e91e63; /* Pink */
+}
+
+.others {
+  background-color: #2ecc71; /* Green */
+}
+
 /* Status-specific styles */
 .appointment-status {
   margin-right: 180px;

@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $image_binary = null;
 
     if (isset($_FILES['picture_path']) && $_FILES['picture_path']['error'] === UPLOAD_ERR_OK) {
-        $target_dir = '../../uploads/prof_images/';
+        $target_dir = '../../uploads/faculty_images/';
         $picture_path = $target_dir . basename($_FILES['picture_path']['name']);
 
         // Move uploaded file

@@ -42,15 +42,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Role Validation: Ensure only one Program Chair or Dean per department
-    if ($acc_type == 'Program Chair' || $acc_type == 'Dean') {
-        // Get the current faculty's acc_type and dept_id from the Faculty table and UserDepartment table
+    // Skip this validation if the current user is already a Dean or Program Chair
+    $current_acc_type = $rowRFID['acc_type']; // Get the current acc_type of the user
+    if (($acc_type == 'Program Chair' || $acc_type == 'Dean') && 
+        ($current_acc_type != 'Program Chair' && $current_acc_type != 'Dean')) {
+        // Check if there is already a Dean or Program Chair in the department
         $sqlCheckExistingRole = "
-        SELECT f.acc_type
-        FROM Faculty f
-        JOIN UserDepartment ud ON f.rfid_no = ud.rfid_no
-        WHERE ud.dept_id = ? AND f.acc_type IN ('Program Chair', 'Dean') AND f.rfid_no != ?
-    ";
-        $paramsExistingRole = [$dept_id, $rfid_no];
+            SELECT f.acc_type
+            FROM Faculty f
+            JOIN UserDepartment ud ON f.rfid_no = ud.rfid_no
+            WHERE ud.dept_id = ? AND f.acc_type IN ('Program Chair', 'Dean')
+        ";
+        $paramsExistingRole = [$dept_id];
         $stmtExistingRole = sqlsrv_query($conn, $sqlCheckExistingRole, $paramsExistingRole);
 
         if ($stmtExistingRole === false) {
@@ -59,10 +62,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $existingRole = sqlsrv_fetch_array($stmtExistingRole, SQLSRV_FETCH_ASSOC);
         if ($existingRole) {
-            $errors[] = "Only one $acc_type is allowed.";
+            $errors[] = "Only one $acc_type is allowed per department.";
         }
     }
-
 
     // If there are errors, redirect with the error message
     if (count($errors) > 0) {

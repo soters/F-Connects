@@ -177,7 +177,7 @@ $admin_rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
                     <!--<button class="pass-btn" type="button">Sent Password Reset Instructions</button>-->
                 </div>
                 <div class="faculty-container-2">
-                    <div class="picture-container">
+                    <!--<div class="picture-container">
                         <div id="image-preview">
                             <img id="preview" src="../../assets/images/add-image.jpg" alt="Image Preview">
                         </div>
@@ -185,8 +185,7 @@ $admin_rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
                         <input type="file" id="picture_path" name="picture_path" accept="image/*"
                             onchange="previewImage(event)">
                     </div>
-
-                    <br>
+                    <br>-->
                     <div class="faculty-name-container">
                         <div>
                             <label for="rfid_no">RFID No.</label>
@@ -363,7 +362,7 @@ $admin_rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
         });
     } 
 </script>
-<script>
+<!--<script>
     function previewImage(event) {
         const input = event.target;
         const preview = document.getElementById("preview");
@@ -379,8 +378,8 @@ $admin_rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
             preview.src = "../../assets/images/add-image.jpg";
         }
     }
-</script>
-<script>
+</script>-->
+<!--<script>
     function uploadImage() {
         var formData = new FormData();
         var fileInput = document.getElementById("picture_path");
@@ -400,7 +399,7 @@ $admin_rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
             .then(data => alert(data)) // Display success or error message
             .catch(error => console.error("Error:", error));
     }
-</script>
+</script>-->
 <script>
     // Get message and type from URL
     const urlParams = new URLSearchParams(window.location.search);
