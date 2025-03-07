@@ -15,6 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'];
     $acc_type = $_POST['acc_type'];
     $dept_id = $_POST['dept_id'];
+    $employment_type = $_POST['employment_type'];
 
     // Address fields
     $region = $_POST['region'];
@@ -100,6 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             dob = ?, 
             email = ?, 
             acc_type = ?, 
+            employment_type = ?,
             picture_path = ISNULL(?, picture_path)
         WHERE rfid_no = ?";
     $paramsFaculty = [
@@ -112,6 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $dob,
         $email,
         $acc_type,
+        $employment_type,
         $picture_path,
         $rfid_no
     ];

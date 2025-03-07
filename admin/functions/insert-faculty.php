@@ -15,6 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
     $acc_type = filter_input(INPUT_POST, 'acc_type', FILTER_SANITIZE_STRING);
     $dept_id = filter_input(INPUT_POST, 'dept_id', FILTER_SANITIZE_NUMBER_INT);
+    $employment_type = filter_input(INPUT_POST, 'employment_type', FILTER_SANITIZE_STRING); // New field
 
     $region = filter_input(INPUT_POST, 'region', FILTER_SANITIZE_STRING);
     $province = filter_input(INPUT_POST, 'province', FILTER_SANITIZE_STRING);
@@ -69,18 +70,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        // Insert into Faculty table
-        $sql_faculty = "INSERT INTO Faculty (rfid_no, fname, mname, lname, suffix, sex, dob, phone_no, email, acc_type, picture_path, image_binary) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CONVERT(VARBINARY(MAX), ?))";
+        // Insert into Faculty table (Added employment_type)
+        $sql_faculty = "INSERT INTO Faculty (rfid_no, fname, mname, lname, suffix, sex, dob, phone_no, email, acc_type, employment_type, picture_path, image_binary) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CONVERT(VARBINARY(MAX), ?))";
 
-        $params_faculty = [$rfid_no, $fname, $mname, $lname, $suffix, $sex, $dob, $phone_no, $email, $acc_type, $picture_path, $image_binary];
+        $params_faculty = [$rfid_no, $fname, $mname, $lname, $suffix, $sex, $dob, $phone_no, $email, $acc_type, $employment_type, $picture_path, $image_binary];
         $stmt_faculty = sqlsrv_query($conn, $sql_faculty, $params_faculty);
 
         if ($stmt_faculty === false) {
             throw new Exception(print_r(sqlsrv_errors(), true));
         }
 
-        // Insert into FacultyAddresses table
+        // Insert into FacultyAdresses table
         $sql_address = "INSERT INTO FacultyAdresses (region, province, city, zip_code, address_dtl, rfid_no) 
                         VALUES (?, ?, ?, ?, ?, ?)";
         $params_address = [$region, $province, $city, $zip_code, $address_dtl, $rfid_no];

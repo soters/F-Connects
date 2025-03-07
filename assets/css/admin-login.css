@@ -107,7 +107,7 @@ body {
   opacity: 0;
 }
 .modal-button {
-  color: #FFC52D;
+  color: #fbf9fb;
   font-family: "Nunito", sans-serif;
   font-size: 18px;
   cursor: pointer;
@@ -263,7 +263,7 @@ body {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  color: #FFC52D;
+  color: #fbf9fb;
   letter-spacing: 5px;
   font-size: 3rem;
   font-weight: 900;

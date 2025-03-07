@@ -189,6 +189,7 @@ $admin_rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
                                     <option value="Lecture">Lecture</option>
                                     <option value="Laboratory">Laboratory</option>
                                     <option value="Break">Break</option>
+                                    <option value="Consultation Time">Consultation Time</option>
                                 </select>
                             </div>
                         </div>
@@ -228,8 +229,8 @@ $admin_rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
                         </div>
                     </div>
 
-                    <h1 class="info-title">Location Details</h1>
-                    <hr>
+                    <h1 id="location" class="info-title">Location Details</h1>
+                    <hr id="location-hr">
 
                     <div class="faculty-name-container">
                         <div>
@@ -242,8 +243,8 @@ $admin_rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
                         </div>
                     </div>
 
-                    <h1 class="info-title">Class Details</h1>
-                    <hr>
+                    <h1 id="class-dtl" class="info-title">Class Details</h1>
+                    <hr id="class-dtl-hr">
 
                     <div class="faculty-name-container">
                         <div>
@@ -341,23 +342,31 @@ $admin_rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const typeSelect = document.getElementById("type");
-        const roomSelect = document.getElementById("room_id");
-        const sectionSelect = document.getElementById("section_id");
-        const subjectSelect = document.getElementById("subject_code");
+        const roomField = document.getElementById("room_id").closest("div");
+        const sectionField = document.getElementById("section_id").closest("div");
+        const subjectField = document.getElementById("subject_code").closest("div");
+        const locationTitle = document.getElementById("location");
+        const locationHr = document.getElementById("location-hr");
+        const classTitle = document.getElementById("class-dtl");
+        const classHr = document.getElementById("class-dtl-hr");
 
         function toggleFields() {
-            if (typeSelect.value === "Break") {
-                roomSelect.value = "";
-                sectionSelect.value = "";
-                subjectSelect.value = "";
-
-                roomSelect.disabled = true;
-                sectionSelect.disabled = true;
-                subjectSelect.disabled = true;
+            if (typeSelect.value === "Break" || typeSelect.value === "Consultation Time") {
+                roomField.style.display = "none";
+                sectionField.style.display = "none";
+                subjectField.style.display = "none";
+                locationTitle.style.display = "none";
+                locationHr.style.display = "none";
+                classTitle.style.display = "none";
+                classHr.style.display = "none";
             } else {
-                roomSelect.disabled = false;
-                sectionSelect.disabled = false;
-                subjectSelect.disabled = false;
+                roomField.style.display = "";
+                sectionField.style.display = "";
+                subjectField.style.display = "";
+                locationTitle.style.display = "";
+                locationHr.style.display = "";
+                classTitle.style.display = "";
+                classHr.style.display = "";
             }
         }
 
@@ -365,6 +374,4 @@ $admin_rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
         toggleFields(); // Call on page load to set correct state
     });
 </script>
-
-
 </html>

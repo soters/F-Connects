@@ -38,13 +38,20 @@ if (isset($_GET['rfid_no'])) {
 
     $events = array();
     while ($row = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC)) {
+        // Determine the event title and color based on the type
+        $eventTitle = ($row['type'] == 'Break') ? 'Break Time' :
+            (($row['type'] == 'Consultation Time') ? 'Consultation Time' : $row['title']);
+
+        $eventColor = ($row['type'] == 'Break') ? '#FF0000' :  // Red for Break
+            (($row['type'] == 'Consultation Time') ? '#ffc52d' : '#3788d8'); // Yellow for Consultation Time, Blue for others
+
         // Ensure proper formatting
         $events[] = array(
             'id' => $row['id'],
-            'title' => ($row['type'] == 'Break') ? 'Break Time' : $row['title'],
+            'title' => $eventTitle,
             'start' => $row['start'],
             'end' => $row['end'],
-            'color' => ($row['type'] == 'Break') ? '#FFA500' : '#3788d8', // Orange for Breaks, Blue for others
+            'color' => $eventColor,
             'extendedProps' => [
                 'sched_id' => $row['id'], // Include sched_id
                 'type' => $row['type'],
@@ -52,13 +59,14 @@ if (isset($_GET['rfid_no'])) {
                 'end_date' => $row['end_date']->format('Y-m-d'),
                 'start_time' => $row['start_time']->format('H:i:s'),
                 'end_time' => $row['end_time']->format('H:i:s'),
-                'room_name' => $row['room_name'], 
+                'room_name' => $row['room_name'],
                 'section_name' => $row['section_name'],
                 'subject_code' => $row['subject_code'] ?? 'N/A',
                 'subject_description' => $row['subject_description']
             ]
         );
     }
+
 
     echo json_encode($events);
     exit;

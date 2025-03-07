@@ -126,7 +126,7 @@ $admin_rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
             <!-- Kiosk -->
             <div class="nav-button">
                 <a href="admin-kiosk.php">
-                <i class="fas bi bi-tv"></i>
+                    <i class="fas bi bi-tv"></i>
                     <span>Kiosk</span>
                 </a>
             </div>
@@ -188,10 +188,21 @@ $admin_rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
                     </div>
 
                     <br>
-                    <div>
-                        <label for="rfid_no">RFID No.</label>
-                        <input class="name-input-2" type="tel" id="rfid_no" name="rfid_no" maxlength="10"
-                            pattern="[0-9]{1,10}" required>
+                    <div class="faculty-name-container">
+                        <div>
+                            <label for="rfid_no">RFID No.</label>
+                            <input class="name-input" type="tel" id="rfid_no" name="rfid_no" maxlength="10"
+                                pattern="[0-9]{1,10}" required>
+                        </div>
+                        <div>
+                            <div class="faculty-name-box">
+                                <label for="employment_type">Employment Type</label>
+                                <select id="employment_type" name="employment_type" class="name-input">
+                                    <option value="Full Time">Full Time</option>
+                                    <option value="Part Time">Part Time</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                     <hr>
 

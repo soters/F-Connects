@@ -163,7 +163,7 @@ if ($stmtDepartments !== false) {
             <!-- Kiosk -->
             <div class="nav-button">
                 <a href="admin-kiosk.php">
-                <i class="fas bi bi-tv"></i>
+                    <i class="fas bi bi-tv"></i>
                     <span>Kiosk</span>
                 </a>
             </div>
@@ -238,10 +238,21 @@ if ($stmtDepartments !== false) {
                     </div>
 
                     <br>
-                    <div>
-                        <label for="rfid_no">RFID No.</label>
-                        <input class="name-input-2" type="tel" id="rfid_no" name="rfid_no"
-                            value="<?= htmlspecialchars($data['rfid_no']) ?>" readonly>
+                    <div class="faculty-name-container">
+                        <div>
+                            <label for="rfid_no">RFID No.</label>
+                            <input class="name-input" type="tel" id="rfid_no" name="rfid_no"
+                                value="<?= htmlspecialchars($data['rfid_no']) ?>" readonly>
+                        </div>
+                        <div>
+                            <label for="employment_type">Employment Type</label>
+                            <select id="employment_type" name="employment_type" class="name-input">
+                                <option value="Full Time" <?= $data['employment_type'] == "Full Time" ? 'selected' : '' ?>>
+                                    Full Time</option>
+                                <option value="Part Time" <?= $data['employment_type'] == "Part Time" ? 'selected' : '' ?>>
+                                    Part Time</option>
+                            </select>
+                        </div>
                     </div>
                     <hr>
 
@@ -305,7 +316,8 @@ if ($stmtDepartments !== false) {
                             <select id="acc_type" name="acc_type" class="name-input">
                                 <option value="Professor" <?= $data['acc_type'] == "Professor" ? 'selected' : '' ?>>
                                     Professor</option>
-                                <option value="Program Chair" <?= $data['acc_type'] == "Program Chair" ? 'selected' : '' ?>>Program Chair</option>
+                                <option value="Program Chair" <?= $data['acc_type'] == "Program Chair" ? 'selected' : '' ?>>
+                                    Program Chair</option>
                                 <option value="Dean" <?= $data['acc_type'] == "Dean" ? 'selected' : '' ?>>Dean</option>
                             </select>
                         </div>
