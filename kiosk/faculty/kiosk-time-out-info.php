@@ -113,7 +113,7 @@ try {
                     </div>
                 </div>
             </div>
-            <a href="../kiosk-index.php" class="no-underline">
+            <a href="kiosk-success-record.php?rfid_no=<?= urlencode($rfid_no) ?>" class="no-underline">
                 <button class="t-confirm-button">CONFIRM</button>
             </a>
         </div>

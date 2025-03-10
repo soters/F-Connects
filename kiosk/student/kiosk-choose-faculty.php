@@ -32,8 +32,8 @@ try {
     WHERE time_out IS NULL
     AND CAST(date_logged AS DATE) = CAST(GETDATE() AS DATE)
     AND archived = 0
+    AND Faculty.employment_type = 'Full Time'
     ORDER BY date_logged DESC";
-
 
     // Execute the query with sqlsrv
     $stmt = sqlsrv_query($conn, $query);

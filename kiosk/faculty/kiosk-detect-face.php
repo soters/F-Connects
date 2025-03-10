@@ -92,8 +92,8 @@ if (!$image_path) {
 
     <div id="noFaceModal" class="modal">
         <div class="modal-content">
-            <p>No Match Face Detected. Please try again.</p>
-            <button id="modalOkay">Okay</button>
+            <p>No Face Detected. Please try again.</p>
+            <button id="modalOkay">Retry</button>
         </div>
     </div>
 
@@ -227,19 +227,21 @@ if (!$image_path) {
             overflow: auto;
             background-color: rgb(0, 0, 0);
             background-color: rgba(0, 0, 0, 0.4);
+            border: solid 3px #ddd;
         }
 
         .modal-content {
             background-color: #fefefe;
             margin: 15% auto;
             padding: 20px;
-            border: 1px solid #888;
+            border: 3px solid #888;
             width: 80%;
             text-align: center;
         }
 
         #modalOkay {
-            background-color: #4CAF50;
+            background-color: #f44336;
+            /* Red */
             color: white;
             padding: 10px 20px;
             border: none;
@@ -248,7 +250,8 @@ if (!$image_path) {
         }
 
         #modalOkay:hover {
-            background-color: #45a049;
+            background-color: #d32f2f;
+            /* Darker red on hover */
         }
 
         #successOkay {

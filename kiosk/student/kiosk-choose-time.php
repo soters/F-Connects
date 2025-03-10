@@ -4,10 +4,12 @@ session_start();
 require_once('../../connection/connection.php');
 date_default_timezone_set('Asia/Manila');
 
-// Get the selected faculty's RFID
+// Get the selected faculty's RFID and student RFID
 $selected_rfid = filter_input(INPUT_POST, 'selected_rfid', FILTER_SANITIZE_STRING);
 $stud_rf = filter_input(INPUT_POST, 'stud_rf', FILTER_SANITIZE_STRING);
-$today = date('Y-m-d'); // Get today's date
+
+$today = date('Y-m-d');
+$currentTimestamp = time(); // Current server time in seconds
 
 // Function to convert 24-hour time to 12-hour format
 function convertTo12HourFormat($time)
@@ -16,79 +18,57 @@ function convertTo12HourFormat($time)
 }
 
 try {
-    // SQL Server query to get the faculty's full name
-    $query_faculty_name = "
-        SELECT fname, mname, lname, suffix
-        FROM Faculty
-        WHERE rfid_no = ?
-    ";
-
-    // Prepare and execute the query
-    $params = array($selected_rfid);
-    $stmt_name = sqlsrv_query($conn, $query_faculty_name, $params);
-
-    // Check if the query executed successfully
-    if ($stmt_name === false) {
+    // Fetch faculty name
+    $query_faculty_name = "SELECT fname, mname, lname, suffix FROM Faculty WHERE rfid_no = ?";
+    $stmt_name = sqlsrv_query($conn, $query_faculty_name, array($selected_rfid));
+    if ($stmt_name === false)
         die(print_r(sqlsrv_errors(), true));
-    }
 
-    // Fetch the faculty's full name
     $faculty_name = '';
     if ($row = sqlsrv_fetch_array($stmt_name, SQLSRV_FETCH_ASSOC)) {
         $faculty_name = $row['fname'] . ' ' . $row['mname'] . ' ' . $row['lname'] . ' ' . $row['suffix'];
     }
 
-    // SQL Server query to get the faculty's consultation schedule for today
+    // Fetch consultation schedule for today
     $query_schedule = "
         SELECT start_time, end_time
         FROM Schedules
         WHERE rfid_no = ? AND start_date = ? AND type = 'Consultation Time'
     ";
-
-    // Prepare and execute the query
     $stmt_schedule = sqlsrv_query($conn, $query_schedule, array($selected_rfid, $today));
-
-    // Check if the query executed successfully
-    if ($stmt_schedule === false) {
+    if ($stmt_schedule === false)
         die(print_r(sqlsrv_errors(), true));
-    }
 
-    // Fetch consultation schedule for the selected faculty
     $consultationTimes = [];
-    if ($row = sqlsrv_fetch_array($stmt_schedule, SQLSRV_FETCH_ASSOC)) {
+    while ($row = sqlsrv_fetch_array($stmt_schedule, SQLSRV_FETCH_ASSOC)) {
         $consultationTimes[] = [
             'start' => $row['start_time']->format('H:i'),
             'end' => $row['end_time']->format('H:i')
         ];
     }
 
-    // SQL Server query to get the faculty's appointments for today
+    // Fetch all appointments for today
     $query_appointments = "
-        SELECT start_time, end_time
+        SELECT start_time, end_time, status
         FROM Appointments
-        WHERE prof_rfid_no = ? 
-        AND date_logged = ? 
-        AND status IN ('Pending', 'Accepted')
+        WHERE prof_rfid_no = ? AND date_logged = ?
     ";
-
-    // Prepare and execute the query
     $stmt_appointments = sqlsrv_query($conn, $query_appointments, array($selected_rfid, $today));
-
-    // Check if the query executed successfully
-    if ($stmt_appointments === false) {
+    if ($stmt_appointments === false)
         die(print_r(sqlsrv_errors(), true));
-    }
 
-    // Fetch all appointments for the selected faculty
     $appointments = [];
     while ($row = sqlsrv_fetch_array($stmt_appointments, SQLSRV_FETCH_ASSOC)) {
         $appointments[] = [
             'start' => $row['start_time']->format('H:i'),
-            'end' => $row['end_time']->format('H:i')
+            'end' => $row['end_time']->format('H:i'),
+            'status' => $row['status']
         ];
     }
 
-    // Generate available time slots within the consultation schedule
+    // Generate available time slots
+    $availableTimes = [];
+    // Generate available time slots
     $availableTimes = [];
     foreach ($consultationTimes as $consultation) {
         $start = strtotime($consultation['start']);
@@ -98,32 +78,64 @@ try {
             $slotStart = date("H:i", $currentSlot);
             $slotEnd = date("H:i", strtotime("+1 hour", $currentSlot));
 
-            // Check if the time slot overlaps with any appointment
             $isAvailable = true;
+            $isDisabled = false;
+
+            $slotStartTime = strtotime($slotStart);
+            $slotEndTime = strtotime($slotEnd);
+
+            // HIDE the slot if end time is within 10 mins from now
+            if (($slotEndTime - $currentTimestamp) <= 600) {
+                continue; // skip adding this slot entirely
+            }
+
+            // Otherwise check for overlaps with appointments
             foreach ($appointments as $appointment) {
-                if (
-                    ($slotStart >= $appointment['start'] && $slotStart < $appointment['end']) ||
-                    ($slotEnd > $appointment['start'] && $slotEnd <= $appointment['end'])
-                ) {
-                    $isAvailable = false;
-                    break;
+                $apptStart = strtotime($appointment['start']);
+                $apptEnd = strtotime($appointment['end']);
+
+                if (in_array($appointment['status'], ['Pending', 'Accepted'])) {
+                    if (
+                        ($slotStartTime >= $apptStart && $slotStartTime < $apptEnd) ||
+                        ($slotEndTime > $apptStart && $slotEndTime <= $apptEnd)
+                    ) {
+                        $isAvailable = false;
+                        $isDisabled = true;
+                        break;
+                    }
+                }
+
+                // If status is Completed but within allowed time
+                if ($appointment['status'] === 'Completed') {
+                    $remainingTime = $apptEnd - $currentTimestamp;
+                    if (
+                        ($slotStartTime >= $apptStart && $slotStartTime < $apptEnd) &&
+                        $remainingTime <= 900
+                    ) {
+                        $isAvailable = true;
+                        $isDisabled = false;
+                        break;
+                    }
                 }
             }
 
-            // Add available time slots
-            if ($isAvailable) {
+            // Still show the slot if available (but maybe disabled)
+            if ($isAvailable || $isDisabled) {
                 $availableTimes[] = [
                     'formatted' => convertTo12HourFormat($slotStart) . ' - ' . convertTo12HourFormat($slotEnd),
                     'start_time' => $slotStart,
-                    'end_time' => $slotEnd
+                    'end_time' => $slotEnd,
+                    'disabled' => $isDisabled
                 ];
             }
         }
     }
+
 } catch (Exception $e) {
-    die("Error fetching data: " . $e->getMessage());
+    die("Error: " . $e->getMessage());
 }
 ?>
+
 
 
 <!DOCTYPE html>
@@ -170,22 +182,24 @@ try {
                     <?php foreach ($availableTimes as $timeSlot): ?>
                         <label>
                             <input type="radio" name="selected_time" value="<?= htmlspecialchars($timeSlot['start_time']); ?>"
-                                required data-start-time="<?= htmlspecialchars($timeSlot['start_time']); ?>"
+                                <?= $timeSlot['disabled'] ? 'disabled' : '' ?> required
+                                data-start-time="<?= htmlspecialchars($timeSlot['start_time']); ?>"
                                 data-end-time="<?= htmlspecialchars($timeSlot['end_time']); ?>"
                                 data-formatted="<?= htmlspecialchars($timeSlot['formatted']); ?>">
-                            <div class="time-card">
+                            <div class="time-card <?= $timeSlot['disabled'] ? 'disabled-slot' : '' ?>">
                                 <div class="info">
                                     <p class="time-name"><?= htmlspecialchars($timeSlot['formatted']); ?></p>
                                 </div>
                             </div>
                         </label>
                     <?php endforeach; ?>
+
                     <!-- Submit Button -->
                     <button class="appoint-btn" type="submit">
                         <span class="btn-text">NEXT</span>
                     </button>
 
-                    <!-- Hidden inputs to pass selected rfid, stud_rf, and time slots -->
+                    <!-- Hidden inputs -->
                     <input type="hidden" name="selected_rfid" value="<?= htmlspecialchars($selected_rfid); ?>">
                     <input type="hidden" name="stud_rf" value="<?= htmlspecialchars($stud_rf); ?>">
                     <input type="hidden" name="start_time" id="start_time">
@@ -196,7 +210,6 @@ try {
                         <p class="code-message">
                             No consultation slots available for today.
                         </p>
-                        <!-- OKAY Button -->
                         <a href="kiosk-student.php?rfid_no=<?= isset($stud_rf) ? urlencode($stud_rf) : '' ?>"
                             class="no-underline">
                             <button class="appoint-btn" type="button">

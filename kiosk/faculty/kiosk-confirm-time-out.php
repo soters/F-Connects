@@ -66,6 +66,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="../../assets/css/kiosk-design.css" />
     <link rel="shortcut icon" href="../../assets/images/F-Connect.ico" type="image/x-icon" />
     <title>F - Connect</title>
+    <style>
+        .action-box-small form {
+            display: flex;
+            justify-content: center;
+            /* Optional: centers the buttons horizontally */
+            gap: 10px;
+            /* Space between buttons */
+        }
+
+        .yesBtn1,
+        .noBtn1 {
+            display: inline-block;
+        }
+    </style>
 </head>
 
 <body class="fade-out">
@@ -90,7 +104,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="action-box-small">
         <form method="POST">
             <a class="no-underline"><button type="submit" class="yesBtn1" name="choice" value="yes">Yes</button></a>
-            <br>
             <a class="no-underline"><button type="submit" class="noBtn1" name="choice" value="no">No</button></a>
         </form>
     </div>

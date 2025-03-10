@@ -93,6 +93,8 @@ sqlsrv_close($conn);
                 <p id="action-message-info-small">Here's What You've Selected</p>
             </i>
             <br>
+            <br>
+            <br>
             <div class="schedule-card">
                 <div class="time">
                     <p><?= htmlspecialchars($start_time_12hr) ?></p>

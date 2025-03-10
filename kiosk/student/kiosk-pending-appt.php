@@ -118,7 +118,6 @@ sqlsrv_close($conn);
                 </p>
             </i>
 
-            <br>
             <div class="schedule-card">
                 <div class="time">
                     <p><?= htmlspecialchars($start_time_12hr) ?></p>
@@ -158,15 +157,10 @@ sqlsrv_close($conn);
             <input type="hidden" name="appointment_code" value="<?= htmlspecialchars($appointment_code) ?>">
 
             <div class="button-container">
-                <button class="appoint-btn cancel-btn" type="submit">
-                    <span class="btn-text">CANCEL APPOINTMENT</span>
+                <button class="appoint-btn-1 cancel-btn" type="submit">
+                    <span class="btn-text">Cancel this Appointment?</span>
                 </button>
             </div>
-            <a href="kiosk-student.php?rfid_no=<?= isset($stud_rfid_no) ? urlencode($stud_rfid_no) : '' ?>" class="no-underline">
-                <button class="appoint-btn" type="button">
-                    <span class="btn-text">OKAY</span>
-                </button>
-            </a>
     </div>
 
     <!--div id="top-right-button">
@@ -176,7 +170,7 @@ sqlsrv_close($conn);
         </div>-->
 
     <div id="top-left-button">
-    <a href="kiosk-personal-info.php?rfid_no=<?= isset($stud_rfid_no) ? urlencode($stud_rfid_no) : '' ?>"
+    <a href="kiosk-student.php?rfid_no=<?= isset($stud_rfid_no) ? urlencode($stud_rfid_no) : '' ?>"
             class="no-underline">
             <button type="button" class="small-button" data-bs-toggle="tooltip" title="Back" data-bs-placement="right">
                 <i class="bi bi-arrow-left-short"></i>

@@ -4,7 +4,6 @@ session_start();
 require_once('../../connection/connection.php');
 
 $rfid_no = isset($_GET['rfid_no']) ? htmlspecialchars($_GET['rfid_no']) : '';
-$appointment_code = isset($_GET['appointment_code']) ? htmlspecialchars($_GET['appointment_code']) : '';
 
 ?>
 
@@ -39,32 +38,20 @@ $appointment_code = isset($_GET['appointment_code']) ? htmlspecialchars($_GET['a
     </nav>
 
     <div id="appointment-container">
-        <p id="action-message-info-2">Appointment Submitted!</p>
+        <p id="action-message-info-2">Attendance Submitted!</p>
         <br>
         <br>
         <div class="code-card">
             <img src="../../assets/images/calendar.png" alt="Calendar Icon" class="code-icon">
-            <p class="code-message">
-                Your appointment has been submitted! Use our mobile app to track it or check its status.
+            <p class="code-message-success">
+                Your attendance has been successfully submitted!
             </p>
-            <!--<div class="appointment-code">
-                <p>
-                    <?php
-                    if ($appointment_code) {
-                        // Format the appointment code with spaces
-                        echo chunk_split($appointment_code, 4, ' ');
-                    } else {
-                        echo "No Appointment Code Available.";
-                    }
-                    ?>
-                </p>
-            </div>-->
         </div>
 
         <!-- Submit Button -->
         <button class="appoint-btn" type="button"
-            onclick="window.location.href='kiosk-student.php?rfid_no=<?= urlencode($rfid_no) ?>';">
-            <span class="btn-text">DONE</span>
+            onclick="window.location.href='kiosk-faculty.php?rfid_no=<?= urlencode($rfid_no) ?>';">
+            <span class="btn-text">OKAY</span>
         </button>
 
     </div>
@@ -75,13 +62,13 @@ $appointment_code = isset($_GET['appointment_code']) ? htmlspecialchars($_GET['a
                 <i class="bi bi-question-lg"></i>
         </div>-->
 
-    <div id="top-left-button">
+    <!--<div id="top-left-button">
         <a href="kiosk-student.php?rfid_no=<?= urlencode($rfid_no) ?>" class="no-underline">
             <button type="button" class="small-button" data-bs-toggle="tooltip" title="Back" data-bs-placement="right">
                 <i class="bi bi-arrow-left-short"></i>
             </button>
         </a>
-    </div>
+    </div>-->
 
     <!--<footer>
         <p id="collaboration-text">In collaboration with Colegio de Sta. Teresa de Avila</p>

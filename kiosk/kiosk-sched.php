@@ -128,10 +128,7 @@ if ($rfid_no) {
             <!-- Display message and image when no schedules and appointments -->
             <div class="no-schedules-appointments">
                 <img src="../assets/images/calendar_3.png" alt="No schedules or appointments" class="no-sched-img">
-                <br>
-                <br>
-                <br>
-                <p class="code-message">
+                <p class="code-message-3">
                     No schedules and appointments for today.
                 </p>
             </div>
@@ -191,18 +188,21 @@ if ($rfid_no) {
                             <div class="accordion-content">
                                 <div class="sc-status <?= $statusClass ?>"> ● <?= $status ?></div>
                                 <div class="sc-details">
-                                    <p><strong>Location:</strong> <?= htmlspecialchars($schedule['room_name']) ?></p>
-                                    <form action="./functions/check-floor.php" method="POST">
-                                        <input type="hidden" name="rfid_no" value="<?= $rfid_no; ?>">
-                                        <input type="hidden" name="room_id" value="<?= $schedule['room_id']; ?>">
-                                        <!-- Pass room_id here -->
-                                        <button class="view-map" type="submit">View in Map <i class="bi bi-map"></i></button>
-                                    </form>
+                                    <!-- Flex container for Location and View in Map button -->
+                                    <div class="location-container">
+                                        <p><strong>Location:</strong> <?= htmlspecialchars($schedule['room_name']) ?></p>
+                                        <form action="./functions/check-floor.php" method="POST">
+                                            <input type="hidden" name="rfid_no" value="<?= $rfid_no; ?>">
+                                            <input type="hidden" name="room_id" value="<?= $schedule['room_id']; ?>">
+                                            <button class="view-map" type="submit">View in Kiosk Map</button>
+                                        </form>
+                                    </div>
                                     <p><strong>Subject:</strong> <?= htmlspecialchars($schedule['subject_code']) ?> -
                                         <?= htmlspecialchars($schedule['subject_description']) ?>
                                     </p>
                                 </div>
                             </div>
+
                         </div>
                     <?php endforeach; ?>
                 </div>

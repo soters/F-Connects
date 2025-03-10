@@ -139,8 +139,8 @@ $otherRooms = getOtherRooms($floor, $room_id);
             // "You Are Here" Marker (Fixed Coordinates)
             L.marker([400, 1380], {
                 icon: L.icon({
-                    iconUrl: '../../assets/images/you_are_here.png', // Use an appropriate icon
-                    iconSize: [58, 61],
+                    iconUrl: '../../assets/images/custom_icon.gif', // Use an appropriate icon
+                    iconSize: [45, 61],
                     iconAnchor: [22, 61],
                     popupAnchor: [0, -50]
                 })

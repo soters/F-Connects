@@ -60,7 +60,7 @@ setInterval(() => {
     time.innerHTML = d.toLocaleTimeString();
 }, 1000)
 
-/** Current Date Fucntion **/
+/** Current Date Function **/
 function updateLiveDate() {
     var currentDate = new Date();
     var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -68,3 +68,9 @@ function updateLiveDate() {
 
     document.getElementById('live-date').textContent = formattedDate;
 }
+
+/** Call function after DOM is loaded **/
+document.addEventListener('DOMContentLoaded', function () {
+    updateLiveDate();
+});
+

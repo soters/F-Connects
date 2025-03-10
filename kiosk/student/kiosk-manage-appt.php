@@ -102,12 +102,13 @@ $status_classes = [
     </nav>
 
     <div id="appointment-container">
-        <p id="action-message-info">Your Appointments</p>
-        <i>
-            <p id="action-message-info-small">Here’s your appointment list. Feel free to browse through it.</p>
-            <br>
-        </i>
         <?php if (!empty($appointments)): ?>
+            <p id="action-message-info">Your Appointments</p>
+            <i>
+                <p id="action-message-info-small">Here’s your appointment list. Feel free to browse through it.</p>
+                <br>
+            </i>
+
             <?php foreach ($appointments as $appointment): ?>
                 <div class="schedule-card">
                     <div class="time">
@@ -129,29 +130,23 @@ $status_classes = [
                                 <p class="professor-title">(<?= htmlspecialchars($appointment['professor_acc_type']) ?>)</p>
                             </div>
                         </div>
-                        <!--<p class="appointment-code-small"><strong>Appointment Code:</strong>
-                            <?= htmlspecialchars($appointment['appointment_code']) ?></p>-->
 
-                        <!-- Cancel Button Form -->
                         <?php if ($appointment['status'] === 'Pending'): ?>
                             <form action="kiosk-cancel-appt.php" method="POST" class="cancel-form">
                                 <input type="hidden" name="appointment_code"
                                     value="<?= htmlspecialchars($appointment['appointment_code']) ?>">
                                 <input type="hidden" name="rfid_no" value="<?= htmlspecialchars($stud_rfid_no) ?>">
-                                <!-- Add the rfid_no -->
                                 <button type="submit" class="cancel-button">
                                     Cancel Appointment
                                 </button>
                             </form>
                         <?php endif; ?>
-
-
                     </div>
                 </div>
             <?php endforeach; ?>
         <?php else: ?>
             <div class="code-card">
-                <img src="../../assets/images/calendar_3.png" alt="" class="faculty-icon-big">
+                <img src="../../assets/images/calendar_3.png" alt="" class="faculty-icon-5">
                 <p class="code-message">
                     No appointments found for today. Try to create one
                 </p>
@@ -160,10 +155,10 @@ $status_classes = [
                     onclick="window.location.href='kiosk-student.php?rfid_no=<?= urlencode($stud_rfid_no) ?>'">
                     <span class="btn-text">OKAY</span>
                 </button>
-
             </div>
         <?php endif; ?>
     </div>
+
 
     <!--div id="top-right-button">
             <button type="button" class="small-button" data-bs-toggle="tooltip" title="Need help?"

@@ -117,9 +117,7 @@ sqlsrv_close($conn);
                     <b><?= htmlspecialchars($professor_full_name) ?></b> today.
                 </p>
             </i>
-            <p id="action-message-info-medium">Kindly check your existing appointment below before proceeding.</p>
 
-            <br>
             <div class="schedule-card">
                 <div class="time">
                     <p><?= htmlspecialchars($start_time_12hr) ?></p>
@@ -133,8 +131,8 @@ sqlsrv_close($conn);
                     <h4><?= htmlspecialchars($agenda) ?></h4>
                     <p class="with">With</p>
                     <div class="professor-info">
-                        <img src="<?php echo htmlspecialchars($professor_picture_path); ?>" alt="Professor's Picture"
-                            class="professor-img">
+                       <!-- <img src="<?php echo htmlspecialchars($professor_picture_path); ?>" alt="Professor's Picture"
+                            class="professor-img">-->
                         <div>
                             <p class="professor-name"><?= htmlspecialchars($professor_full_name) ?></p>
                             <p class="professor-title">(<?= htmlspecialchars($professor_acc_type) ?>)</p>
@@ -192,7 +190,7 @@ sqlsrv_close($conn);
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script type="text/javascript" src="../js/custom-javascript.js"></script>
+    <script type="text/javascript" src="../../assets/js/custom-javascript.js"></script>
 
     <script>
         $(document).ready(function () {
