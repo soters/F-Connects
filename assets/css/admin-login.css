@@ -107,7 +107,7 @@ body {
   opacity: 0;
 }
 .modal-button {
-  color: #fbf9fb;
+  color: #FFC52D;
   font-family: "Nunito", sans-serif;
   font-size: 18px;
   cursor: pointer;
@@ -185,7 +185,7 @@ body {
   padding: 8px 12px;
   outline: none;
   border: 0;
-  color: #fbf9fb;
+  color: #FFC52D;
   border-radius: 4px;
   background: #2B5876;
   font-family: "Nunito", sans-serif;
@@ -263,7 +263,7 @@ body {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  color: #fbf9fb;
+  color: #FFC52D;
   letter-spacing: 5px;
   font-size: 3rem;
   font-weight: 900;

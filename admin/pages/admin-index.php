@@ -161,7 +161,6 @@ $agendaHasData = count($agendaCounts) > 0 ? 'true' : 'false';
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css">
     <link rel="stylesheet" href="../../assets/css/admin-design.css">
-
 </head>
 
 <body>
@@ -272,7 +271,7 @@ $agendaHasData = count($agendaCounts) > 0 ? 'true' : 'false';
             <!-- Kiosk -->
             <div class="nav-button">
                 <a href="../../kiosk/kiosk-index.php">
-                <i class="fas bi bi-tv"></i>
+                    <i class="fas bi bi-tv"></i>
                     <span>Kiosk</span>
                 </a>
             </div>
@@ -309,12 +308,12 @@ $agendaHasData = count($agendaCounts) > 0 ? 'true' : 'false';
             </div>
 
             <div id="nav-footer">
-            <div id="nav-footer-heading">
-                <div id="nav-footer-avatar"><img src="../../assets/images/Male_PF.jpg" />
+                <div id="nav-footer-heading">
+                    <div id="nav-footer-avatar"><img src="../../assets/images/Male_PF.jpg" />
+                    </div>
+                    <div id="nav-footer-titlebox">Benedict<span id="nav-footer-subtitle">Admin</span></div>
                 </div>
-                <div id="nav-footer-titlebox">Benedict<span id="nav-footer-subtitle">Admin</span></div>
             </div>
-        </div>
         </div>
 
 

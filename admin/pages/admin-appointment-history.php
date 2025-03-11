@@ -173,6 +173,7 @@ while ($row = sqlsrv_fetch_array($appointmentStmt, SQLSRV_FETCH_ASSOC)) {
             <img id="nav-logo" src="../../assets/images/F-Connect_L3.png" alt="F-CONNECT Logo" />
             <label for="nav-toggle"><span id="nav-toggle-burger"></span></label>
             <hr />
+
         </div>
 
         <div id="nav-content">
@@ -296,13 +297,6 @@ while ($row = sqlsrv_fetch_array($appointmentStmt, SQLSRV_FETCH_ASSOC)) {
             <div id="nav-content-highlight"></div>
         </div>
 
-        <div id="nav-footer">
-            <div id="nav-footer-heading">
-                <div id="nav-footer-avatar"><img src="../../assets/images/Male_PF.jpg" />
-                </div>
-                <div id="nav-footer-titlebox">Benedict<span id="nav-footer-subtitle">Admin</span></div>
-            </div>
-        </div>
     </div>
 
     <!-- Main Content -->
@@ -313,6 +307,14 @@ while ($row = sqlsrv_fetch_array($appointmentStmt, SQLSRV_FETCH_ASSOC)) {
             <!-- Display Current Date and Time -->
             <div id="current-datetime" class="current-datetime">
                 <p id="date-time"></p> <!-- Updated id here -->
+            </div>
+
+            <div id="nav-footer">
+                <div id="nav-footer-heading">
+                    <div id="nav-footer-avatar"><img src="../../assets/images/Male_PF.jpg" />
+                    </div>
+                    <div id="nav-footer-titlebox">Benedict<span id="nav-footer-subtitle">Admin</span></div>
+                </div>
             </div>
         </div>
 

@@ -174,7 +174,7 @@ if ($stmt_table === false) {
             <!-- Kiosk -->
             <div class="nav-button">
                 <a href="admin-kiosk.php">
-                <i class="fas bi bi-tv"></i>
+                    <i class="fas bi bi-tv"></i>
                     <span>Kiosk</span>
                 </a>
             </div>
@@ -198,22 +198,25 @@ if ($stmt_table === false) {
             <div id="nav-content-highlight"></div>
         </div>
 
-        <div id="nav-footer">
-            <div id="nav-footer-heading">
-                <div id="nav-footer-avatar"><img src="../../assets/images/Male_PF.jpg" />
-                </div>
-                <div id="nav-footer-titlebox">Benedict<span id="nav-footer-subtitle">Admin</span></div>
-            </div>
-        </div>
+
     </div>
 
     <!-- Main Content -->
     <div id="main-content" class="main-content">
         <div id="header">
             <h1 class="title-text">Announcements</h1>
+
             <!-- Display Current Date and Time -->
             <div id="current-datetime" class="current-datetime">
                 <p id="date-time"></p> <!-- Updated id here -->
+            </div>
+
+            <div id="nav-footer">
+                <div id="nav-footer-heading">
+                    <div id="nav-footer-avatar"><img src="../../assets/images/Male_PF.jpg" />
+                    </div>
+                    <div id="nav-footer-titlebox">Benedict<span id="nav-footer-subtitle">Admin</span></div>
+                </div>
             </div>
         </div>
 

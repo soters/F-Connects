@@ -198,14 +198,6 @@ $attendanceData = json_encode($attendanceCounts);
 
             <div id="nav-content-highlight"></div>
         </div>
-
-        <div id="nav-footer">
-            <div id="nav-footer-heading">
-                <div id="nav-footer-avatar"><img src="../../assets/images/Male_PF.jpg" />
-                </div>
-                <div id="nav-footer-titlebox">Benedict<span id="nav-footer-subtitle">Admin</span></div>
-            </div>
-        </div>
     </div>
 
     <!-- Main Content -->
@@ -216,6 +208,13 @@ $attendanceData = json_encode($attendanceCounts);
             <!-- Display Current Date and Time -->
             <div id="current-datetime" class="current-datetime">
                 <p id="date-time"></p> <!-- Updated id here -->
+            </div>
+            <div id="nav-footer">
+                <div id="nav-footer-heading">
+                    <div id="nav-footer-avatar"><img src="../../assets/images/Male_PF.jpg" />
+                    </div>
+                    <div id="nav-footer-titlebox">Benedict<span id="nav-footer-subtitle">Admin</span></div>
+                </div>
             </div>
         </div>
 
