@@ -1,4 +1,10 @@
 <?php
+
+session_start();
+$admin_fname = $_SESSION['admin_fname'] ?? 'Unknown';
+$acc_type = $_SESSION['acc_type'] ?? 'Unknown';
+$picture_path = $_SESSION['picture_path'] ?? '../../assets/images/Prof.png';
+
 include('../../connection/connection.php');
 date_default_timezone_set('Asia/Manila');
 
@@ -38,7 +44,17 @@ if ($stmt_paginated === false) {
     die(print_r(sqlsrv_errors(), true));
 }
 
-// Query for Locations Table View
+// Pagination settings
+$perPageLoc = 10;
+$pageLoc = isset($_GET['pageLoc']) ? (int) $_GET['pageLoc'] : 1;
+$startLoc = ($pageLoc - 1) * $perPageLoc;
+
+// Count total location rows
+$sql_count = "SELECT COUNT(*) AS total FROM Locations";
+$stmt_count = sqlsrv_query($conn, $sql_count);
+$totalLoc = sqlsrv_fetch_array($stmt_count, SQLSRV_FETCH_ASSOC)['total'];
+$totalPagesLoc = ceil($totalLoc / $perPageLoc);
+
 $sql_table = "SELECT 
                 Locations.room_id, 
                 Locations.room_name, 
@@ -50,7 +66,8 @@ $sql_table = "SELECT
                 Locations.date_created
             FROM Locations
             LEFT JOIN Buildings ON Locations.bldg_id = Buildings.bldg_id
-            ORDER BY Locations.room_name ASC";
+            ORDER BY Locations.room_name ASC
+            OFFSET $startLoc ROWS FETCH NEXT $perPageLoc ROWS ONLY";
 
 $stmt_table = sqlsrv_query($conn, $sql_table);
 if ($stmt_table === false) {
@@ -216,9 +233,11 @@ if ($stmt_table === false) {
             </div>
             <div id="nav-footer">
                 <div id="nav-footer-heading">
-                    <div id="nav-footer-avatar"><img src="../../assets/images/Male_PF.jpg" />
+                    <div id="nav-footer-avatar"><img src="<?php echo htmlspecialchars($picture_path); ?>" /></div>
+                    <div id="nav-footer-titlebox">
+                        <?php echo htmlspecialchars($admin_fname); ?>
+                        <span id="nav-footer-subtitle"><?php echo htmlspecialchars($acc_type); ?></span>
                     </div>
-                    <div id="nav-footer-titlebox">Benedict<span id="nav-footer-subtitle">Admin</span></div>
                 </div>
             </div>
         </div>
@@ -356,6 +375,21 @@ if ($stmt_table === false) {
                 <img class="no-data-image" src="../../assets/images/data-not-found.png" alt="No Data Found">
                 <h1 class="not-found-message">No Data found.</h1>
             </div>
+            <div class="faculty-pagination-container">
+                <div class="faculty-pagination">
+                    <?php
+                    for ($i = 1; $i <= $totalPagesLoc; $i++):
+                        $urlParams = $_GET;
+                        $urlParams['pageLoc'] = $i;
+                        $urlParams['view'] = 'table'; // preserve view toggle
+                        $queryStr = http_build_query(data: $urlParams);
+                        $active = ($i == $pageLoc) ? 'faculty-active-page' : '';
+                        ?>
+                        <a href="?<?= $queryStr ?>" class="faculty-pagination-link <?= $active ?>"><?= $i ?></a>
+                    <?php endfor; ?>
+                </div>
+            </div>
+
         </div>
     </div>
 

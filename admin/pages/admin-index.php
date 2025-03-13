@@ -1,8 +1,11 @@
 <?php
+session_start();
+$admin_fname = $_SESSION['admin_fname'] ?? 'Unknown';
+$acc_type = $_SESSION['acc_type'] ?? 'Unknown';
+$picture_path = $_SESSION['picture_path'] ?? '../../assets/images/Prof.png';
+
 include('../../connection/connection.php');
 date_default_timezone_set('Asia/Manila');
-
-$admin_rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
 
 // Queries to count rows in tables
 $sqlFaculty = "SELECT COUNT(*) as count FROM Faculty";
@@ -173,7 +176,6 @@ $agendaHasData = count($agendaCounts) > 0 ? 'true' : 'false';
             <label for="nav-toggle"><span id="nav-toggle-burger"></span></label>
             <hr />
         </div>
-
         <div id="nav-content">
             <!-- Dashboard -->
             <div class="nav-button">
@@ -188,32 +190,6 @@ $agendaHasData = count($agendaCounts) > 0 ? 'true' : 'false';
                 <a href="admin-attendance-records.php">
                     <i class="fas fa-clipboard"></i>
                     <span>Attendance Records</span>
-                </a>
-            </div>
-            <hr />
-
-            <!-- Faculty -->
-            <div class="nav-button">
-                <a href="admin-faculty.php">
-                    <i class="fas fa-user"></i>
-                    <span>Faculty Members</span>
-                </a>
-            </div>
-
-            <!-- Student -->
-            <div class="nav-button">
-                <a href="admin-student.php">
-                    <i class="fas fa-users"></i>
-                    <span>Student</span>
-                </a>
-            </div>
-            <hr />
-
-            <!-- Schedule -->
-            <div class="nav-button">
-                <a href="admin-schedule.php">
-                    <i class="fas fa-calendar"></i>
-                    <span>Schedule</span>
                 </a>
             </div>
 
@@ -233,13 +209,35 @@ $agendaHasData = count($agendaCounts) > 0 ? 'true' : 'false';
                 </a>
             </div>
 
-            <hr />
+            <!-- Faculty -->
+            <div class="nav-button">
+                <a href="admin-faculty.php">
+                    <i class="fas fa-user"></i>
+                    <span>Faculty Members</span>
+                </a>
+            </div>
+
+            <!-- Schedule -->
+            <div class="nav-button">
+                <a href="admin-schedule.php">
+                    <i class="fas fa-calendar"></i>
+                    <span>Schedule</span>
+                </a>
+            </div>
 
             <!-- Sections -->
             <div class="nav-button">
                 <a href="admin-sections.php">
                     <i class="fas fa-users"></i>
                     <span>Sections</span>
+                </a>
+            </div>
+
+            <!-- Student -->
+            <div class="nav-button">
+                <a href="admin-student.php">
+                    <i class="fas fa-users"></i>
+                    <span>Student</span>
                 </a>
             </div>
 
@@ -250,39 +248,16 @@ $agendaHasData = count($agendaCounts) > 0 ? 'true' : 'false';
                     <span>Subjects</span>
                 </a>
             </div>
-            <hr />
 
-            <!-- Locations -->
-            <div class="nav-button">
-                <a href="admin-locations.php">
-                    <i class="fas fa-location-arrow"></i>
-                    <span>Locations</span>
-                </a>
-            </div>
-
-            <!-- Reports -->
-            <div class="nav-button">
-                <a href="admin-reports.php">
-                    <i class=" fas bi bi-file-earmark-text-fill"></i>
-                    <span>Reports</span>
-                </a>
-            </div>
-
-            <!-- Kiosk -->
-            <div class="nav-button">
-                <a href="../../kiosk/kiosk-index.php">
-                    <i class="fas bi bi-tv"></i>
-                    <span>Kiosk</span>
-                </a>
-            </div>
-
-            <!-- Admins -->
-            <div class="nav-button">
-                <a href="../authentication/admin-admins.php">
-                    <i class="fas fa-user-tie"></i>
-                    <span>Admins</span>
-                </a>
-            </div>
+            <?php if ($acc_type === 'Super Admin'): ?>
+                <!-- Admin Panel -->
+                <div class="nav-button">
+                    <a href="../authentication/admin-admins.php">
+                        <i class="fas fa-user-tie"></i>
+                        <span>Admin Panel</span>
+                    </a>
+                </div>
+            <?php endif; ?>
 
             <!-- Logout -->
             <div class="nav-button">
@@ -294,7 +269,6 @@ $agendaHasData = count($agendaCounts) > 0 ? 'true' : 'false';
 
             <div id="nav-content-highlight"></div>
         </div>
-
     </div>
 
     <!-- Main Content -->
@@ -309,11 +283,14 @@ $agendaHasData = count($agendaCounts) > 0 ? 'true' : 'false';
 
             <div id="nav-footer">
                 <div id="nav-footer-heading">
-                    <div id="nav-footer-avatar"><img src="../../assets/images/Male_PF.jpg" />
+                    <div id="nav-footer-avatar"><img src="<?php echo htmlspecialchars($picture_path); ?>" /></div>
+                    <div id="nav-footer-titlebox">
+                        <?php echo htmlspecialchars($admin_fname); ?>
+                        <span id="nav-footer-subtitle"><?php echo htmlspecialchars($acc_type); ?></span>
                     </div>
-                    <div id="nav-footer-titlebox">Benedict<span id="nav-footer-subtitle">Admin</span></div>
                 </div>
             </div>
+
         </div>
 
 

@@ -395,13 +395,14 @@ label[for="nav-toggle"] {
 #nav-footer-titlebox {
   position: relative;
   margin-left: 16px;
-  width: 10px;
+  /* width: 10px; <-- REMOVE or INCREASE this */
   display: flex;
   color: #322e36;
   font-weight: 500;
   flex-direction: column;
   transition: opacity 1s;
 }
+
 
 #nav-footer-subtitle {
   color: gray;
@@ -1303,6 +1304,36 @@ label[for="nav-footer-toggle"] {
   background-color: #f1f1f1;
   border-radius: 5px;
   margin-top: 8px;
+}
+.faculty-pagination-container {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.faculty-pagination {
+  display: inline-block;
+}
+
+.faculty-pagination-link {
+  display: inline-block;
+  padding: 8px 12px;
+  margin: 0 4px;
+  background-color: #f0f0f0;
+  color: #333;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+  font-size: 14px;
+}
+
+.faculty-pagination-link:hover {
+  background-color: #ddd;
+}
+
+.faculty-active-page {
+  background-color: #6366f1;
+  color: white;
+  font-weight: bold;
 }
 
 .placeholder-img {

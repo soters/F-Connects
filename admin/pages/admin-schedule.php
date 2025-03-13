@@ -1,4 +1,9 @@
 <?php
+session_start();
+$admin_fname = $_SESSION['admin_fname'] ?? 'Unknown';
+$acc_type = $_SESSION['acc_type'] ?? 'Unknown';
+$picture_path = $_SESSION['picture_path'] ?? '../../assets/images/Prof.png';
+
 include('../../connection/connection.php');
 date_default_timezone_set('Asia/Manila');
 
@@ -17,6 +22,12 @@ if ($query_faculty === false) {
     die('Error fetching faculty data: ' . print_r(sqlsrv_errors(), true));
 }
 
+// Example: Get current page from URL
+$page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+$perPage = 40; // Set your per-page limit
+$offset = ($page - 1) * $perPage;
+
+// Schedule query with pagination
 $sql_table = "
    SELECT 
     Schedules.sched_id,  
@@ -33,7 +44,8 @@ JOIN Schedules ON Faculty.rfid_no = Schedules.rfid_no
 LEFT JOIN Sections ON Schedules.section_id = Sections.section_id
 LEFT JOIN Locations ON Schedules.room_id = Locations.room_id
 WHERE Faculty.archived = 0
-ORDER BY Faculty.lname ASC, Faculty.fname ASC;";
+ORDER BY Faculty.lname ASC, Faculty.fname ASC
+OFFSET $offset ROWS FETCH NEXT $perPage ROWS ONLY;";
 
 $stmt_table = sqlsrv_query($conn, $sql_table);
 
@@ -267,24 +279,50 @@ function convertTo12HourFormat($time)
             });
         });
 
-        // Toggle between Calendar View and Table View
         function toggleView() {
             const gridView = document.querySelector('.faculty-container-calendar');
             const tableView = document.getElementById('faculty-table');
             const toggleButton = document.getElementById('toggle-view-btn');
 
+            const currentUrl = new URL(window.location.href);
+            const params = currentUrl.searchParams;
+
             if (gridView.style.display === 'none') {
                 gridView.style.display = 'block';
                 tableView.style.display = 'none';
                 toggleButton.textContent = 'View as Table';
+                params.set('view', 'calendar');
             } else {
                 gridView.style.display = 'none';
                 tableView.style.display = 'block';
                 toggleButton.textContent = 'View as Calendar';
+                params.set('view', 'table');
             }
-        }
-    </script>
 
+            // Update URL without reloading
+            history.replaceState(null, '', `${currentUrl.pathname}?${params.toString()}`);
+        }
+
+        // On load, show correct view based on URL param
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const view = urlParams.get('view');
+            const gridView = document.querySelector('.faculty-container-calendar');
+            const tableView = document.getElementById('faculty-table');
+            const toggleButton = document.getElementById('toggle-view-btn');
+
+            if (view === 'table') {
+                gridView.style.display = 'none';
+                tableView.style.display = 'block';
+                toggleButton.textContent = 'View as Calendar';
+            } else {
+                gridView.style.display = 'block';
+                tableView.style.display = 'none';
+                toggleButton.textContent = 'View as Table';
+            }
+        });
+
+    </script>
 </head>
 
 <body>
@@ -314,13 +352,44 @@ function convertTo12HourFormat($time)
                     <span>Attendance Records</span>
                 </a>
             </div>
-            <hr />
+
+            <!-- Appointment -->
+            <div class="nav-button">
+                <a href="admin-appointment.php">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Appointment</span>
+                </a>
+            </div>
+
+            <!-- Announcement -->
+            <div class="nav-button">
+                <a href="admin-announcement.php">
+                    <i class="fas fa-bullhorn"></i>
+                    <span>Announcement</span>
+                </a>
+            </div>
 
             <!-- Faculty -->
             <div class="nav-button">
                 <a href="admin-faculty.php">
                     <i class="fas fa-user"></i>
                     <span>Faculty Members</span>
+                </a>
+            </div>
+
+            <!-- Schedule -->
+            <div class="nav-button">
+                <a href="admin-schedule.php">
+                    <i class="fas fa-calendar"></i>
+                    <span>Schedule</span>
+                </a>
+            </div>
+
+            <!-- Sections -->
+            <div class="nav-button">
+                <a href="admin-sections.php">
+                    <i class="fas fa-users"></i>
+                    <span>Sections</span>
                 </a>
             </div>
 
@@ -331,41 +400,6 @@ function convertTo12HourFormat($time)
                     <span>Student</span>
                 </a>
             </div>
-            <hr />
-
-            <!-- Schedule -->
-            <div class="nav-button">
-                <a href="admin-schedule.php">
-                    <i class="fas fa-calendar"></i>
-                    <span>Schedule</span>
-                </a>
-            </div>
-
-            <!-- Appointment -->
-            <div class="nav-button">
-                <a href="admin-appointment.php">
-                    <i class="fas fa-calendar-check"></i>
-                    <span>Appointment</span>
-                </a>
-            </div>
-
-            <!-- Announcement (Newly Added) -->
-            <div class="nav-button">
-                <a href="admin-announcement.php">
-                    <i class="fas fa-bullhorn"></i>
-                    <span>Announcement</span>
-                </a>
-            </div>
-
-            <hr />
-
-            <!-- Sections -->
-            <div class="nav-button">
-                <a href="admin-sections.php">
-                    <i class="fas fa-users"></i>
-                    <span>Sections</span>
-                </a>
-            </div>
 
             <!-- Subjects -->
             <div class="nav-button">
@@ -374,39 +408,16 @@ function convertTo12HourFormat($time)
                     <span>Subjects</span>
                 </a>
             </div>
-            <hr />
 
-            <!-- Locations -->
-            <div class="nav-button">
-                <a href="admin-locations.php">
-                    <i class="fas fa-location-arrow"></i>
-                    <span>Locations</span>
-                </a>
-            </div>
-
-            <!-- Reports -->
-            <div class="nav-button">
-                <a href="admin-reports.php">
-                    <i class=" fas bi bi-file-earmark-text-fill"></i>
-                    <span>Reports</span>
-                </a>
-            </div>
-
-            <!-- Kiosk -->
-            <div class="nav-button">
-                <a href="admin-kiosk.php">
-                <i class="fas bi bi-tv"></i>
-                    <span>Kiosk</span>
-                </a>
-            </div>
-
-            <!-- Admins -->
-            <div class="nav-button">
-                <a href="../authentication/admin-admins.php">
-                    <i class="fas fa-user-tie"></i>
-                    <span>Admins</span>
-                </a>
-            </div>
+            <?php if ($acc_type === 'Super Admin'): ?>
+                <!-- Admin Panel -->
+                <div class="nav-button">
+                    <a href="../authentication/admin-admins.php">
+                        <i class="fas fa-user-tie"></i>
+                        <span>Admin Panel</span>
+                    </a>
+                </div>
+            <?php endif; ?>
 
             <!-- Logout -->
             <div class="nav-button">
@@ -430,9 +441,11 @@ function convertTo12HourFormat($time)
             </div>
             <div id="nav-footer">
                 <div id="nav-footer-heading">
-                    <div id="nav-footer-avatar"><img src="../../assets/images/Male_PF.jpg" />
+                    <div id="nav-footer-avatar"><img src="<?php echo htmlspecialchars($picture_path); ?>" /></div>
+                    <div id="nav-footer-titlebox">
+                        <?php echo htmlspecialchars($admin_fname); ?>
+                        <span id="nav-footer-subtitle"><?php echo htmlspecialchars($acc_type); ?></span>
                     </div>
-                    <div id="nav-footer-titlebox">Benedict<span id="nav-footer-subtitle">Admin</span></div>
                 </div>
             </div>
         </div>
@@ -535,6 +548,29 @@ function convertTo12HourFormat($time)
             <div id="no-data-message-2" style="display: none;">
                 <img class="no-data-image" src="../../assets/images/data-not-found.png" alt="No Data Found">
                 <h1 class="not-found-message">No Data found.</h1>
+            </div>
+
+            <!-- Faculty Schedule Pagination Container -->
+            <div class="faculty-pagination-container">
+                <div class="faculty-pagination">
+                    <?php
+                    // Count total rows for pagination
+                    $count_sql = "SELECT COUNT(*) AS total FROM Faculty JOIN Schedules ON Faculty.rfid_no = Schedules.rfid_no WHERE Faculty.archived = 0";
+                    $count_stmt = sqlsrv_query($conn, $count_sql);
+                    $count_result = sqlsrv_fetch_array($count_stmt, SQLSRV_FETCH_ASSOC);
+                    $totalRows = $count_result['total'];
+                    $totalPages = ceil($totalRows / $perPage);
+
+                    for ($i = 1; $i <= $totalPages; $i++) {
+                        $urlParams = $_GET;
+                        $urlParams['page'] = $i;
+                        $urlParams['view'] = 'table';
+                        $queryStr = http_build_query($urlParams);
+                        $activeClass = ($i == $page) ? 'faculty-active-page' : '';
+                        echo "<a class=\"faculty-pagination-link {$activeClass}\" href=\"?{$queryStr}\">{$i}</a> ";
+                    }
+                    ?>
+                </div>
             </div>
         </div>
     </div>

@@ -1,4 +1,9 @@
 <?php
+session_start();
+$admin_fname = $_SESSION['admin_fname'] ?? 'Unknown';
+$acc_type = $_SESSION['acc_type'] ?? 'Unknown';
+$picture_path = $_SESSION['picture_path'] ?? '../../assets/images/Prof.png';
+
 include('../../connection/connection.php');
 date_default_timezone_set('Asia/Manila');
 
@@ -226,9 +231,11 @@ if ($stmt_table === false) {
             </div>
             <div id="nav-footer">
                 <div id="nav-footer-heading">
-                    <div id="nav-footer-avatar"><img src="../../assets/images/Male_PF.jpg" />
+                    <div id="nav-footer-avatar"><img src="<?php echo htmlspecialchars($picture_path); ?>" /></div>
+                    <div id="nav-footer-titlebox">
+                        <?php echo htmlspecialchars($admin_fname); ?>
+                        <span id="nav-footer-subtitle"><?php echo htmlspecialchars($acc_type); ?></span>
                     </div>
-                    <div id="nav-footer-titlebox">Benedict<span id="nav-footer-subtitle">Admin</span></div>
                 </div>
             </div>
         </div>

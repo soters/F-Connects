@@ -1,4 +1,10 @@
 <?php
+
+session_start();
+$admin_fname = $_SESSION['admin_fname'] ?? 'Unknown';
+$acc_type = $_SESSION['acc_type'] ?? 'Unknown';
+$picture_path = $_SESSION['picture_path'] ?? '../../assets/images/Prof.png';
+
 include('../../connection/connection.php');
 date_default_timezone_set('Asia/Manila');
 
@@ -192,13 +198,44 @@ while ($row = sqlsrv_fetch_array($appointmentStmt, SQLSRV_FETCH_ASSOC)) {
                     <span>Attendance Records</span>
                 </a>
             </div>
-            <hr />
+
+            <!-- Appointment -->
+            <div class="nav-button">
+                <a href="admin-appointment.php">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Appointment</span>
+                </a>
+            </div>
+
+            <!-- Announcement -->
+            <div class="nav-button">
+                <a href="admin-announcement.php">
+                    <i class="fas fa-bullhorn"></i>
+                    <span>Announcement</span>
+                </a>
+            </div>
 
             <!-- Faculty -->
             <div class="nav-button">
                 <a href="admin-faculty.php">
                     <i class="fas fa-user"></i>
                     <span>Faculty Members</span>
+                </a>
+            </div>
+
+            <!-- Schedule -->
+            <div class="nav-button">
+                <a href="admin-schedule.php">
+                    <i class="fas fa-calendar"></i>
+                    <span>Schedule</span>
+                </a>
+            </div>
+
+            <!-- Sections -->
+            <div class="nav-button">
+                <a href="admin-sections.php">
+                    <i class="fas fa-users"></i>
+                    <span>Sections</span>
                 </a>
             </div>
 
@@ -209,41 +246,6 @@ while ($row = sqlsrv_fetch_array($appointmentStmt, SQLSRV_FETCH_ASSOC)) {
                     <span>Student</span>
                 </a>
             </div>
-            <hr />
-
-            <!-- Schedule -->
-            <div class="nav-button">
-                <a href="admin-schedule.php">
-                    <i class="fas fa-calendar"></i>
-                    <span>Schedule</span>
-                </a>
-            </div>
-
-            <!-- Appointment -->
-            <div class="nav-button">
-                <a href="admin-appointment.php">
-                    <i class="fas fa-calendar-check"></i>
-                    <span>Appointment</span>
-                </a>
-            </div>
-
-            <!-- Announcement (Newly Added) -->
-            <div class="nav-button">
-                <a href="admin-announcement.php">
-                    <i class="fas fa-bullhorn"></i>
-                    <span>Announcement</span>
-                </a>
-            </div>
-
-            <hr />
-
-            <!-- Sections -->
-            <div class="nav-button">
-                <a href="admin-sections.php">
-                    <i class="fas fa-users"></i>
-                    <span>Sections</span>
-                </a>
-            </div>
 
             <!-- Subjects -->
             <div class="nav-button">
@@ -252,39 +254,16 @@ while ($row = sqlsrv_fetch_array($appointmentStmt, SQLSRV_FETCH_ASSOC)) {
                     <span>Subjects</span>
                 </a>
             </div>
-            <hr />
 
-            <!-- Locations -->
-            <div class="nav-button">
-                <a href="admin-locations.php">
-                    <i class="fas fa-location-arrow"></i>
-                    <span>Locations</span>
-                </a>
-            </div>
-
-            <!-- Reports -->
-            <div class="nav-button">
-                <a href="admin-reports.php">
-                    <i class=" fas bi bi-file-earmark-text-fill"></i>
-                    <span>Reports</span>
-                </a>
-            </div>
-
-            <!-- Kiosk -->
-            <div class="nav-button">
-                <a href="admin-kiosk.php">
-                <i class="fas bi bi-tv"></i>
-                    <span>Kiosk</span>
-                </a>
-            </div>
-
-            <!-- Admins -->
-            <div class="nav-button">
-                <a href="../authentication/admin-admins.php">
-                    <i class="fas fa-user-tie"></i>
-                    <span>Admins</span>
-                </a>
-            </div>
+            <?php if ($acc_type === 'Super Admin'): ?>
+                <!-- Admin Panel -->
+                <div class="nav-button">
+                    <a href="../authentication/admin-admins.php">
+                        <i class="fas fa-user-tie"></i>
+                        <span>Admin Panel</span>
+                    </a>
+                </div>
+            <?php endif; ?>
 
             <!-- Logout -->
             <div class="nav-button">
@@ -308,12 +287,13 @@ while ($row = sqlsrv_fetch_array($appointmentStmt, SQLSRV_FETCH_ASSOC)) {
             <div id="current-datetime" class="current-datetime">
                 <p id="date-time"></p> <!-- Updated id here -->
             </div>
-
             <div id="nav-footer">
                 <div id="nav-footer-heading">
-                    <div id="nav-footer-avatar"><img src="../../assets/images/Male_PF.jpg" />
+                    <div id="nav-footer-avatar"><img src="<?php echo htmlspecialchars($picture_path); ?>" /></div>
+                    <div id="nav-footer-titlebox">
+                        <?php echo htmlspecialchars($admin_fname); ?>
+                        <span id="nav-footer-subtitle"><?php echo htmlspecialchars($acc_type); ?></span>
                     </div>
-                    <div id="nav-footer-titlebox">Benedict<span id="nav-footer-subtitle">Admin</span></div>
                 </div>
             </div>
         </div>
@@ -358,7 +338,7 @@ while ($row = sqlsrv_fetch_array($appointmentStmt, SQLSRV_FETCH_ASSOC)) {
                         });
                     </script>
 
-                    <button class="gabtn-red" id="openModal">Generate Report</button>
+                    <!--<button class="gabtn-red" id="openModal">Generate Report</button>-->
                 </div>
             </div>
             <div class="widget-search"></div>
