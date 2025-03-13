@@ -1,4 +1,9 @@
 <?php
+session_start();
+$admin_fname = $_SESSION['admin_fname'] ?? 'Unknown';
+$acc_type = $_SESSION['acc_type'] ?? 'Unknown';
+$picture_path = $_SESSION['picture_path'] ?? '../../assets/images/Prof.png';
+
 include('../../connection/connection.php');
 date_default_timezone_set('Asia/Manila');
 
@@ -62,109 +67,8 @@ sqlsrv_free_stmt($stmtAdmin);
             <!-- Dashboard -->
             <div class="nav-button">
                 <a href="admin-index.php">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Dashboard</span>
-                </a>
-            </div>
-
-            <!-- Attendance Records -->
-            <div class="nav-button">
-                <a href="admin-attendance-records.php">
-                    <i class="fas fa-clipboard"></i>
-                    <span>Attendance Records</span>
-                </a>
-            </div>
-            <hr />
-
-            <!-- Faculty -->
-            <div class="nav-button">
-                <a href="admin-faculty.php">
-                    <i class="fas fa-user"></i>
-                    <span>Faculty Members</span>
-                </a>
-            </div>
-
-            <!-- Student -->
-            <div class="nav-button">
-                <a href="admin-student.php">
-                    <i class="fas fa-users"></i>
-                    <span>Student</span>
-                </a>
-            </div>
-            <hr />
-
-            <!-- Schedule -->
-            <div class="nav-button">
-                <a href="admin-schedule.php">
-                    <i class="fas fa-calendar"></i>
-                    <span>Schedule</span>
-                </a>
-            </div>
-
-            <!-- Appointment -->
-            <div class="nav-button">
-                <a href="admin-appointment.php">
-                    <i class="fas fa-calendar-check"></i>
-                    <span>Appointment</span>
-                </a>
-            </div>
-
-            <!-- Announcement (Newly Added) -->
-            <div class="nav-button">
-                <a href="admin-announcement.php">
-                    <i class="fas fa-bullhorn"></i>
-                    <span>Announcement</span>
-                </a>
-            </div>
-
-            <hr />
-
-            <!-- Sections -->
-            <div class="nav-button">
-                <a href="admin-sections.php">
-                    <i class="fas fa-users"></i>
-                    <span>Sections</span>
-                </a>
-            </div>
-
-            <!-- Subjects -->
-            <div class="nav-button">
-                <a href="admin-subjects.php">
-                    <i class="fas fa-book"></i>
-                    <span>Subjects</span>
-                </a>
-            </div>
-            <hr />
-
-            <!-- Locations -->
-            <div class="nav-button">
-                <a href="admin-locations.php">
-                    <i class="fas fa-location-arrow"></i>
-                    <span>Locations</span>
-                </a>
-            </div>
-
-            <!-- Reports -->
-            <div class="nav-button">
-                <a href="admin-reports.php">
-                    <i class=" fas bi bi-file-earmark-text-fill"></i>
-                    <span>Reports</span>
-                </a>
-            </div>
-
-            <!-- Kiosk -->
-            <div class="nav-button">
-                <a href="admin-kiosk.php">
-                <i class="fas bi bi-tv"></i>
-                    <span>Kiosk</span>
-                </a>
-            </div>
-
-            <!-- Admins -->
-            <div class="nav-button">
-                <a href="../authentication/admin-admins.php">
-                    <i class="fas fa-user-tie"></i>
-                    <span>Admins</span>
+                <i class="fas bi-arrow-left-short"></i>
+                    <span>To Dashboard</span>
                 </a>
             </div>
 
@@ -187,7 +91,7 @@ sqlsrv_free_stmt($stmtAdmin);
                 <div class="widget-button">
                     <h1 class="sub-title">Admin / Edit </h1>
                     <div class="buttons">
-                        <button class="create-btn" type="submit">Save</button>
+                        <button class="create-btn-3" type="submit">Save</button>
                         <a href="admin-manage.php" class="discard-btn">Discard</a>
                     </div>
                 </div>

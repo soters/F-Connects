@@ -365,7 +365,6 @@ label[for="nav-toggle"] {
   border: solid 1px #d1d1d1;
   display: flex;
   flex-direction: column;
-  z-index: 2;
   transition: width 0.2s, height 0.2s;
 }
 
@@ -1209,6 +1208,37 @@ label[for="nav-footer-toggle"] {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+.navbar-1 {
+  display: flex;
+  justify-content: left;
+}
+
+.navbar-1 a {
+  font-size: 14px;
+  color: #322e36;
+  text-decoration: none;
+  padding: 8px 14px;
+  font-family: "Poppins", sans-serif;
+  margin-right: 15px;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+  font-weight: 500;
+}
+
+.navbar-1 a:hover {
+  background-color: #6366f1;
+  color: #fff;
+  font-weight: 500;
+}
+
+.navbar-1 a.active {
+  background-color: #f97316;
+  color: #fff;
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+}
+
+
 .create-btn {
   background-color: #6366f1; /* Primary Color */
   color: white;
@@ -1223,7 +1253,7 @@ label[for="nav-footer-toggle"] {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 15px;
+  margin-top: 7px;
 }
 
 .create-btn:hover {
@@ -1265,12 +1295,41 @@ label[for="nav-footer-toggle"] {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+.create-btn-3 {
+  background-color: #6366f1; /* Primary Color */
+  color: white;
+  font-size: 14px;
+  border: none;
+  padding: 5px 28px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  font-family: "Poppins", sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 15px;
+}
+
+.create-btn-3:hover {
+  background-color: #4f46e5; /* Darker shade on hover */
+  transform: scale(1.05); /* Slight enlargement */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.create-btn-3:active {
+  transform: scale(0.98); /* Small press effect */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+
 .pagination {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 10px;
-  margin-top: 10px;
+  margin-top: 0px;
 }
 
 .pagination a {

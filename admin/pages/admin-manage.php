@@ -102,109 +102,8 @@ if ($stmt_table === false) {
             <!-- Dashboard -->
             <div class="nav-button">
                 <a href="admin-index.php">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Dashboard</span>
-                </a>
-            </div>
-
-            <!-- Attendance Records -->
-            <div class="nav-button">
-                <a href="admin-attendance-records.php">
-                    <i class="fas fa-clipboard"></i>
-                    <span>Attendance Records</span>
-                </a>
-            </div>
-            <hr />
-
-            <!-- Faculty -->
-            <div class="nav-button">
-                <a href="admin-faculty.php">
-                    <i class="fas fa-user"></i>
-                    <span>Faculty Members</span>
-                </a>
-            </div>
-
-            <!-- Student -->
-            <div class="nav-button">
-                <a href="admin-student.php">
-                    <i class="fas fa-users"></i>
-                    <span>Student</span>
-                </a>
-            </div>
-            <hr />
-
-            <!-- Schedule -->
-            <div class="nav-button">
-                <a href="admin-schedule.php">
-                    <i class="fas fa-calendar"></i>
-                    <span>Schedule</span>
-                </a>
-            </div>
-
-            <!-- Appointment -->
-            <div class="nav-button">
-                <a href="admin-appointment.php">
-                    <i class="fas fa-calendar-check"></i>
-                    <span>Appointment</span>
-                </a>
-            </div>
-
-            <!-- Announcement (Newly Added) -->
-            <div class="nav-button">
-                <a href="admin-announcement.php">
-                    <i class="fas fa-bullhorn"></i>
-                    <span>Announcement</span>
-                </a>
-            </div>
-
-            <hr />
-
-            <!-- Sections -->
-            <div class="nav-button">
-                <a href="admin-sections.php">
-                    <i class="fas fa-users"></i>
-                    <span>Sections</span>
-                </a>
-            </div>
-
-            <!-- Subjects -->
-            <div class="nav-button">
-                <a href="admin-subjects.php">
-                    <i class="fas fa-book"></i>
-                    <span>Subjects</span>
-                </a>
-            </div>
-            <hr />
-
-            <!-- Locations -->
-            <div class="nav-button">
-                <a href="admin-locations.php">
-                    <i class="fas fa-location-arrow"></i>
-                    <span>Locations</span>
-                </a>
-            </div>
-
-            <!-- Reports -->
-            <div class="nav-button">
-                <a href="admin-reports.php">
-                    <i class=" fas bi bi-file-earmark-text-fill"></i>
-                    <span>Reports</span>
-                </a>
-            </div>
-
-            <!-- Kiosk -->
-            <div class="nav-button">
-                <a href="admin-kiosk.php">
-                    <i class="fas bi bi-tv"></i>
-                    <span>Kiosk</span>
-                </a>
-            </div>
-
-            <!-- Admins -->
-            <div class="nav-button">
-                <a href="../authentication/admin-admins.php">
-                    <i class="fas fa-user-tie"></i>
-                    <span>Admins</span>
+                <i class="fas bi-arrow-left-short"></i>
+                    <span>To Dashboard</span>
                 </a>
             </div>
 
@@ -218,13 +117,12 @@ if ($stmt_table === false) {
 
             <div id="nav-content-highlight"></div>
         </div>
-
     </div>
 
     <!-- Main Content -->
     <div id="main-content" class="main-content">
         <div id="header">
-            <h1 class="title-text">Admins</h1>
+            <h1 class="title-text">Admin Panel</h1>
             <!-- Display Current Date and Time -->
             <div id="current-datetime" class="current-datetime">
                 <p id="date-time"></p> <!-- Updated id here -->
@@ -237,6 +135,14 @@ if ($stmt_table === false) {
                         <span id="nav-footer-subtitle"><?php echo htmlspecialchars($acc_type); ?></span>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="action-widgets">
+            <div class="navbar-1">
+                <a href="admin-manage.php" class="nav-link active" onclick="setActive(this)">Admins</a>
+                <a href="admin-reports.php" class="nav-link" onclick="setActive(this)">Reports</a>
+                <a href="admin-locations.php" class="nav-link" onclick="setActive(this)">Room</a>
+                <a href="../../kiosk/kiosk-index.php" class="nav-link" onclick="setActive(this)">Go to Kiosk</a>
             </div>
         </div>
 

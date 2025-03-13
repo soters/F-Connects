@@ -10,7 +10,7 @@
 </head>
 
 <body>
-    <a href="../pages/admin-index.php" class="back-button"><i class="bi bi-arrow-left"></i></a>
+    <a href="../pages/admin-index.php" class="back-button"><i class="bi bi-arrow-left-short"></i></a>
     <div class="wrapper">
         <div class="title">
             Admin Authentication

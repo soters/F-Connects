@@ -1,8 +1,12 @@
 <?php
+session_start();
+$admin_fname = $_SESSION['admin_fname'] ?? 'Unknown';
+$acc_type = $_SESSION['acc_type'] ?? 'Unknown';
+$picture_path = $_SESSION['picture_path'] ?? '../../assets/images/Prof.png';
+
 include('../../connection/connection.php');
 date_default_timezone_set('Asia/Manila');
 
-$admin_rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
 $announcement_id = isset($_GET['announcement_id']) ? $_GET['announcement_id'] : null;
 
 // Default values
@@ -70,13 +74,44 @@ if ($announcement_id) {
                     <span>Attendance Records</span>
                 </a>
             </div>
-            <hr />
+
+            <!-- Appointment -->
+            <div class="nav-button">
+                <a href="admin-appointment.php">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Appointment</span>
+                </a>
+            </div>
+
+            <!-- Announcement -->
+            <div class="nav-button">
+                <a href="admin-announcement.php">
+                    <i class="fas fa-bullhorn"></i>
+                    <span>Announcement</span>
+                </a>
+            </div>
 
             <!-- Faculty -->
             <div class="nav-button">
                 <a href="admin-faculty.php">
                     <i class="fas fa-user"></i>
                     <span>Faculty Members</span>
+                </a>
+            </div>
+
+            <!-- Schedule -->
+            <div class="nav-button">
+                <a href="admin-schedule.php">
+                    <i class="fas fa-calendar"></i>
+                    <span>Schedule</span>
+                </a>
+            </div>
+
+            <!-- Sections -->
+            <div class="nav-button">
+                <a href="admin-sections.php">
+                    <i class="fas fa-users"></i>
+                    <span>Sections</span>
                 </a>
             </div>
 
@@ -87,41 +122,6 @@ if ($announcement_id) {
                     <span>Student</span>
                 </a>
             </div>
-            <hr />
-
-            <!-- Schedule -->
-            <div class="nav-button">
-                <a href="admin-schedule.php">
-                    <i class="fas fa-calendar"></i>
-                    <span>Schedule</span>
-                </a>
-            </div>
-
-            <!-- Appointment -->
-            <div class="nav-button">
-                <a href="admin-appointment.php">
-                    <i class="fas fa-calendar-check"></i>
-                    <span>Appointment</span>
-                </a>
-            </div>
-
-            <!-- Announcement (Newly Added) -->
-            <div class="nav-button">
-                <a href="admin-announcement.php">
-                    <i class="fas fa-bullhorn"></i>
-                    <span>Announcement</span>
-                </a>
-            </div>
-
-            <hr />
-
-            <!-- Sections -->
-            <div class="nav-button">
-                <a href="admin-sections.php">
-                    <i class="fas fa-users"></i>
-                    <span>Sections</span>
-                </a>
-            </div>
 
             <!-- Subjects -->
             <div class="nav-button">
@@ -130,39 +130,16 @@ if ($announcement_id) {
                     <span>Subjects</span>
                 </a>
             </div>
-            <hr />
 
-            <!-- Locations -->
-            <div class="nav-button">
-                <a href="admin-locations.php">
-                    <i class="fas fa-location-arrow"></i>
-                    <span>Locations</span>
-                </a>
-            </div>
-
-            <!-- Reports -->
-            <div class="nav-button">
-                <a href="admin-reports.php">
-                    <i class=" fas bi bi-file-earmark-text-fill"></i>
-                    <span>Reports</span>
-                </a>
-            </div>
-
-            <!-- Kiosk -->
-            <div class="nav-button">
-                <a href="admin-kiosk.php">
-                <i class="fas bi bi-tv"></i>
-                    <span>Kiosk</span>
-                </a>
-            </div>
-
-            <!-- Admins -->
-            <div class="nav-button">
-                <a href="../authentication/admin-admins.php">
-                    <i class="fas fa-user-tie"></i>
-                    <span>Admins</span>
-                </a>
-            </div>
+            <?php if ($acc_type === 'Super Admin'): ?>
+                <!-- Admin Panel -->
+                <div class="nav-button">
+                    <a href="../authentication/admin-admins.php">
+                        <i class="fas fa-user-tie"></i>
+                        <span>Admin Panel</span>
+                    </a>
+                </div>
+            <?php endif; ?>
 
             <!-- Logout -->
             <div class="nav-button">
@@ -185,7 +162,7 @@ if ($announcement_id) {
                 <div class="widget-button">
                     <h1 class="sub-title">Announcement / <?php echo $announcement_id ? "Edit" : "New"; ?></h1>
                     <div class="buttons">
-                        <button class="create-btn" type="submit">Save</button>
+                        <button class="create-btn-3" type="submit">Save</button>
                         <a href="admin-announcement.php" class="discard-btn">Discard</a>
                     </div>
                 </div>

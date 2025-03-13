@@ -1,5 +1,4 @@
 <?php
-
 session_start();
 $admin_fname = $_SESSION['admin_fname'] ?? 'Unknown';
 $acc_type = $_SESSION['acc_type'] ?? 'Unknown';
