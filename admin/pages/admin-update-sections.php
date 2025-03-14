@@ -86,19 +86,19 @@ if ($section_id) {
 $students_table = [];
 if ($section_id) {
     $sql_table = "SELECT 
-                    Students.rfid_no, 
-                    Students.student_number,
-                    Students.fname, 
-                    Students.lname, 
-                    Students.email, 
-                    Students.sex,  -- Added sex column
-                    Students.acc_type AS student_role, 
-                    Sections.section_name AS student_section
-                FROM Students
-                LEFT JOIN Sections ON Students.section_id = Sections.section_id
-                WHERE Students.archived = 0  
-                AND Students.section_id = ?  -- Filter by section_id
-                ORDER BY Students.lname ASC, Students.fname ASC";
+    Students.rfid_no, 
+    Students.student_number,
+    Students.fname, 
+    Students.lname, 
+    Students.email, 
+    Students.sex,  
+    Students.acc_type AS student_role, 
+    Sections.section_name AS student_section
+FROM Students
+LEFT JOIN Sections ON Students.section_id = Sections.section_id
+WHERE Students.archived = 0  
+AND Students.section_id = ?  
+ORDER BY Students.sex ASC, Students.lname ASC, Students.fname ASC";
 
     $stmt_table = sqlsrv_query($conn, $sql_table, [$section_id]);
 
@@ -109,8 +109,6 @@ if ($section_id) {
     }
 }
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -317,29 +315,26 @@ if ($section_id) {
                             <?php if (!empty($students_table)): ?>
                                 <div id="studentTable" class="custom-table-2">
                                     <div class="custom-table-header">
-                                        <div class="custom-table-cell">Student Name</div>
                                         <div class="custom-table-cell">Student No.</div>
+                                        <div class="custom-table-cell">Student Name</div>
                                         <div class="custom-table-cell">Email</div>
                                         <div class="custom-table-cell">Gender</div>
-                                        <div class="custom-table-cell">Section</div>
                                     </div>
                                     <div class="custom-table-body">
                                         <?php foreach ($students_table as $student): ?>
                                             <div class="custom-table-row">
                                                 <div class="custom-table-cell">
-                                                    <?= htmlspecialchars($student['fname'] . ' ' . $student['lname']) ?>
-                                                </div>
-                                                <div class="custom-table-cell">
                                                     <?= htmlspecialchars($student['student_number']) ?>
                                                 </div>
                                                 <div class="custom-table-cell">
+                                                    <?= htmlspecialchars($student['fname'] . ' ' . $student['lname']) ?>
+                                                </div>
+                                                <div class="custom-table-cell email-cell"
+                                                    title="<?= htmlspecialchars($student['email']) ?>">
                                                     <?= htmlspecialchars($student['email']) ?>
                                                 </div>
                                                 <div class="custom-table-cell">
                                                     <?= htmlspecialchars($student['sex']) ?>
-                                                </div>
-                                                <div class="custom-table-cell">
-                                                    <?= htmlspecialchars($student['student_section'] ?: 'No Section Assigned') ?>
                                                 </div>
                                             </div>
                                         <?php endforeach; ?>
@@ -356,26 +351,22 @@ if ($section_id) {
                         <table id="studentTables" class="custom-table-2" style="display: none;">
                             <thead class="custom-table-header-2">
                                 <tr>
-                                    <th class="custom-table-cell">Student Name</th>
                                     <th class="custom-table-cell">Student No.</th>
+                                    <th class="custom-table-cell">Student Name</th>
                                     <th class="custom-table-cell">Email</th>
                                     <th class="custom-table-cell">Gender</th>
-                                    <th class="custom-table-cell">Section</th>
                                 </tr>
                             </thead>
                             <tbody class="custom-table-body">
                                 <?php foreach ($students_table as $student): ?>
                                     <tr class="custom-table-row">
+                                        <td class="custom-table-cell"><?= htmlspecialchars($student['student_number']) ?>
+                                        </td>
                                         <td class="custom-table-cell">
                                             <?= htmlspecialchars($student['fname'] . ' ' . $student['lname']) ?>
                                         </td>
-                                        <td class="custom-table-cell"><?= htmlspecialchars($student['student_number']) ?>
-                                        </td>
                                         <td class="custom-table-cell"><?= htmlspecialchars($student['email']) ?></td>
                                         <td class="custom-table-cell"><?= htmlspecialchars($student['sex']) ?></td>
-                                        <td class="custom-table-cell">
-                                            <?= htmlspecialchars($student['student_section'] ?: 'No Section Assigned') ?>
-                                        </td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
@@ -550,71 +541,120 @@ if ($section_id) {
 </script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-    let exportPDFButton = document.querySelector(".pdf-btn");
-    if (exportPDFButton) {
-        exportPDFButton.addEventListener("click", function () {
-            const { jsPDF } = window.jspdf;
-            let doc = new jsPDF();
+        let exportPDFButton = document.querySelector(".pdf-btn");
+        if (exportPDFButton) {
+            exportPDFButton.addEventListener("click", function () {
+                const { jsPDF } = window.jspdf;
+                let doc = new jsPDF();
 
-            if (typeof doc.autoTable !== "function") {
-                console.error("Error: autoTable plugin not loaded. Check script imports.");
-                return;
-            }
+                if (typeof doc.autoTable !== "function") {
+                    console.error("Error: autoTable plugin not loaded. Check script imports.");
+                    return;
+                }
 
-            let table = document.querySelector(".custom-table-2");
-            if (!table) {
-                alert("Error: No student table found.");
-                return;
-            }
+                let table = document.querySelector(".custom-table-2");
+                if (!table) {
+                    alert("Error: No student table found.");
+                    return;
+                }
 
-            let rows = table.querySelectorAll(".custom-table-body .custom-table-row");
+                let rows = table.querySelectorAll(".custom-table-body .custom-table-row");
 
-            let data = [];
-            data.push(["Student Name", "Student No.", "Email", "Gender", "Section"]); // Table headers
+                let data = [];
+                data.push(["Student Name", "Student No.", "Email", "Gender"]); // Table headers
 
-            rows.forEach(row => {
-                let cells = row.querySelectorAll(".custom-table-cell");
-                let rowData = Array.from(cells).map(cell => cell.innerText);
-                data.push(rowData);
+                rows.forEach(row => {
+                    let cells = row.querySelectorAll(".custom-table-cell");
+                    let rowData = Array.from(cells).map(cell => cell.innerText);
+                    data.push(rowData);
+                });
+
+                let sectionName = document.getElementById("sectionName")?.innerText.trim() || "BSIT 1-1";
+                let fileName = `${sectionName.replace(/\s+/g, '_')}_Students.pdf`;
+
+                // === HEADER ===
+                doc.setFont("times", "bold");
+                doc.setFontSize(18);
+                doc.text("COLEGIO DE STA TERESA DE AVILA", 105, 15, null, null, "center");
+
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(10);
+                doc.text("6 Kingfisher St. cor. Skylark St., Zabarte Subd., Novaliches, Quezon City", 105, 20, null, null, "center");
+
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(16);
+                doc.text("COLLEGE OF INFORMATION TECHNOLOGY", 105, 30, null, null, "center");
+
+                doc.setFillColor(0, 0, 0); // Black bar
+                doc.rect(15, 35, 180, 10, 'F');
+                doc.setFontSize(14);
+                doc.setTextColor(255, 255, 255);
+                doc.text(sectionName, 105, 42, null, null, "center");
+
+                doc.setTextColor(0, 0, 0); // Reset to black
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(10);
+                doc.text("AY: 2024-2025", 105, 50, null, null, "center");
+                doc.text("TERM : FIRST SEMESTER", 105, 55, null, null, "center");
+
+                // === Generated Date ===
+                let today = new Date();
+                let generatedDate = today.toLocaleDateString('en-PH', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(10);
+                doc.text(`Generated on: ${generatedDate}`, 15, 63);
+
+                // === STUDENT TABLE ===
+                doc.autoTable({
+                    startY: 68,
+                    head: [data[0]],
+                    body: data.slice(1),
+                    theme: "grid", // This adds borders to the table
+                    headStyles: {
+                        fillColor: [255, 255, 255], // White background
+                        textColor: [0, 0, 0],       // Black text
+                        fontStyle: 'bold',
+                        lineWidth: 0.1,             // Light border lines
+                        lineColor: [0, 0, 0]
+                    },
+                    bodyStyles: {
+                        textColor: [0, 0, 0],
+                        lineWidth: 0.1,
+                        lineColor: [0, 0, 0]
+                    },
+                    styles: {
+                        fontSize: 10,
+                        halign: 'left'
+                    }
+                });
+
+                // === FOOTER (LEFT SIDE) ===
+                let finalY = doc.lastAutoTable.finalY + 20;
+
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(11);
+                doc.text("Prepared by:", 15, finalY);
+
+                doc.setFont("helvetica", "bold");
+                doc.text("HAROLD R. LUCERO, MIT", 22, finalY + 10);
+
+                // Line under name (adjusted width for left alignment)
+                let lineWidth = 60;
+                doc.setLineWidth(0.5);
+                doc.line(15, finalY + 12, 15 + lineWidth, finalY + 12);
+
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(11);
+                doc.text("Dean", 40, finalY + 18);
+
+                // Save PDF
+                doc.save(fileName);
             });
-
-            // Get section name
-            let sectionName = document.getElementById("sectionName")?.innerText.trim() || "Section";
-            let fileName = `${sectionName.replace(/\s+/g, '_')}_Students.pdf`;
-
-            // Add Large School Logo (Adjust size to cover address space)
-            let logoImage = "../../assets/images/csa_logo.png"; // Can be a URL or base64 data
-            doc.addImage(logoImage, "PNG", 15, 10, 26, 26); // (x, y, width, height) - Increased size
-
-            // Add School Header with Times New Roman 18
-            doc.setFont("times", "bold");  // Times New Roman
-            doc.setFontSize(18);  // Font size 18
-            doc.text("Colegio de Sta. Teresa de Avila", 50, 18); // Adjusted X position to avoid logo
-
-            // Additional School Info (Regular Font)
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(10);
-            doc.text("Address: 6 Kingfisher corner Skylark Street, Zabarte Subdivision,", 50, 25);
-            doc.text("Brgy. Kaligayahan, Novaliches, Quezon City, Philippines", 50, 30);
-            doc.text("Contact: 282753916 | Email: officialregistrarcsta@gmail.com", 50, 35);
-
-            // Section Name Title
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(10);
-            doc.text(`Section: ${sectionName}`, 15, 45);
-
-            // Generate Table
-            doc.autoTable({
-                startY: 48, // Position the table below the header and logo
-                head: [data[0]],
-                body: data.slice(1),
-                theme: "grid",
-                styles: { fontSize: 10 }
-            });
-
-            doc.save(fileName);
-        });
-    }
-});
+        }
+    });
 </script>
 </html>
