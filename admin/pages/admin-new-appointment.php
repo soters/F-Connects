@@ -179,7 +179,7 @@ date_default_timezone_set('Asia/Manila');
                             <label for="agenda">Agenda</label>
                             <select id="agenda" name="agenda" class="name-input-2" required>
                                 <option value="" disabled selected>Select Agenda</option>
-                                <option value="Project/Research Discussion">Project/Research Discussion</option>
+                                <option value="Project Or Research Discussion">Project Or Research Discussion</option>
                                 <option value="Mentorship">Mentorship</option>
                                 <option value="Internship or Practical Experience Advice">Internship or Practical
                                     Experience Advice</option>

@@ -1444,6 +1444,35 @@ label[for="nav-footer-toggle"] {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+.face-btn {
+  background-color: #f97316; /* Orange - Primary */
+  color: white;
+  font-size: 14px;
+  border: none;
+  padding: 8px 28px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  font-family: "Poppins", sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 0px;
+}
+
+.face-btn:hover {
+  background-color: #ea580c; /* Darker Orange on hover */
+  transform: scale(1.05); /* Slight enlargement */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.face-btn:active {
+  transform: scale(0.98); /* Press effect */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+}
+
+
 .red-btn {
   background-color: #ef4444; /* Primary Color (Red) */
   color: white;
@@ -2358,13 +2387,17 @@ label[for="nav-footer-toggle"] {
 .count-2 {
   float: right;
   font-size: 30px;
-  margin-right: 5px;
+  margin-right: 0px;
   font-family: Poppins, sans-serif;
   font-weight: 1000;
   color: red;
 }
 
 .completed-lbl {
+  font-size: 12px;
+}
+
+.completed-lbl-2 {
   font-size: 12px;
 }
 

@@ -561,7 +561,7 @@ ORDER BY Students.sex ASC, Students.lname ASC, Students.fname ASC";
                 let rows = table.querySelectorAll(".custom-table-body .custom-table-row");
 
                 let data = [];
-                data.push(["Student Name", "Student No.", "Email", "Gender"]); // Table headers
+                data.push(["Student No.", "Student Name", "Email", "Gender"]); // Table headers
 
                 rows.forEach(row => {
                     let cells = row.querySelectorAll(".custom-table-cell");
@@ -575,7 +575,7 @@ ORDER BY Students.sex ASC, Students.lname ASC, Students.fname ASC";
                 // === HEADER ===
                 doc.setFont("times", "bold");
                 doc.setFontSize(18);
-                doc.text("COLEGIO DE STA TERESA DE AVILA", 105, 15, null, null, "center");
+                doc.text("COLEGIO DE STA. TERESA DE AVILA", 105, 15, null, null, "center");
 
                 doc.setFont("helvetica", "normal");
                 doc.setFontSize(10);
@@ -605,7 +605,7 @@ ORDER BY Students.sex ASC, Students.lname ASC, Students.fname ASC";
                     day: 'numeric'
                 });
                 doc.setFont("helvetica", "normal");
-                doc.setFontSize(10);
+                doc.setFontSize(9);
                 doc.text(`Generated on: ${generatedDate}`, 15, 63);
 
                 // === STUDENT TABLE ===
@@ -613,13 +613,16 @@ ORDER BY Students.sex ASC, Students.lname ASC, Students.fname ASC";
                     startY: 68,
                     head: [data[0]],
                     body: data.slice(1),
-                    theme: "grid", // This adds borders to the table
+                    theme: "grid", // Adds borders to the table
                     headStyles: {
                         fillColor: [255, 255, 255], // White background
                         textColor: [0, 0, 0],       // Black text
                         fontStyle: 'bold',
                         lineWidth: 0.1,             // Light border lines
-                        lineColor: [0, 0, 0]
+                        lineColor: [0, 0, 0],
+                        halign: 'center',           // Center align text
+                        valign: 'middle',           // Vertically center text
+                        cellPadding: 4             // Adjust padding for the header
                     },
                     bodyStyles: {
                         textColor: [0, 0, 0],
@@ -631,6 +634,7 @@ ORDER BY Students.sex ASC, Students.lname ASC, Students.fname ASC";
                         halign: 'left'
                     }
                 });
+
 
                 // === FOOTER (LEFT SIDE) ===
                 let finalY = doc.lastAutoTable.finalY + 20;
@@ -657,4 +661,5 @@ ORDER BY Students.sex ASC, Students.lname ASC, Students.fname ASC";
         }
     });
 </script>
+
 </html>

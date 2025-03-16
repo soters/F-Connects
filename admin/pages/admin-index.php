@@ -100,6 +100,8 @@ $sqlTopProf = "
     WHERE a.status = 'Completed' 
     AND MONTH(a.date_logged) = ? 
     AND YEAR(a.date_logged) = ?
+    AND f.employment_type = 'Full time'
+    AND f.archived = 0
     GROUP BY f.rfid_no, f.fname, f.mname, f.lname
     ORDER BY completed_count DESC
 ";
@@ -115,29 +117,30 @@ while ($row = sqlsrv_fetch_array($stmtTopProf, SQLSRV_FETCH_ASSOC)) {
     ];
 }
 
-// Query for top 3 professors with highest "Declined" appointments in selected month and year
-$sqlTopDeclinedProf = "
-    SELECT TOP 3 
-        f.rfid_no, 
-        CONCAT(f.fname, ' ', COALESCE(f.mname + ' ', ''), f.lname) AS fullname, 
-        COUNT(a.appointment_code) AS declined_count
-    FROM Appointments a
-    JOIN Faculty f ON a.prof_rfid_no = f.rfid_no
-    WHERE a.status = 'Declined' 
-    AND MONTH(a.date_logged) = ? 
-    AND YEAR(a.date_logged) = ?
+$sqlLeastEngagedProf = "
+    SELECT TOP 3
+        f.rfid_no,
+        CONCAT(f.fname, ' ', COALESCE(f.mname + ' ', ''), f.lname) AS fullname,
+        COUNT(a.appointment_code) AS completed_appointments
+    FROM Faculty f
+    LEFT JOIN Appointments a 
+        ON a.prof_rfid_no = f.rfid_no
+        AND a.status = 'Completed'
+        AND MONTH(a.date_logged) = ?
+        AND YEAR(a.date_logged) = ?
+    WHERE f.employment_type = 'Full Time' AND f.archived = 0
     GROUP BY f.rfid_no, f.fname, f.mname, f.lname
-    ORDER BY declined_count DESC
+    ORDER BY completed_appointments ASC
 ";
 
-$stmtTopDeclinedProf = sqlsrv_query($conn, $sqlTopDeclinedProf, $params);
+$stmtLeastEngagedProf = sqlsrv_query($conn, $sqlLeastEngagedProf, $params);
 
-$topDeclinedProfs = [];
-while ($row = sqlsrv_fetch_array($stmtTopDeclinedProf, SQLSRV_FETCH_ASSOC)) {
-    $topDeclinedProfs[] = [
+$leastEngagedProfs = [];
+while ($row = sqlsrv_fetch_array($stmtLeastEngagedProf, SQLSRV_FETCH_ASSOC)) {
+    $leastEngagedProfs[] = [
         'prof_rfid_no' => $row['rfid_no'],
         'fullname' => $row['fullname'],
-        'declined_count' => $row['declined_count']
+        'completed_appointments' => $row['completed_appointments']
     ];
 }
 
@@ -424,14 +427,14 @@ $agendaHasData = count($agendaCounts) > 0 ? 'true' : 'false';
                     <p class="no-data-message-4">No data available for this month</p>
                 </div>
             <?php endif; ?>
-            <?php if (!empty($topDeclinedProfs)): ?>
+            <?php if (!empty($leastEngagedProfs)): ?>
                 <div class="chart-widget">
-                    <h2 class="tbl-title-2">Least Engagement / month</h2>
-                    <?php foreach ($topDeclinedProfs as $prof): ?>
+                    <h2 class="tbl-title-2">Least Engagement / Month</h2>
+                    <?php foreach ($leastEngagedProfs as $prof): ?>
                         <div class="most-card">
                             <h3 class="prof-full-name"><?= htmlspecialchars($prof['fullname']) ?></h3>
-                            <p class="completed-lbl"><i>Declined Appointments:</i>
-                                <span class="count-2"><?= $prof['declined_count'] ?></span>
+                            <p class="completed-lbl-2"><i>Completed Appointments:</i>
+                                <span class="count-2"><?= $prof['completed_appointments'] ?></span>
                             </p>
                         </div>
                     <?php endforeach; ?>
@@ -441,7 +444,6 @@ $agendaHasData = count($agendaCounts) > 0 ? 'true' : 'false';
                     <p class="no-data-message-4">No data available for this month</p>
                 </div>
             <?php endif; ?>
-
         </div>
 
         <!-- Second Widgets Lines For Different Counts -->

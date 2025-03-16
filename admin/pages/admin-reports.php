@@ -85,7 +85,7 @@ $attendanceData = json_encode($attendanceCounts);
             <!-- Dashboard -->
             <div class="nav-button">
                 <a href="admin-index.php">
-                <i class="fas bi-arrow-left-short"></i>
+                    <i class="fas bi-arrow-left-short"></i>
                     <span>To Dashboard</span>
                 </a>
             </div>
@@ -785,31 +785,47 @@ $attendanceData = json_encode($attendanceCounts);
 
         // ------------------------ HELPER FUNCTIONS ------------------------
         function addReportHeader(doc, title) {
-            let logoImage = "../../assets/images/csa_logo.png";
-            doc.addImage(logoImage, "PNG", 15, 10, 26, 26);
-
+            // === HEADER ===
             doc.setFont("times", "bold");
             doc.setFontSize(18);
-            doc.text("Colegio de Sta. Teresa de Avila", 50, 18);
+            doc.text("COLEGIO DE STA. TERESA DE AVILA", 105, 15, null, null, "center");
 
             doc.setFont("helvetica", "normal");
             doc.setFontSize(10);
-            doc.text("Address: 6 Kingfisher corner Skylark Street, Zabarte Subdivision,", 50, 25);
-            doc.text("Brgy. Kaligayahan, Novaliches, Quezon City, Philippines", 50, 30);
-            doc.text("Contact: 282753916 | Email: officialregistrarcsta@gmail.com", 50, 35);
-
-            doc.setLineWidth(0.5);
-            doc.line(15, 40, 195, 40);
+            doc.text("6 Kingfisher St. cor. Skylark St., Zabarte Subd., Novaliches, Quezon City", 105, 20, null, null, "center");
 
             doc.setFont("helvetica", "bold");
-            doc.setFontSize(14);
-            doc.text(title, 15, 50);
+            doc.setFontSize(16);
+            doc.text("COLLEGE OF INFORMATION TECHNOLOGY", 105, 30, null, null, "center");
 
-            let timestamp = new Date().toLocaleString();
-            doc.setFont("helvetica", "italic");
+            // === Black Bar for "APPOINTMENT REPORT" ===
+            doc.setFillColor(0, 0, 0); // Black background
+            doc.rect(15, 35, 180, 10, 'F'); // Black bar
+
+            doc.setFontSize(14);
+            doc.setTextColor(255, 255, 255); // White text
+            doc.text("APPOINTMENT REPORT", 105, 42, null, null, "center");
+
+            // Reset text color to black
+            doc.setTextColor(0, 0, 0);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(10);
+            doc.text("AY: 2024-2025", 105, 50, null, null, "center");
+            doc.text("TERM : FIRST SEMESTER", 105, 55, null, null, "center");
+
+            // === Generated Date ===
+            let today = new Date();
+            let generatedDate = today.toLocaleDateString('en-PH', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            doc.setFont("helvetica", "normal");
             doc.setFontSize(9);
-            doc.text(`Generated on: ${timestamp}`, 15, 55);
+            doc.text(`Generated on: ${generatedDate}`, 15, 63);
         }
+
 
         function addPageNumbers(doc) {
             const pageCount = doc.internal.getNumberOfPages();

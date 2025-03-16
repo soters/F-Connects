@@ -192,6 +192,10 @@ if ($stmtDepartments !== false) {
                         onclick="openArchiveModal(<?= isset($_GET['rfid_no']) ? htmlspecialchars($_GET['rfid_no']) : 'null'; ?>)">
                         Archive
                     </a>
+                    <a href="javascript:void(0);" class="face-btn"
+                        onclick="openArchiveModal(<?= isset($_GET['rfid_no']) ? htmlspecialchars($_GET['rfid_no']) : 'null'; ?>)">
+                        Upload Face Data
+                    </a>
                     <!--<button class="pass-btn" type="button">Account Informations</button>-->
                 </div>
                 <div class="faculty-container-2">

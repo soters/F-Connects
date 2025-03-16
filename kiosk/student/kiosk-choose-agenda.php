@@ -53,13 +53,13 @@ $end_time = filter_input(INPUT_POST, 'end_time', FILTER_SANITIZE_STRING);
         <form action="kiosk-summary.php" method="POST">
             <div class="agenda-cards">
                 <label>
-                    <input type="radio" name="selected_agenda" value="Project/Research Discussion" required>
+                    <input type="radio" name="selected_agenda" value="Project Or Research Discussion" required>
                     <div class="agenda-card">
                         <div class="agenda-logo">
                             <i class="bi bi-clipboard-check agenda-logo"></i>
                         </div>
                         <div class="info">
-                            <p class="agenda-name">Project/Research Discussion</p>
+                            <p class="agenda-name">Project Or Research Discussion</p>
                         </div>
                     </div>
                 </label>
