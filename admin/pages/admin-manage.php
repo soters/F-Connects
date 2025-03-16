@@ -526,6 +526,7 @@ if ($stmt_table === false) {
         window.location.href = `admin-update-admin.php?rfid_no=${rfid_no}`;
     }
 </script>
+
 <script>
     document.querySelectorAll('.faculty-card').forEach(card => {
         card.addEventListener('click', () => {
@@ -534,5 +535,4 @@ if ($stmt_table === false) {
         });
     });
 </script>
-
 </html>
