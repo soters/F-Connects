@@ -1185,7 +1185,7 @@ label[for="nav-footer-toggle"] {
   color: white;
   font-size: 14px;
   border: none;
-  padding: 5px 28px;
+  padding: 5px 15px;
   border-radius: 5px;
   cursor: pointer;
   transition: all 0.3s ease-in-out;
@@ -1217,9 +1217,9 @@ label[for="nav-footer-toggle"] {
   font-size: 14px;
   color: #322e36;
   text-decoration: none;
-  padding: 8px 14px;
+  padding: 5px 28px;
   font-family: "Poppins", sans-serif;
-  margin-right: 15px;
+  margin-right: 8px;
   border-radius: 6px;
   transition: background-color 0.3s ease;
   font-weight: 500;

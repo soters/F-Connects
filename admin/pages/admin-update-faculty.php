@@ -184,10 +184,10 @@ if ($stmtDepartments !== false) {
                         onclick="openResetModal(<?= isset($_GET['rfid_no']) ? htmlspecialchars($_GET['rfid_no']) : 'null'; ?>)">
                         Reset Password
                     </a>
-                    <a href="javascript:void(0);" class="red-btn"
+                    <!--<a href="javascript:void(0);" class="red-btn"
                         onclick="openDeleteModal(<?= isset($_GET['rfid_no']) ? htmlspecialchars($_GET['rfid_no']) : 'null'; ?>)">
                         Delete
-                    </a>
+                    </a>-->
                     <a href="javascript:void(0);" class="arc-btn"
                         onclick="openArchiveModal(<?= isset($_GET['rfid_no']) ? htmlspecialchars($_GET['rfid_no']) : 'null'; ?>)">
                         Archive
@@ -383,7 +383,7 @@ if ($stmtDepartments !== false) {
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
+    <!-- Delete Confirmation Modal 
     <div id="deleteModal" class="custom-modal">
         <div class="modal-content">
             <h2>Confirm Delete</h2>
@@ -393,7 +393,7 @@ if ($stmtDepartments !== false) {
                 <button onclick="closeDeleteModal()" class="btn-cancel">Cancel</button>
             </div>
         </div>
-    </div>
+    </div>-->
 
     <!-- Reset Confirmation Modal -->
     <div id="resetModal" class="custom-modal">
@@ -493,7 +493,7 @@ if ($stmtDepartments !== false) {
         window.location.href = `../functions/archive-faculty.php?rfid_no=${rfidNo}`; // Redirect with RFID
     });
 
-    function openDeleteModal(rfidNo) {
+    /**function openDeleteModal(rfidNo) {
         document.getElementById("deleteModal").style.display = "block"; // Show modal
         document.getElementById("modalOverlay").style.display = "block"; // Show dark overlay
         document.getElementById("confirmDelete").setAttribute("data-rfid", rfidNo); // Store RFID
@@ -508,7 +508,7 @@ if ($stmtDepartments !== false) {
     document.getElementById("confirmDelete").addEventListener("click", function () {
         let rfidNo = this.getAttribute("data-rfid"); // Get stored RFID
         window.location.href = `../functions/delete-faculty.php?rfid_no=${rfidNo}`; // Redirect with RFID
-    });
+    }); **/
 
     function openResetModal(rfidNo) {
         document.getElementById("resetModal").style.display = "block"; // Show modal

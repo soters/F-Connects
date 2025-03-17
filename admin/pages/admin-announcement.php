@@ -225,15 +225,13 @@ if ($stmt_table === false) {
                     <button class='bx bx-search'></button>
                 </div>
                 <div class="dropdown-sort">
-                    <div class="dropdown-sort">
-                        <select id="sort-dropdown" onchange="sortWidgets()">
-                            <option value="" disabled selected>Filters</option>
-                            <option value="title-asc">Title (A-Z)</option>
-                            <option value="title-desc">Title (Z-A)</option>
-                            <option value="date-recent">Date (Recent-Oldest)</option>
-                            <option value="date-oldest">Date (Oldest-Recent)</option>
-                        </select>
-                    </div>
+                    <select id="sort-dropdown" onchange="sortWidgets()">
+                        <option value="" disabled selected>Filters</option>
+                        <option value="title-asc">Title (A-Z)</option>
+                        <option value="title-desc">Title (Z-A)</option>
+                        <option value="date-recent">Date (Recent-Oldest)</option>
+                        <option value="date-oldest">Date (Oldest-Recent)</option>
+                    </select>
                 </div>
                 <button class="toggle-view-btn" id="toggle-view-btn" onclick="toggleView()">View as Table</button>
             </div>

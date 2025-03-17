@@ -70,7 +70,6 @@ while ($row = sqlsrv_fetch_array($stmtTopProf, SQLSRV_FETCH_ASSOC)) {
         'completed_count' => $row['completed_count']
     ];
 }
-
 $sqlLeastEngagedProf = "
     SELECT TOP 3
         f.rfid_no,
@@ -78,7 +77,7 @@ $sqlLeastEngagedProf = "
         COUNT(a.appointment_code) AS completed_appointments
     FROM Faculty f
     LEFT JOIN Appointments a 
-        ON a.prof_rfid_no = f.r fid_no
+        ON a.prof_rfid_no = f.rfid_no
         AND a.status = 'Completed'
         AND MONTH(a.date_logged) = ?
         AND YEAR(a.date_logged) = ?
@@ -87,8 +86,16 @@ $sqlLeastEngagedProf = "
     ORDER BY completed_appointments ASC 
 ";
 
+// Execute query
 $stmtLeastEngagedProf = sqlsrv_query($conn, $sqlLeastEngagedProf, $params);
 
+// Check for query failure
+if ($stmtLeastEngagedProf === false) {
+    echo "Query failed: ";
+    die(print_r(sqlsrv_errors(), true));
+}
+
+// Fetch results
 $leastEngagedProfs = [];
 while ($row = sqlsrv_fetch_array($stmtLeastEngagedProf, SQLSRV_FETCH_ASSOC)) {
     $leastEngagedProfs[] = [
@@ -97,7 +104,6 @@ while ($row = sqlsrv_fetch_array($stmtLeastEngagedProf, SQLSRV_FETCH_ASSOC)) {
         'completed_appointments' => $row['completed_appointments']
     ];
 }
-
 
 // Query to select all appointments (no date filter)
 $sql = "

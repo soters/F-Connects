@@ -7,9 +7,9 @@ $picture_path = $_SESSION['picture_path'] ?? '../../assets/images/Prof.png';
 include('../../connection/connection.php');
 date_default_timezone_set('Asia/Manila');
 
-$admin_rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
+$rfid_no = isset($_GET['rfid_no']) ? $_GET['rfid_no'] : null;
 
-if (!$admin_rfid_no) {
+if (!$rfid_no) {
     $message = "No RFID provided!";
     $type = "error";
     header("Location: admin-manage.php?message=" . urlencode($message) . "&type=" . urlencode($type));
@@ -17,17 +17,17 @@ if (!$admin_rfid_no) {
 }
 
 // Fetch admin data
-$sqlAdmin = "SELECT a.*, addr.region, addr.province, addr.city, addr.brgy, addr.zip_code, addr.address_dtl 
+$sqlAdmin = "SELECT a.*, addr.region, addr.province, addr.city, addr.zip_code, addr.address_dtl 
              FROM Admin a
              LEFT JOIN AdminAddresses addr ON a.rfid_no = addr.rfid_no
              WHERE a.rfid_no = ?";
-$paramsAdmin = [$admin_rfid_no];
+$paramsAdmin = [$rfid_no];
 $stmtAdmin = sqlsrv_query($conn, $sqlAdmin, $paramsAdmin);
 
 if ($stmtAdmin === false || !sqlsrv_has_rows($stmtAdmin)) {
     $message = "Admin data not found!";
     $type = "error";
-    header("Location: admin-management.php?message=" . urlencode($message) . "&type=" . urlencode($type));
+    header("Location: admin-manages.php?message=" . urlencode($message) . "&type=" . urlencode($type));
     exit();
 }
 

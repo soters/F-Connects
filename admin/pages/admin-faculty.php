@@ -267,10 +267,10 @@ if ($stmt_table === false) {
                                     onclick="openArchiveModal('<?= htmlspecialchars($faculty['rfid_no']) ?>')">
                                     <i class="fas fa-archive"></i> <!-- Archive icon -->
                                 </button>
-                                <button class="action-btn delete-btn"
+                                <!--<button class="action-btn delete-btn"
                                     onclick="openDeleteModal(<?= htmlspecialchars($faculty['rfid_no']) ?>)">
-                                    <i class="fas fa-trash"></i> <!-- Trash icon -->
-                                </button>
+                                    <i class="fas fa-trash"></i> 
+                                </button>-->
                                 <button class="action-btn update-btn"
                                     onclick="updateFaculty(<?= htmlspecialchars($faculty['rfid_no']) ?>)">
                                     <i class="fas fa-edit"></i> <!-- Edit icon -->
@@ -303,7 +303,7 @@ if ($stmt_table === false) {
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
+    <!-- Delete Confirmation Modal 
     <div id="deleteModal" class="custom-modal">
         <div class="modal-content">
             <h2>Confirm Delete</h2>
@@ -313,7 +313,7 @@ if ($stmt_table === false) {
                 <button onclick="closeDeleteModal()" class="btn-cancel">Cancel</button>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <!-- Scroll to Top Button -->
     <button id="scrollToTopBtn" onclick="scrollToTop()">↑</button>
@@ -531,7 +531,7 @@ if ($stmt_table === false) {
         window.location.href = `../functions/archive-faculty.php?rfid_no=${rfidNo}`; // Redirect with RFID
     });
 
-    function openDeleteModal(rfidNo) {
+    /**function openDeleteModal(rfidNo) {
         document.getElementById("deleteModal").style.display = "block"; // Show modal
         document.getElementById("modalOverlay").style.display = "block"; // Show dark overlay
         document.getElementById("confirmDelete").setAttribute("data-rfid", rfidNo); // Store RFID
@@ -546,7 +546,7 @@ if ($stmt_table === false) {
     document.getElementById("confirmDelete").addEventListener("click", function () {
         let rfidNo = this.getAttribute("data-rfid"); // Get stored RFID
         window.location.href = `../functions/delete-faculty.php?rfid_no=${rfidNo}`; // Redirect with RFID
-    });
+    }); **/
 </script>
 
 <script>
