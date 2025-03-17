@@ -75,14 +75,14 @@ $rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
             <a href="kiosk-reminder-1.php?rfid_no=<?php echo urlencode($rfid_no); ?>" class="no-underline">
                 <button type="button" class="small-button" data-bs-toggle="tooltip" title="Back"
                     data-bs-placement="right">
-                    <i class="bi bi-arrow-left"></i>
+                    <i class="bi bi-arrow-left-short"></i>
                 </button>
             </a>
         </div>
 
-        <footer>
+        <!--<footer>
             <p id="collaboration-text">In collaboration with Colegio de Sta. Teresa de Avila</p>
-        </footer>
+        </footer>-->
 
         <!-- Scripts -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">

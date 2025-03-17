@@ -37,13 +37,15 @@ $rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
         <a id="live-date"></a>
     </nav>
 
-
+    <br>
     <div id="u-action-message-container">
-        <p id="action-message-rfid">Register Your Facial Data</p>
-        <p id="action-message-small">Position your face in front of the camera and touch "Capture"</p>
     </div>
 
     <div id="body-container">
+    <p id="action-message-rfid">Register Your Facial Data</p>
+            <p id="action-message-small">Position your face in front of the camera and touch "Capture"</p>
+    <br>    
+    <br>    
         <video id="video" width="540" height="400" autoplay></video>
         <div class="preview-container" id="previewContainer"></div>
         <canvas id="canvas" width="540" height="400"></canvas>
@@ -56,7 +58,7 @@ $rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
         <p id="status"></p>
         <!--<p id="message" class="message">You can only capture up to 3 photos.</p> -->
     </div>
-      <!--div id="top-right-button">
+    <!--div id="top-right-button">
             <button type="button" class="small-button" data-bs-toggle="tooltip" title="Need help?"
                 data-bs-placement="left">
                 <i class="bi bi-question-lg"></i>
@@ -65,14 +67,14 @@ $rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
     <div id="top-left-button">
         <a href="kiosk-reminder-3.php?rfid_no=<?php echo urlencode($rfid_no); ?>" class="no-underline">
             <button type="button" class="small-button" data-bs-toggle="tooltip" title="Back" data-bs-placement="right">
-                <i class="bi bi-arrow-left"></i>
+                <i class="bi bi-arrow-left-short"></i>
             </button>
         </a>
     </div>
 
-    <footer>
+    <!-- <footer>
         <p id="collaboration-text">In collaboration with Colegio de Sta. Teresa de Avila</p>
-    </footer>
+    </footer>-->
 
     <div id="confirmModal" class="modal">
         <div class="modal-content">

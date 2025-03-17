@@ -285,9 +285,9 @@ if ($room_id) {
 
 <script>
     function openQRModal() {
-        let buildingId = "<?php echo $bldg_id; ?>";
+        let buildingName = "<?php echo $building_name; ?>";
         let roomName = "<?php echo $room_name; ?>";
-        let qrData = buildingId + "_" + roomName;
+        let qrData = buildingName + " - " + roomName;
 
         document.getElementById("qrCodeContainer").innerHTML = ""; 
         new QRCode(document.getElementById("qrCodeContainer"), qrData);

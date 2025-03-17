@@ -94,7 +94,7 @@ try {
                 $apptStart = strtotime($appointment['start']);
                 $apptEnd = strtotime($appointment['end']);
 
-                if (in_array($appointment['status'], ['Pending', 'Accepted'])) {
+                if (in_array($appointment['status'], ['Pending', 'Accepted', 'Started'])) {
                     if (
                         ($slotStartTime >= $apptStart && $slotStartTime < $apptEnd) ||
                         ($slotEndTime > $apptStart && $slotEndTime <= $apptEnd)
