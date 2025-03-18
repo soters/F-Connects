@@ -167,6 +167,16 @@ $agendaHasData = count($agendaCounts) > 0 ? 'true' : 'false';
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css">
     <link rel="stylesheet" href="../../assets/css/admin-design.css">
+    <style>
+        .clickable-row {
+            cursor: pointer;
+        }
+
+        .clickable-row:hover {
+            background-color: #f0f0f0;
+        }
+    </style>
+
 </head>
 
 <body>
@@ -515,13 +525,14 @@ $agendaHasData = count($agendaCounts) > 0 ? 'true' : 'false';
                                         break;
                                 }
                                 ?>
-                                <tr class="tbl-row">
+                                <tr class="tbl-row clickable-row"
+                                    data-href="admin-update-attendance.php?attd_ref=<?= urlencode($row['attd_ref']) ?>">
                                     <td class="small-text"><?= htmlspecialchars($row['fname'] . " " . $row['lname']) ?></td>
-                                    <!--<td><?= htmlspecialchars($row['acc_type']) ?></td>-->
                                     <td><?= $row['time_in'] ? $row['time_in']->format('h:i A') : 'N/A' ?></td>
                                     <td><?= $row['time_out'] ? $row['time_out']->format('h:i A') : 'N/A' ?></td>
                                     <td class="<?= $statusClass ?>"><?= htmlspecialchars($row['status']) ?></td>
                                 </tr>
+
                             <?php endwhile; ?>
                         </tbody>
                     </table>
@@ -558,6 +569,17 @@ $agendaHasData = count($agendaCounts) > 0 ? 'true' : 'false';
         }
     });
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const rows = document.querySelectorAll('.clickable-row');
+        rows.forEach(row => {
+            row.addEventListener('click', () => {
+                window.location.href = row.getAttribute('data-href');
+            });
+        });
+    });
+</script>
+
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>

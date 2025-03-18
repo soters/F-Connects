@@ -2,13 +2,12 @@
 include('../../connection/connection.php');
 date_default_timezone_set('Asia/Manila');
 
-if (isset($_GET['attd_ref']) && isset($_GET['rfid_no'])) {
+if (isset($_GET['attd_ref'])) {
     $attdRef = $_GET['attd_ref'];
-    $rfidNo = $_GET['rfid_no'];
 
-    // Delete the attendance record
-    $sql = "DELETE FROM AttendanceRecords WHERE attd_ref = ? AND rfid_no = ?";
-    $stmt = sqlsrv_query($conn, $sql, array($attdRef, $rfidNo));
+    // Delete the attendance record using only attd_ref
+    $sql = "DELETE FROM AttendanceToday WHERE attd_ref = ?";
+    $stmt = sqlsrv_query($conn, $sql, array($attdRef));
 
     if ($stmt) {
         $message = "Attendance record deleted successfully!";

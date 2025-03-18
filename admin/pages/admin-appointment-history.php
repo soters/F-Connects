@@ -426,7 +426,7 @@ while ($row = sqlsrv_fetch_array($appointmentStmt, SQLSRV_FETCH_ASSOC)) {
                             $statusKey = strtolower(trim($row['status']));
                             $statusClass = $statusClasses[$statusKey] ?? 'status-default';
 
-                            $isClickable = in_array($statusKey, ['pending', 'accepted']);
+                            $isClickable = in_array($statusKey, ['pending', 'accepted','cancel', 'completed']);
 
                             $professor = htmlspecialchars($row['prof_fname'] . " " . $row['prof_lname']);
                             $student = htmlspecialchars($row['stud_fname'] . " " . $row['stud_lname']);
