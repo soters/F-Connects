@@ -117,41 +117,6 @@ try {
     exit;
 }
 
-// Begin transaction
-sqlsrv_begin_transaction($conn);
-
-try {
-    // Step 1: Insert rows from AttendanceToday to AttendanceRecords
-    $insertQuery = "
-        INSERT INTO AttendanceRecords (attd_ref, rfid_no, time_in, time_out, status, date_logged)
-        SELECT attd_ref, rfid_no, time_in, time_out, status, date_logged
-        FROM AttendanceToday
-        WHERE date_logged < CAST(GETDATE() AS DATE)
-    ";
-    $insertStmt = sqlsrv_query($conn, $insertQuery);
-
-    if ($insertStmt === false) {
-        throw new Exception("Error inserting data: " . print_r(sqlsrv_errors(), true));
-    }
-
-    // Step 2: Delete the inserted rows from AttendanceToday
-    $deleteQuery = "
-        DELETE FROM AttendanceToday
-        WHERE date_logged < CAST(GETDATE() AS DATE)
-    ";
-    $deleteStmt = sqlsrv_query($conn, $deleteQuery);
-
-    if ($deleteStmt === false) {
-        throw new Exception("Error deleting data: " . print_r(sqlsrv_errors(), true));
-    }
-
-    // Commit transaction
-    sqlsrv_commit($conn);
-} catch (Exception $e) {
-    // Rollback transaction in case of error
-    sqlsrv_rollback($conn);
-}
-
 // Close the connection
 sqlsrv_close($conn);
 ?>

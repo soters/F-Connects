@@ -953,7 +953,7 @@ $attendanceData = json_encode($attendanceCounts);
                         head: [["Rating Summary"]],
                         body: [
                             ["Total Ratings Given: " + (ratingCount ?? "0")],
-                            ["Average Rating: " + (ratingAverage !== null && ratingAverage !== undefined ? ratingAverage.toFixed(2)  : "No ratings yet")]
+                            ["Average Rating: " + (ratingAverage !== null && ratingAverage !== undefined ? ratingAverage.toFixed(2) : "No ratings yet")]
                         ],
                         theme: 'grid',
                         headStyles: {
@@ -1278,101 +1278,210 @@ $attendanceData = json_encode($attendanceCounts);
             const { jsPDF } = window.jspdf;
             let doc = new jsPDF();
 
-            let weekInput = document.getElementById("reportWeek")?.value; // Get value from input
+            let weekInput = document.getElementById("reportWeek")?.value;
             let facultySelect = document.getElementById("facultySelect");
             let facultyRFID = facultySelect?.value;
-            let facultyName = facultySelect?.options[facultySelect.selectedIndex]?.text || "Unknown Faculty";
 
-            if (!weekInput) {
-                alert("Please select a week.");
-                return;
-            }
+            if (!weekInput) return alert("Please select a week.");
+            if (!facultyRFID) return alert("Please select a faculty member.");
 
-            if (!facultyRFID) {
-                alert("Please select a faculty member.");
-                return;
-            }
-
-            // Extract year and week number from the input
             let [selectedYear, selectedWeek] = weekInput.split("-W");
+            if (!selectedYear || !selectedWeek) return alert("Invalid week format.");
 
-            if (!selectedYear || !selectedWeek) {
-                alert("Invalid week format.");
-                return;
-            }
-
-            console.log(`Selected Year: ${selectedYear}, Selected Week: ${selectedWeek}`);
-
-            // Ensure API request includes the 'year' parameter
             fetch(`../functions/fetch-records-by-week.php?week=${selectedWeek}&year=${selectedYear}&rfid_no=${facultyRFID}`)
                 .then(response => response.json())
                 .then(data => {
-                    console.log("Fetched Data:", data);
+                    const {
+                        facultyInfo,
+                        attendanceReport,
+                        statusCounts,
+                        totalScheduledDays,
+                        totalScheduledHours,
+                        actualWorkedHours
+                    } = data;
 
-                    if (!data.attendanceRecords || data.attendanceRecords.length === 0) {
+                    if (!attendanceReport || attendanceReport.length === 0) {
                         alert("No attendance records found for this week.");
                         return;
                     }
 
-                    // Add Report Header with Faculty Name
+                    // --- Header ---
                     addReportHeader(doc, `Weekly Attendance Report - Week ${selectedWeek}, ${selectedYear}`);
-                    doc.setFontSize(12);
-                    doc.setFont("helvetica", "bold");
-                    doc.text(`Faculty: ${facultyName}`, 14, 62);
 
-                    let y = 65;
+                    let y = 68;
 
-                    // Table Header
-                    let tableData = [
-                        ["Date", "Time In", "Time Out", "Total Hours", "Status"]
-                    ];
-
-                    // Add attendance records
-                    data.attendanceRecords.forEach(record => {
-                        tableData.push([
-                            record.date_logged || "N/A",
-                            formatTime(record.time_in),
-                            formatTime(record.time_out),
-                            record.total_hours || "0",
-                            record.status || "N/A"
-                        ]);
-                    });
-
-                    // Generate table
-                    doc.autoTable({
-                        startY: y,
-                        head: [tableData[0]],
-                        body: tableData.slice(1),
-                        theme: "grid",
-                        styles: { fontSize: 8 },
-                        margin: { bottom: 10 }
-                    });
-
-                    y = doc.lastAutoTable.finalY + 10; // Position after table
-
-                    // Attendance Summary Section
-                    doc.setFontSize(12);
-                    doc.setFont("helvetica", "bold");
-                    doc.text("Attendance Status Count", 14, y);
+                    // --- Faculty Info ---
+                    doc.setFontSize(10);
                     doc.setFont("helvetica", "normal");
+
+                    doc.text("Faculty:", 15, y);
+                    doc.setFont("helvetica", "bold");
+                    doc.text(`${facultyInfo.fname} ${facultyInfo.lname}`, 35, y);
+                    y += 6;
+
+                    doc.setFont("helvetica", "normal");
+                    doc.text("RFID No:", 15, y);
+                    doc.setFont("helvetica", "bold");
+                    doc.text(facultyInfo.rfid_no, 35, y);
+
+                    let rightY = 68;
+                    doc.setFont("helvetica", "normal");
+                    doc.text("Employment Type:", 148, rightY);
+                    doc.setFont("helvetica", "bold");
+                    doc.text(facultyInfo.employment_type, 180, rightY);
+                    rightY += 6;
+
+                    doc.setFont("helvetica", "normal");
+                    doc.text("Email:", 134, rightY);
+                    doc.setFont("helvetica", "italic");
+                    doc.text(facultyInfo.email, 145, rightY);
+
+                    y = Math.max(y, rightY) + 10;
+
+                    const recordsByDate = {};
+                    attendanceReport.forEach(record => {
+                        const date = new Date(record.date).toLocaleDateString("en-US");
+                        if (!recordsByDate[date]) {
+                            recordsByDate[date] = {
+                                records: [],
+                                time_in: record.time_in,
+                                time_out: record.time_out,
+                                status: record.status
+                            };
+                        }
+
+                        recordsByDate[date].records.push({
+                            type: record.type,
+                            start: formatTime(record.start_time),
+                            end: formatTime(record.end_time),
+                            sched_hours: record.sched_hours
+                        });
+                    });
+
+                    let totalWorkingDays = 0;
+                    let totalPresent = 0;
+                    let totalAbsent = 0;
+                    let totalLate = 0;
+                    let totalSchedHours = 0;
+
+                    const dateStatusMap = new Map();
+
+                    attendanceReport.forEach(record => {
+                        const date = record.date;
+                        const status = record.status;
+                        const schedHours = parseFloat(record.sched_hours || 0);
+
+                        totalSchedHours += schedHours;
+
+                        if (!dateStatusMap.has(date)) {
+                            dateStatusMap.set(date, status);
+                        } else {
+                            const existingStatus = dateStatusMap.get(date);
+                            if (status === 'Absent' || (status === 'Late' && existingStatus === 'Present')) {
+                                dateStatusMap.set(date, status); // prioritize worse status
+                            }
+                        }
+                    });
+
+                    totalWorkingDays = dateStatusMap.size;
+
+                    dateStatusMap.forEach(status => {
+                        switch (status) {
+                            case 'Present':
+                                totalPresent++;
+                                break;
+                            case 'Absent':
+                                totalAbsent++;
+                                break;
+                            case 'Late':
+                                totalLate++;
+                                break;
+                        }
+                    });
+
+                    // ✅ Late is also considered present for attendancePercentage
+                    const attendedDays = totalPresent + totalLate;
+                    const attendancePercentage = totalWorkingDays ? (attendedDays / totalWorkingDays) * 100 : 0;
+
+
+
+
+                    // Render one table per unique date
+                    Object.entries(recordsByDate).forEach(([date, info]) => {
+                        // Date label
+                        doc.setFontSize(10);
+                        doc.setFont("helvetica", "bold");
+                        doc.text(`Date ${date}`, 14, y);
+                        y += 6;
+
+                        // Worked Hours table
+                        const body = info.records.map(r => [r.type, r.start, r.end, r.sched_hours]);
+
+                        doc.autoTable({
+                            startY: y,
+                            head: [["Type", "Start", "End", "Hours"]],
+                            body: body,
+                            theme: "grid",
+                            styles: { fontSize: 9 },
+                            margin: { left: 14, right: 100 },
+                            didDrawCell: (data) => {
+                                if (data.row.index === body.length - 1 && data.column.index === 0) {
+                                    // Last row: add Total Hours label
+                                    doc.setFont("helvetica", "bold");
+                                    doc.text("Total Hours:", 14, data.cell.y + data.cell.height + 6);
+                                    doc.text(
+                                        body.reduce((sum, r) => sum + parseFloat(r[3]), 0).toFixed(2),
+                                        50,
+                                        data.cell.y + data.cell.height + 6
+                                    );
+                                }
+                            }
+                        });
+
+                        const tableEndY = doc.lastAutoTable.finalY;
+
+                        // Kiosk Attendance Section (inline with table)
+                        doc.setFontSize(9);
+                        doc.setFont("helvetica", "normal");
+                        doc.text("KIOSK Attendance:", 115, y);
+                        doc.text(`Time In     : ${formatTime(info.time_in)}`, 125, y + 6);
+                        doc.text(`Time Out : ${formatTime(info.time_out)}`, 125, y + 12);
+
+                        // Status
+                        doc.setFont("helvetica", "bold");
+                        doc.setFillColor(144, 238, 144); // Light green for PRESENT
+                        doc.rect(150, tableEndY + 6, 35, 8, "F");
+                        doc.setTextColor(0);
+                        doc.text("Status:", 115, tableEndY + 12);
+                        doc.setTextColor(0);
+                        doc.text(info.status, 155, tableEndY + 12);
+
+                        y = tableEndY + 20; // Update y for next date block
+                    });
+
+                    // Summary Section
+                    y = doc.lastAutoTable.finalY + 10;
+                    doc.setFontSize(12);
+                    doc.setFont("helvetica", "bold");
+                    doc.text("Attendance Summary", 14, y);
                     y += 8;
 
-                    Object.entries(data.statusCounts).forEach(([status, count]) => {
-                        doc.text(`${status}: ${count}`, 20, y);
-                        y += 6;
-                    });
+                    doc.setFont("helvetica", "normal");
+                    doc.text(`Total Working Days: ${totalWorkingDays}`, 20, y); y += 6;
+                    doc.text(`Present: ${totalPresent}`, 20, y); y += 6;
+                    doc.text(`Absent: ${totalAbsent}`, 20, y); y += 6;
+                    doc.text(`Late: ${totalLate}`, 20, y); y += 6;
+                    doc.text(`Total Scheduled Hours: ${totalSchedHours.toFixed(2)} hrs`, 20, y); y += 6;
+                    doc.text(`Attendance Percentage: ${attendancePercentage.toFixed(2)}%`, 20, y);
 
-                    y += 8; // Space before Grand Total
-                    doc.setFontSize(12);
-                    doc.setFont("helvetica", "bold");
-                    doc.text(`Grand Total of Hours: ${data.grandTotalHours || 0} hrs`, 14, y);
+
 
                     addPageNumbers(doc);
                     doc.save(`Weekly_Attendance_Report_Week_${selectedWeek}_${selectedYear}.pdf`);
                 })
-                .catch(error => {
-                    console.error("Error fetching data:", error);
-                    alert("Error generating weekly report.");
+                .catch(err => {
+                    console.error("Error:", err);
+                    alert("Error generating report.");
                 });
         }
 
@@ -1591,31 +1700,57 @@ $attendanceData = json_encode($attendanceCounts);
 
 
         // ------------------------ ATTENDANCE HELPER FUNCTIONS ------------------------
-        function addReportHeader(doc, title) {
-            let logoImage = "../../assets/images/csa_logo.png";
-            doc.addImage(logoImage, "PNG", 15, 10, 26, 26);
+        function addReportHeader(doc, title, subtitle = "") {
+            const pageWidth = doc.internal.pageSize.getWidth();
 
+            // === HEADER ===
             doc.setFont("times", "bold");
             doc.setFontSize(18);
-            doc.text("Colegio de Sta. Teresa de Avila", 50, 18);
+            doc.text("COLEGIO DE STA. TERESA DE AVILA", pageWidth / 2, 15, null, null, "center");
 
             doc.setFont("helvetica", "normal");
             doc.setFontSize(10);
-            doc.text("Address: 6 Kingfisher corner Skylark Street, Zabarte Subdivision,", 50, 25);
-            doc.text("Brgy. Kaligayahan, Novaliches, Quezon City, Philippines", 50, 30);
-            doc.text("Contact: 282753916 | Email: officialregistrarcsta@gmail.com", 50, 35);
-
-            doc.setLineWidth(0.5);
-            doc.line(15, 40, 195, 40);
+            doc.text("6 Kingfisher St. cor. Skylark St., Zabarte Subd., Novaliches, Quezon City", pageWidth / 2, 20, null, null, "center");
 
             doc.setFont("helvetica", "bold");
-            doc.setFontSize(14);
-            doc.text(title, 15, 50);
+            doc.setFontSize(16);
+            doc.text("COLLEGE OF INFORMATION TECHNOLOGY", pageWidth / 2, 30, null, null, "center");
 
-            let timestamp = new Date().toLocaleString();
+            // === Black Bar for "APPOINTMENT REPORT" ===
+            doc.setFillColor(0, 0, 0); // Black background
+            doc.rect(15, 35, pageWidth - 30, 10, 'F'); // Black bar
+
+            doc.setFontSize(14);
+            doc.setTextColor(255, 255, 255); // White text
+            doc.text("ATTENDANCE REPORT", pageWidth / 2, 41.5, null, null, "center");
+
+            // === Academic Year and Term ===
+            doc.setTextColor(0, 0, 0);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(10);
+            doc.text("AY: 2024-2025", pageWidth / 2, 55, null, null, "center");
+            doc.text("TERM : SECOND SEMESTER", pageWidth / 2, 60, null, null, "center");
+
+            // === Subtitle on left, Generated on right ===
             doc.setFont("helvetica", "italic");
-            doc.setFontSize(9);
-            doc.text(`Generated on: ${timestamp}`, 15, 55);
+            doc.setFontSize(10);
+
+            const generatedDate = new Date().toLocaleDateString('en-PH', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            const generatedByText = "Generated By: Admin User";
+            const generatedOnText = `Generated on: ${generatedDate}`;
+            const generatedOnTextWidth = doc.getTextWidth(generatedOnText);
+
+            // Draw "Generated By" on the left
+            doc.text(generatedByText, 15, 60);
+
+            // Draw "Generated on" aligned to the right
+            doc.text(generatedOnText, pageWidth - 15 - generatedOnTextWidth, 60);
+
         }
 
         function addPageNumbers(doc) {

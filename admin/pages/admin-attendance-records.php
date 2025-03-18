@@ -37,7 +37,7 @@ $selectedYear = isset($_GET['year']) ? $_GET['year'] : date('Y');
 
 // Fetch attendance status counts filtered by user-selected month and year
 $sqlAttendanceCount = "SELECT status, COUNT(*) as count 
-                        FROM AttendanceRecords 
+                        FROM AttendanceToday
                         WHERE status IN ('Present', 'Absent', 'Late') 
                         AND MONTH(date_logged) = ? 
                         AND YEAR(date_logged) = ? 
@@ -295,7 +295,7 @@ $attendanceData = json_encode($attendanceCounts);
 
             <div class="widget widget-chart">
                 <div class="widget-header">
-                    <span class="widget-ttl">Attendance Trends</span>
+                    <span class="widget-ttl">Attendance Trends / month</span>
                 </div>
                 <div class="widget-body">
                     <canvas id="attendanceChart"></canvas>

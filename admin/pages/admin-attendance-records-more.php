@@ -11,18 +11,18 @@ $rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
 
 $sql = "
     SELECT 
-        ar.attd_ref,
-        ar.rfid_no,
+        at.attd_ref,
+        at.rfid_no,
         f.fname AS prof_fname, 
         f.lname AS prof_lname, 
-        ar.time_in, 
-        ar.time_out, 
-        ar.status, 
-        ar.date_logged
-    FROM AttendanceRecords ar
-    JOIN Faculty f ON ar.rfid_no = f.rfid_no
-    WHERE ar.rfid_no = ?
-    ORDER BY ar.date_logged DESC, ar.time_in ASC
+        at.time_in, 
+        at.time_out, 
+        at.status, 
+        at.date_logged
+    FROM AttendanceToday at
+    JOIN Faculty f ON at.rfid_no = f.rfid_no
+    WHERE at.rfid_no = ?
+    ORDER BY at.date_logged DESC, at.time_in ASC
 ";
 
 $params = [$rfid_no];

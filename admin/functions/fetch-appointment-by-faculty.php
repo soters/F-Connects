@@ -23,7 +23,7 @@ $sql = "SELECT a.appointment_code, s.fname AS stud_fname, s.lname AS stud_lname,
         FROM Appointments a
         JOIN Students s ON a.stud_rfid_no = s.rfid_no
         WHERE a.prof_rfid_no = ?
-        ORDER BY a.start_time ASC";
+        ORDER BY a.date_logged ASC";
 
 $stmt = sqlsrv_query($conn, $sql, [$facultyRFID]);
 

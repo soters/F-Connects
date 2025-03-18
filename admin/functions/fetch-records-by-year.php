@@ -17,7 +17,7 @@ $rfid_no = $_GET['rfid_no']; // Faculty RFID number
 // Fetch attendance records for the given year and faculty RFID
 $sql = "SELECT a.attd_ref, a.rfid_no, f.fname, f.lname, 
                a.time_in, a.time_out, a.status, a.date_logged
-        FROM AttendanceRecords a
+        FROM AttendanceToday a
         JOIN Faculty f ON a.rfid_no = f.rfid_no
         WHERE FORMAT(a.date_logged, 'yyyy') = ? AND a.rfid_no = ?
         ORDER BY a.date_logged ASC"; // Ordered by date
