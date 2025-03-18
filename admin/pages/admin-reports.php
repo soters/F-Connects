@@ -35,7 +35,7 @@ $selectedYear = isset($_GET['year']) ? $_GET['year'] : date('Y');
 
 // Fetch attendance status counts filtered by user-selected month and year
 $sqlAttendanceCount = "SELECT status, COUNT(*) as count 
-                        FROM AttendanceRecords 
+                        FROM AttendanceToday 
                         WHERE status IN ('Present', 'Absent', 'Late') 
                         AND MONTH(date_logged) = ? 
                         AND YEAR(date_logged) = ? 
