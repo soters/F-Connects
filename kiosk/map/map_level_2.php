@@ -168,7 +168,7 @@ $otherRooms = getOtherRooms($floor, $room_id);
 
         function loadMap(floor) {
             if (floor === 1) {
-                window.location.href = 'map_level_1.php??room_id=<?= $room_id ?>&rfid_no=<?= $rfid_no ?>';
+                window.location.href = 'map_level_1.php?room_id=<?= $room_id ?>&rfid_no=<?= $rfid_no ?>';
             } else if (floor === 2) {
                 initMap('../../assets/maps/Map_Level_2.png', [[0, 0], [1000, 1700]]);
                 addMarkers();
