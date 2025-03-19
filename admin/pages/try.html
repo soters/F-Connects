@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate PDF</title>
+    <!-- Include jsPDF library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Include jsPDF AutoTable plugin -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+    <button id="generatePdf">Generate PDF</button>
+
+    <script>
+        // Sample data (replace this with the actual data fetched from your PHP script)
+        const data = {
+            facultyInfo: {
+                rfid_no: "12345",
+                fname: "John",
+                lname: "Doe",
+                email: "john.doe@example.com",
+                employment_type: "Full-Time"
+            },
+            attendanceReport: [
+                {
+                    date: "2023-10-01",
+                    type: "Lecture",
+                    start_time: "09:00:00",
+                    end_time: "11:00:00",
+                    sched_hours: "2.00",
+                    time_in: "09:05:00",
+                    time_out: "10:55:00",
+                    actual_hours: "1.83",
+                    status: "Present"
+                },
+                {
+                    date: "2023-10-02",
+                    type: "Laboratory",
+                    start_time: "13:00:00",
+                    end_time: "15:00:00",
+                    sched_hours: "2.00",
+                    time_in: "13:10:00",
+                    time_out: "14:50:00",
+                    actual_hours: "1.67",
+                    status: "Late"
+                }
+            ],
+            statusCounts: {
+                Present: 1,
+                Late: 1,
+                Absent: 0
+            },
+            totalScheduledDays: 2,
+            totalScheduledHours: "4.00",
+            actualWorkedHours: "3.50",
+            attendancePercentage: "100.00",
+            totalWorkingDays: 2
+        };
+
+        // Function to generate PDF
+        function generatePdf() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Set font and size
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(12);
+
+            // Add title
+            doc.setFontSize(18);
+            doc.text("Faculty Attendance Report", 10, 15);
+
+            // Faculty Info
+            doc.setFontSize(12);
+            doc.text(`Name: ${data.facultyInfo.fname} ${data.facultyInfo.lname}`, 10, 30);
+            doc.text(`Email: ${data.facultyInfo.email}`, 10, 40);
+            doc.text(`Employment Type: ${data.facultyInfo.employment_type}`, 10, 50);
+
+            // Attendance Summary
+            doc.setFontSize(14);
+            doc.text("Attendance Summary", 10, 65);
+            doc.setFontSize(12);
+            doc.text(`Total Scheduled Days: ${data.totalScheduledDays}`, 10, 75);
+            doc.text(`Total Scheduled Hours: ${data.totalScheduledHours}`, 10, 85);
+            doc.text(`Total Rendered Hours: ${data.actualWorkedHours}`, 10, 95);
+            doc.text(`Attendance Percentage: ${data.attendancePercentage}%`, 10, 105);
+
+            // Attendance Details Table
+            doc.setFontSize(14);
+            doc.text("Attendance Details", 10, 120);
+            doc.setFontSize(12);
+
+            // Table headers
+            const headers = [
+                "Date",
+                "Type",
+                "Start Time",
+                "End Time",
+                "Scheduled Hours",
+                "Time In",
+                "Time Out",
+                "Actual Hours",
+                "Status"
+            ];
+
+            // Table data
+            const rows = data.attendanceReport.map(entry => [
+                entry.date,
+                entry.type,
+                entry.start_time,
+                entry.end_time,
+                entry.sched_hours,
+                entry.time_in || "N/A",
+                entry.time_out || "N/A",
+                entry.actual_hours,
+                entry.status
+            ]);
+
+            // Generate table
+            doc.autoTable({
+                startY: 125,
+                head: [headers],
+                body: rows,
+                theme: "grid",
+                styles: { fontSize: 10 },
+                headStyles: { fillColor: [22, 160, 133] }
+            });
+
+            // Save PDF
+            doc.save("Faculty_Attendance_Report.pdf");
+        }
+
+        // Attach event listener to button
+        document.getElementById("generatePdf").addEventListener("click", generatePdf);
+    </script>
+</body>
+</html>

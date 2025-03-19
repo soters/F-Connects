@@ -35,11 +35,28 @@ if ($schedStmt === false) {
 $schedules = [];
 $totalScheduledDays = 0;
 $totalScheduledHours = 0;
+$totalRenderedHours = 0;
 
 while ($row = sqlsrv_fetch_array($schedStmt, SQLSRV_FETCH_ASSOC)) {
     $startTime = strtotime($row['start_time']->format('H:i:s'));
     $endTime = strtotime($row['end_time']->format('H:i:s'));
     $schedHours = ($endTime - $startTime) / 3600;
+
+    $timedIn = $row['timed_in'] ? strtotime($row['timed_in']->format('H:i:s')) : null;
+    $timedOut = $row['timed_out'] ? strtotime($row['timed_out']->format('H:i:s')) : null;
+
+    $status = $row['status'] ?? null;
+    $renderedHours = 0;
+
+    // Only compute if status is not Absent or NULL
+    if ($status !== 'Absent' && $status !== null && $timedIn && $timedOut) {
+        // Cap timedOut to scheduled end time
+        $actualOut = min($timedOut, $endTime);
+        if ($actualOut > $timedIn) {
+            $renderedHours = ($actualOut - $timedIn) / 3600;
+            $totalRenderedHours += $renderedHours;
+        }
+    }
 
     $schedules[] = [
         'sched_id' => $row['sched_id'],
@@ -47,12 +64,16 @@ while ($row = sqlsrv_fetch_array($schedStmt, SQLSRV_FETCH_ASSOC)) {
         'start_time' => $row['start_time']->format('H:i:s'),
         'end_time' => $row['end_time']->format('H:i:s'),
         'sched_hours' => number_format($schedHours, 2),
-        'type' => $row['type']
+        'type' => $row['type'],
+        'timed_in' => $row['timed_in'] ? $row['timed_in']->format('H:i:s') : null,
+        'timed_out' => $row['timed_out'] ? $row['timed_out']->format('H:i:s') : null,
+        'rendered_hours' => number_format($renderedHours, 2)
     ];
 
     $totalScheduledDays++;
     $totalScheduledHours += $schedHours;
 }
+
 sqlsrv_free_stmt($schedStmt);
 
 // 2. Fetch TAP-INs from AttendanceToday
@@ -123,6 +144,24 @@ foreach ($schedules as $sched) {
     $date = $sched['date'];
     $attd = $attendanceMap[$date] ?? null;
 
+    // Compute total_worked_hours based on timed_in/timed_out
+    $timedIn = isset($sched['timed_in']) ? strtotime($sched['timed_in']) : null;
+    $timedOut = isset($sched['timed_out']) ? strtotime($sched['timed_out']) : null;
+    $schedEnd = strtotime($sched['end_time']);
+
+    $totalWorkedHours = 0;
+
+    $status = $attd['status'] ?? null;
+
+    if ($status !== 'Absent' && $status !== null && $timedIn && $timedOut) {
+        $actualOut = min($timedOut, $schedEnd);
+        if ($actualOut > $timedIn) {
+            $totalWorkedHours = ($actualOut - $timedIn) / 3600;
+        }
+    } else {
+        $totalWorkedHours = 0;
+    }
+
     $attendanceReport[] = [
         "date" => $date,
         "type" => $sched['type'],
@@ -132,9 +171,11 @@ foreach ($schedules as $sched) {
         "time_in" => $attd['time_in'] ?? null,
         "time_out" => $attd['time_out'] ?? null,
         "actual_hours" => $attd['worked_hours'] ?? 0,
-        "status" => $attd['status'] ?? 'Absent'
+        "status" => $attd['status'] ?? 'Absent',
+        "total_worked_hours" => number_format($totalWorkedHours, 2) // <-- new field for jsPDF
     ];
 }
+
 
 // 5. Attendance Percentage
 $presentDays = $statusCounts['Present'];
@@ -149,7 +190,9 @@ $response = [
     "totalScheduledDays" => $totalScheduledDays,
     "totalScheduledHours" => number_format($totalScheduledHours, 2),
     "actualWorkedHours" => number_format($actualWorkedHours, 2),
+    "totalRenderedHours" => number_format($totalRenderedHours, 2),
     "attendancePercentage" => $attendancePercentage
+
 ];
 
 echo json_encode($response, JSON_PRETTY_PRINT);
