@@ -3,8 +3,8 @@ declare(strict_types=1);
 date_default_timezone_set('Asia/Manila');
 
 try {
-    $serverName = "fconnect-newserver.database.windows.net";     
-    $database = "fconnect-newdb"; 
+    $serverName = "fconnect-sqlserver.database.windows.net";     
+    $database = "fconnectdb"; 
     $username = "fconnect";         
     $password = "CSTA_2025"; 
 
