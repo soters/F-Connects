@@ -36,9 +36,8 @@ try {
     $attendanceResult = sqlsrv_fetch_array($attendanceStmt, SQLSRV_FETCH_ASSOC);
 
     if ($attendanceResult && $attendanceResult['time_in'] !== null && $attendanceResult['time_out'] !== null) {
-        // Time-in and time-out already recorded
-        $_SESSION['error_message'] = "We’ve already recorded your Time In and Time Out for today.";
-        header("Location: ../faculty/kiosk-faculty.php?rfid_no=" . urlencode($rfid_no));
+        // Time-in and timeout already recorded
+        header("Location: ../faculty/kiosk-continue-work.php?rfid_no=" . urlencode($rfid_no));
         exit;
     }
 

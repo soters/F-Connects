@@ -4,7 +4,36 @@ session_start();
 require_once('../../connection/connection.php');
 
 $rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
+
+if ($rfid_no) {
+    // Use SQLSRV prepared statement
+    $sql = "SELECT * FROM FaceData WHERE rfid_no = ?";
+    $params = array($rfid_no);
+    $stmt = sqlsrv_query($conn, $sql, $params);
+
+    if ($stmt === false) {
+        die(print_r(sqlsrv_errors(), true));
+    }
+
+    if (sqlsrv_has_rows($stmt)) {
+        // Face data already exists
+        $message = "Face data already exists for RFID: $rfid_no";
+        $type = "error";
+        header("Location: ../../admin/pages/admin-update-faculty.php?rfid_no=" . urlencode($rfid_no) . "&message=" . urlencode($message) . "&type=" . urlencode($type));
+        exit();
+    }
+
+    // Continue with other logic (e.g., allowing face data upload)
+} else {
+    $message = "Invalid or missing RFID number.";
+    $type = "error";
+    header("Location: ../../admin/pages/admin-update-faculty.php?message=" . urlencode($message) . "&type=" . urlencode($type));
+    exit();
+}
+
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -14,7 +43,7 @@ $rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="view-transition" content="same-origin" />
     <!-- Custom Links -->
-    <link rel="stylesheet" href="../../assets/css/kiosk-design.css"/>
+    <link rel="stylesheet" href="../../assets/css/kiosk-design.css" />
     <link rel="shortcut icon" href="../../assets/images/F-Connect.ico" type="image/x-icon" />
     <title>F - Connect</title>
 </head>
@@ -38,14 +67,13 @@ $rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
     </nav>
 
     <div id="body-container">
-        <p id="action-message-rfid">Facial data successfully saved!</p>
 
-        <br>
-        <div class="action-box-s">
-            <a href="../../admin/pages/admin-update-faculty.php?rfid_no=<?php echo $rfid_no; ?>" class="no-underline">
-                <button class="buttonDesign">
-                    Proceed
-                </button>
+        <div class="first-facial-container">
+            <h1>Face Data Upload</h1>
+            <p>Take a photo first to enable Time In/Out functionality.</p>
+            <br>
+            <a href="kiosk-reminder-1.php?rfid_no=<?php echo urlencode($rfid_no); ?>" class="no-underline">
+                <button class="ff-button">Take a photo</button>
             </a>
         </div>
 
@@ -54,6 +82,15 @@ $rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
                 data-bs-placement="left">
                 <i class="bi bi-question-lg"></i>
         </div>-->
+
+        <div id="top-left-button">
+            <a href="../../admin/pages/admin-update-faculty.php?rfid_no=<?php echo urlencode($rfid_no); ?>" class="no-underline">
+                <button type="button" class="small-button" data-bs-toggle="tooltip" title="Back"
+                    data-bs-placement="right">
+                    <i class="bi bi-arrow-left-short"></i>
+                </button>
+            </a>
+        </div>
 
         <!--<footer>
             <p id="collaboration-text">In collaboration with Colegio de Sta. Teresa de Avila</p>
@@ -101,6 +138,7 @@ $rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
             });
 
         </script>
+
 </body>
 
 </html>

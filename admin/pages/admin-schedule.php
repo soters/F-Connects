@@ -28,6 +28,7 @@ $perPage = 40; // Set your per-page limit
 $offset = ($page - 1) * $perPage;
 
 // Schedule query with pagination
+// Schedule query with pagination
 $sql_table = "
    SELECT 
     Schedules.sched_id,  
@@ -44,8 +45,9 @@ JOIN Schedules ON Faculty.rfid_no = Schedules.rfid_no
 LEFT JOIN Sections ON Schedules.section_id = Sections.section_id
 LEFT JOIN Locations ON Schedules.room_id = Locations.room_id
 WHERE Faculty.archived = 0
-ORDER BY Faculty.lname ASC, Faculty.fname ASC
-OFFSET $offset ROWS FETCH NEXT $perPage ROWS ONLY;";
+ORDER BY Schedules.date_created DESC
+OFFSET $offset ROWS FETCH NEXT $perPage ROWS ONLY;
+";
 
 $stmt_table = sqlsrv_query($conn, $sql_table);
 

@@ -2228,8 +2228,26 @@ t-container {
 }
 
 .disabled-slot {
-  background-color: #ffcccc !important;
-  cursor: not-allowed;
+  background-color: #CE2727 !important;
+  cursor: not-allowed;  
+  border: 3px solid #7C0000;
+  padding: 20px;
+}
+
+.disabled-slot .time-name {
+  font-family: "DM Sans", sans-serif;
+  font-size: 1.2rem;
+  font-weight: 1000;
+  color: #fff;
+}
+
+.status-text-2{
+  font-family: "DM Sans", sans-serif;
+  font-size: .8rem;
+  font-weight: 700;
+  color: #fff;
+  margin-top: 3px;
+  font-style: italic;
 }
 
 .no-sched-app{

@@ -96,7 +96,7 @@ try {
         // If an overlapping appointment exists, redirect with an error message
         if (sqlsrv_fetch_array($overlap_stmt, SQLSRV_FETCH_ASSOC)) {
             $_SESSION['error_message'] = 'You already have an appointment that overlaps with the selected time. Please choose a different time.';
-            header("Location: ../student/kiosk-rfid.php");
+            header("Location: ../student/kiosk-student.php?rfid_no=" . urlencode($stud_rf));
             exit;
         }
 

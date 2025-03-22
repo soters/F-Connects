@@ -193,7 +193,7 @@ if ($stmtSections !== false) {
                         onclick="openArchiveModal(<?= isset($_GET['rfid_no']) ? htmlspecialchars($_GET['rfid_no']) : 'null'; ?>)">
                         Archive
                     </a>
-                    <button class="face-btn" type="button">Account Information</button>
+                    <!--<button class="face-btn" type="button">Account Information</button>-->
                 </div>
                 <div class="faculty-container-2">
                     <!--<div class="picture-container">

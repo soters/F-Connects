@@ -68,8 +68,6 @@ try {
 
     // Generate available time slots
     $availableTimes = [];
-    // Generate available time slots
-    $availableTimes = [];
     foreach ($consultationTimes as $consultation) {
         $start = strtotime($consultation['start']);
         $end = strtotime($consultation['end']);
@@ -176,35 +174,68 @@ try {
         </i>
         <br>
 
+        <?php
+        $allDisabled = true;
+        foreach ($availableTimes as $slot) {
+            if (!$slot['disabled']) {
+                $allDisabled = false;
+                break;
+            }
+        }
+        ?>
+
         <form action="kiosk-choose-agenda.php" method="POST">
             <div class="time-cards">
                 <?php if (!empty($availableTimes)): ?>
                     <?php foreach ($availableTimes as $timeSlot): ?>
-                        <label>
-                            <input type="radio" name="selected_time" value="<?= htmlspecialchars($timeSlot['start_time']); ?>"
-                                <?= $timeSlot['disabled'] ? 'disabled' : '' ?> required
-                                data-start-time="<?= htmlspecialchars($timeSlot['start_time']); ?>"
-                                data-end-time="<?= htmlspecialchars($timeSlot['end_time']); ?>"
-                                data-formatted="<?= htmlspecialchars($timeSlot['formatted']); ?>">
-                            <div class="time-card <?= $timeSlot['disabled'] ? 'disabled-slot' : '' ?>">
-                                <div class="info">
-                                    <p class="time-name"><?= htmlspecialchars($timeSlot['formatted']); ?></p>
-                                </div>
-                            </div>
-                        </label>
-                    <?php endforeach; ?>
+    <label>
+        <input type="radio" name="selected_time" value="<?= htmlspecialchars($timeSlot['start_time']); ?>"
+            <?= $timeSlot['disabled'] ? 'disabled' : '' ?>
+            <?= !$allDisabled ? 'required' : '' ?>
+            data-start-time="<?= htmlspecialchars($timeSlot['start_time']); ?>"
+            data-end-time="<?= htmlspecialchars($timeSlot['end_time']); ?>"
+            data-formatted="<?= htmlspecialchars($timeSlot['formatted']); ?>">
+        <div class="time-card <?= $timeSlot['disabled'] ? 'disabled-slot' : '' ?>">
+            <div class="info">
+                <p class="time-name"><?= htmlspecialchars($timeSlot['formatted']); ?></p>
+                <?php if ($timeSlot['disabled']): ?>
+                    <p class="status-text-2">Ongoing Appointment</p>
+                <?php endif; ?>
+            </div>
+        </div>
+    </label>
+<?php endforeach; ?>
 
-                    <!-- Submit Button -->
-                    <button class="appoint-btn" type="submit">
-                        <span class="btn-text">NEXT</span>
-                    </button>
 
-                    <!-- Hidden inputs -->
-                    <input type="hidden" name="selected_rfid" value="<?= htmlspecialchars($selected_rfid); ?>">
-                    <input type="hidden" name="stud_rf" value="<?= htmlspecialchars($stud_rf); ?>">
-                    <input type="hidden" name="start_time" id="start_time">
-                    <input type="hidden" name="end_time" id="end_time">
+                    <?php if ($allDisabled): ?>
+                        <!-- All timeslots are disabled -->
+                        <div class="code-card">
+                            <a href="kiosk-student.php?rfid_no=<?= isset($stud_rf) ? urlencode($stud_rf) : '' ?>"
+                                class="no-underline">
+                                <button class="appoint-btn" type="button">
+                                    <span class="btn-text">OKAY</span>
+                                </button>
+                            </a>
+                        </div>
+                        <script>
+                            document.getElementById("action-message-info").style.display = "none";
+                            document.getElementById("action-message-info-small").style.display = "none";
+                        </script>
+                    <?php else: ?>
+                        <!-- At least one timeslot is available -->
+                        <button class="appoint-btn" type="submit">
+                            <span class="btn-text">NEXT</span>
+                        </button>
+
+                        <!-- Hidden inputs -->
+                        <input type="hidden" name="selected_rfid" value="<?= htmlspecialchars($selected_rfid); ?>">
+                        <input type="hidden" name="stud_rf" value="<?= htmlspecialchars($stud_rf); ?>">
+                        <input type="hidden" name="start_time" id="start_time">
+                        <input type="hidden" name="end_time" id="end_time">
+                    <?php endif; ?>
+
                 <?php else: ?>
+                    <!-- No timeslot data at all -->
                     <div class="code-card">
                         <img src="../../assets/images/time_slot.png" alt="" class="faculty-icon-2">
                         <p class="code-message">
@@ -225,7 +256,6 @@ try {
             </div>
         </form>
     </div>
-
 
     <!--div id="top-right-button">
             <button type="button" class="small-button" data-bs-toggle="tooltip" title="Need help?"

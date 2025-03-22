@@ -92,7 +92,7 @@ if (!$image_path) {
 
     <div id="noFaceModal" class="modal">
         <div class="modal-content">
-            <p>No Face Detected. Please try again.</p>
+            <p>Face does not match. Please try again.</p>
             <button id="modalOkay">Retry</button>
         </div>
     </div>

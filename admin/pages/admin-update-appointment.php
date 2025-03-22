@@ -209,7 +209,7 @@ $apptEnd = $appointment['end_time']->format('H:i');
                                     Accepted</option>
                                 <option value="Completed" <?= ($appointment['status'] === 'Completed') ? 'selected' : '' ?>>Completed</option>
                                 <option value="Cancelled" <?= ($appointment['status'] === 'Cancelled') ? 'selected' : '' ?>>
-                                    Canceled</option>
+                                    Cancelled</option>
                                 <option value="Declined" <?= ($appointment['status'] === 'Declined') ? 'selected' : '' ?>>
                                     Declined</option>
                             </select>

@@ -68,7 +68,7 @@ if ($attendance && is_null($attendance['time_out'])) {
     // Update appointments
     $update_appointments_query = "
         UPDATE Appointments
-        SET status = 'Canceled'
+        SET status = 'Cancelled'
         WHERE prof_rfid_no = ? 
           AND date_logged = ?
           AND status IN ('Pending', 'Accepted')

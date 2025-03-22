@@ -3,55 +3,39 @@ session_start();
 require_once '../../connection/connection.php';
 
 $rfid_no = $_GET['rfid_no'] ?? null;
-$attd_ref = $_GET['attd_ref'] ?? null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $choice = $_POST['choice'];
 
     if ($choice === 'yes') {
-        // Update AttendanceToday with time_out
-        $current_time = date('H:i:s');
+
+        // Update AttendanceToday by setting time_out to NULL
         $update_query = "
             UPDATE AttendanceToday
-            SET time_out = ?
-            WHERE attd_ref = ?
+            SET time_out = NULL
+            WHERE rfid_no = ?
+            AND CAST(date_logged AS DATE) = CAST(GETDATE() AS DATE)
         ";
-        $update_params = [$current_time, $attd_ref];
+        $update_params = [$rfid_no];
         $update_stmt = sqlsrv_query($conn, $update_query, $update_params);
 
         if ($update_stmt === false) {
             die(print_r(sqlsrv_errors(), true));
         }
 
-        // Update appointments
-        $current_date = date('Y-m-d');
-        $update_appointments_query = "
-            UPDATE Appointments
-            SET status = 'Cancelled'
-            WHERE prof_rfid_no = ? 
-              AND date_logged = ?
-              AND status IN ('Pending', 'Accepted')
-        ";
-        $update_appointments_params = [$rfid_no, $current_date];
-        $update_appointments_stmt = sqlsrv_query($conn, $update_appointments_query, $update_appointments_params);
-
-        if ($update_appointments_stmt === false) {
-            die(print_r(sqlsrv_errors(), true));
-        }
-
         // Close the statements and connection
         sqlsrv_free_stmt($update_stmt);
-        sqlsrv_free_stmt($update_appointments_stmt);
         sqlsrv_close($conn);
 
         // Redirect to success page
-        header("Location: ../faculty/kiosk-time-out-info.php?rfid_no=" . urlencode($rfid_no) . "&attd_ref=" . urlencode($attd_ref));
+        header("Location: ../faculty/kiosk-success-continue.php?rfid_no=" . urlencode($rfid_no));
         exit();
     } else {
         // Redirect back to the kiosk page
         header("Location: ../faculty/kiosk-faculty.php?rfid_no=" . urlencode($rfid_no));
         exit();
     }
+
 }
 ?>
 
@@ -100,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <a id="live-date"></a>
     </nav>
 
-    <p id="action-message-medium">Are you sure you want to time out before your scheduled end time?</p>
+    <p id="action-message-medium">Already timed out. Resume work hours?</p>
     <div class="action-box-small">
         <form method="POST">
             <a class="no-underline"><button type="submit" class="yesBtn1" name="choice" value="yes">Yes</button></a>

@@ -192,10 +192,15 @@ if ($stmtDepartments !== false) {
                         onclick="openArchiveModal(<?= isset($_GET['rfid_no']) ? htmlspecialchars($_GET['rfid_no']) : 'null'; ?>)">
                         Archive
                     </a>
-                    <a href="javascript:void(0);" class="face-btn"
-                        onclick="openArchiveModal(<?= isset($_GET['rfid_no']) ? htmlspecialchars($_GET['rfid_no']) : 'null'; ?>)">
+                    <a href="../../kiosk/faculty/kiosk-first-facial-2.php?rfid_no=<?= isset($_GET['rfid_no']) ? urlencode($_GET['rfid_no']) : '' ?>"
+                        class="face-btn">
                         Upload Face Data
                     </a>
+                    <a href="javascript:void(0);" class="red-btn"
+                        onclick="openDeleteModal(<?= isset($_GET['rfid_no']) ? htmlspecialchars($_GET['rfid_no']) : 'null'; ?>)">
+                        Delete Face Data
+                    </a>
+
                     <!--<button class="pass-btn" type="button">Account Informations</button>-->
                 </div>
                 <div class="faculty-container-2">
@@ -383,17 +388,17 @@ if ($stmtDepartments !== false) {
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal 
+    Delete Confirmation Modal 
     <div id="deleteModal" class="custom-modal">
         <div class="modal-content">
             <h2>Confirm Delete</h2>
-            <p>Are you sure you want to delete this faculty member?</p>
+            <p>Are you sure you want to delete this face data?</p>
             <div class="modal-actions">
                 <button id="confirmDelete" class="btn-confirm">Yes, Delete</button>
                 <button onclick="closeDeleteModal()" class="btn-cancel">Cancel</button>
             </div>
         </div>
-    </div>-->
+    </div>
 
     <!-- Reset Confirmation Modal -->
     <div id="resetModal" class="custom-modal">
@@ -493,7 +498,7 @@ if ($stmtDepartments !== false) {
         window.location.href = `../functions/archive-faculty.php?rfid_no=${rfidNo}`; // Redirect with RFID
     });
 
-    /**function openDeleteModal(rfidNo) {
+    function openDeleteModal(rfidNo) {
         document.getElementById("deleteModal").style.display = "block"; // Show modal
         document.getElementById("modalOverlay").style.display = "block"; // Show dark overlay
         document.getElementById("confirmDelete").setAttribute("data-rfid", rfidNo); // Store RFID
@@ -507,8 +512,8 @@ if ($stmtDepartments !== false) {
     // When "Yes, Delete" button is clicked, redirect to delete_faculty.php
     document.getElementById("confirmDelete").addEventListener("click", function () {
         let rfidNo = this.getAttribute("data-rfid"); // Get stored RFID
-        window.location.href = `../functions/delete-faculty.php?rfid_no=${rfidNo}`; // Redirect with RFID
-    }); **/
+        window.location.href = `../functions/delete-face-data.php?rfid_no=${rfidNo}`; // Redirect with RFID
+    }); 
 
     function openResetModal(rfidNo) {
         document.getElementById("resetModal").style.display = "block"; // Show modal
