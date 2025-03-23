@@ -16,19 +16,40 @@ $conn = sqlsrv_connect($serverName, $connectionOptions);
 if ($conn === false) {
     die(print_r(sqlsrv_errors(), true));
 }
+// Fetch the appointment record with faculty and student details
+$query = "SELECT A.*, 
+                 F.fname AS prof_fname, F.lname AS prof_lname, F.acc_type AS prof_acc_type, 
+                 S.fname AS stud_fname, S.lname AS stud_lname
+          FROM Appointments A
+          INNER JOIN Faculty F ON A.prof_rfid_no = F.rfid_no
+          INNER JOIN Students S ON A.stud_rfid_no = S.rfid_no
+          WHERE A.appointment_code = ?";
 
-// Fetch the appointment record
-$query = "SELECT * FROM Appointments WHERE appointment_code = ?";
 $params = array($appointment_code);
 $stmt = sqlsrv_query($conn, $query, $params);
+
 if ($stmt === false) {
     die(print_r(sqlsrv_errors(), true));
 }
+
 $appointment = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+
 if (!$appointment) {
     echo "Appointment not found.";
     exit();
 }
+
+// Define full names
+$facultyFullName = $appointment['prof_fname'] . ' ' . $appointment['prof_lname'];
+$studentFullName = $appointment['stud_fname'] . ' ' . $appointment['stud_lname'];
+
+// Extract other details
+$facultyAccType = $appointment['prof_acc_type'];
+$startTimeFormatted = $appointment['start_time']->format('H:i');
+$endTimeFormatted = $appointment['end_time']->format('H:i');
+$status = $appointment['status'];
+$dateLogged = $appointment['date_logged']->format('Y-m-d');
+$agenda = $appointment['agenda'];
 
 // 3. Format the appointment's start and end times for comparison.
 // (Assuming the time fields come as DateTime objects from SQLSRV.)
@@ -183,6 +204,29 @@ $apptEnd = $appointment['end_time']->format('H:i');
                     <h1 class="info-title">Appointment Information</h1>
                     <hr>
                     <div class="faculty-name-container">
+                        <div>
+                            <label for="faculty_name">Faculty Member</label>
+                            <input class="name-input" type="text" id="faculty_name" name="faculty_name"
+                                value="<?= htmlspecialchars($facultyFullName) ?>" readonly>
+                        </div>
+                        <div>
+                            <label for="student_name">Student</label>
+                            <input class="name-input" type="text" id="student_name" name="student_name"
+                                value="<?= htmlspecialchars($studentFullName) ?>" readonly>
+                        </div>
+                        <div>
+                            <label for="start-time">Start Time</label>
+                            <input class="name-input" type="time" id="start_time" name="start_time"
+                                value="<?= $appointment['start_time'] ? $appointment['start_time']->format('H:i') : '' ?>"
+                                min="07:00" max="20:00">
+
+                        </div>
+                        <div>
+                            <label for="end_time">End Time</label>
+                            <input class="name-input" type="time" id="end_time" name="end_time"
+                                value="<?= $appointment['end_time'] ? $appointment['end_time']->format('H:i') : '' ?>"
+                                min="07:00" max="20:00">
+                        </div>
                         <!-- In this example, we assume the first select is for the Agenda and the second for Status -->
                         <div class="faculty-name-box">
                             <label for="agenda">Agenda</label>
@@ -217,6 +261,7 @@ $apptEnd = $appointment['end_time']->format('H:i');
                         <input type="hidden" name="appointment_code"
                             value="<?= htmlspecialchars($appointment_code); ?>">
                     </div>
+
                 </div>
             </div>
         </form>

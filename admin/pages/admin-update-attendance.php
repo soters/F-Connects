@@ -178,7 +178,7 @@ $dateLogged = $attendance['date_logged']->format('Y-m-d');
         <form id="uploadForm" action="../functions/update-attendance.php" method="POST" enctype="multipart/form-data">
             <div class="action-widgets-2">
                 <div class="widget-button">
-                    <h1 class="sub-title">Appointment / Edit </h1>
+                    <h1 class="sub-title">Attendance / Edit </h1>
                     <div class="buttons">
                         <button class="create-btn-3" type="submit">Update</button>
                         <a href="admin-index.php" class="discard-btn">Discard</a>
@@ -235,7 +235,6 @@ $dateLogged = $attendance['date_logged']->format('Y-m-d');
                                 value="<?= $attendance['time_out'] ? $attendance['time_out']->format('H:i') : '' ?>"
                                 min="07:00" max="20:00">
                         </div>
-
                     </div>
                 </div>
             </div>

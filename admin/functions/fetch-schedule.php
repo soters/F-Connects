@@ -67,7 +67,6 @@ if (isset($_GET['rfid_no'])) {
         );
     }
 
-
     echo json_encode($events);
     exit;
 }

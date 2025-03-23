@@ -231,6 +231,10 @@ function convertTo12HourFormat($time)
                         ? `${info.event.extendedProps.subject_code} - ${info.event.extendedProps.subject_description}`
                         : "Not Assigned";
 
+                    // Store the event ID in the button for redirection
+                    let editButton = document.getElementById('editButton');
+                    editButton.setAttribute('data-id', info.event.id);
+
                     var eventModal = new bootstrap.Modal(document.getElementById('eventDetailsModal'), {});
                     eventModal.show();
                 }
@@ -323,7 +327,6 @@ function convertTo12HourFormat($time)
                 toggleButton.textContent = 'View as Table';
             }
         });
-
     </script>
 </head>
 
@@ -830,6 +833,16 @@ function convertTo12HourFormat($time)
         // Redirect to the update page with rfid_no as a query parameter
         window.location.href = `admin-update-schedule.php?sched_id=${sched_id}`;
     }
+</script>
+<script>
+    document.getElementById('editButton').addEventListener('click', function () {
+        let schedId = this.getAttribute('data-id'); // Get the stored event ID
+        if (schedId) {
+            window.location.href = `admin-update-schedule.php?sched_id=${schedId}`;
+        } else {
+            alert('No schedule selected.');
+        }
+    });
 </script>
 
 </html>

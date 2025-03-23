@@ -130,6 +130,38 @@ if ($stmt === false) {
     die("Database error: " . print_r(sqlsrv_errors(), true));
 }
 
+// Query for Top 3 Rated Faculty Based on Selected Month and Year
+$sqlTopRatedFaculty = "
+    SELECT TOP 3 
+        f.rfid_no, 
+        CONCAT(f.fname, ' ', COALESCE(f.mname + ' ', ''), f.lname) AS fullname, 
+        f.picture_path,
+        COUNT(a.appointment_code) AS total_appointments,
+        AVG(CAST(a.rate AS FLOAT)) AS average_rating
+    FROM Appointments a
+    JOIN Faculty f ON a.prof_rfid_no = f.rfid_no
+    WHERE a.rate IS NOT NULL 
+        AND f.archived = 0
+        AND MONTH(a.date_logged) = ?
+        AND YEAR(a.date_logged) = ?
+    GROUP BY f.rfid_no, f.fname, f.mname, f.lname, f.picture_path
+    ORDER BY average_rating DESC, total_appointments DESC
+";
+
+$paramsTopRated = array($selectedMonth, $selectedYear);
+$stmtTopRatedFaculty = sqlsrv_query($conn, $sqlTopRatedFaculty, $paramsTopRated);
+
+$topRatedFaculty = [];
+while ($row = sqlsrv_fetch_array($stmtTopRatedFaculty, SQLSRV_FETCH_ASSOC)) {
+    $topRatedFaculty[] = [
+        'rfid_no' => $row['rfid_no'],
+        'fullname' => $row['fullname'],
+        'picture_path' => $row['picture_path'] ?? '../../assets/images/Prof.png',
+        'total_appointments' => $row['total_appointments'],
+        'average_rating' => round($row['average_rating'], 1) // Rounded to 1 decimal place
+    ];
+}
+
 // Convert agenda and status count data to JSON for Chart.js
 $statusData = json_encode($statusCounts);
 $agendaData = json_encode($agendaCounts);
@@ -376,15 +408,30 @@ while ($row = sqlsrv_fetch_array($appointmentStmt, SQLSRV_FETCH_ASSOC)) {
                     <p class="no-data-message-4">No data available for this month</p>
                 </div>
             <?php endif; ?>
-            <?php if (!empty($leastEngagedProfs)): ?>
+            <?php if (!empty($topRatedFaculty)): ?>
                 <div class="chart-widget">
-                    <h2 class="tbl-title-2">Least Engagement / Month</h2>
-                    <?php foreach ($leastEngagedProfs as $prof): ?>
-                        <div class="most-card">
-                            <h3 class="prof-full-name"><?= htmlspecialchars($prof['fullname']) ?></h3>
-                            <p class="completed-lbl-2"><i>Completed Appointments:</i>
-                                <span class="count-2"><?= $prof['completed_appointments'] ?></span>
-                            </p>
+                    <h2 class="tbl-title-2">Top Rated Faculty</h2>
+                    <?php foreach ($topRatedFaculty as $faculty): ?>
+                        <div class="faculty-item2">
+                            <img src="<?php echo htmlspecialchars($faculty['picture_path']); ?>" alt="Profile"
+                                class="profile-picture2">
+                            <div class="faculty-details2">
+                                <p class="prof-full-name"><?php echo htmlspecialchars($faculty['fullname']); ?></p>
+                                <div class="rating-box2">
+                                    <?php echo $faculty['average_rating']; ?>
+                                    <?php
+                                    $fullStars = floor($faculty['average_rating']);
+                                    $halfStar = ($faculty['average_rating'] - $fullStars) >= 0.5 ? 1 : 0;
+
+                                    for ($i = 0; $i < $fullStars; $i++) {
+                                        echo '<i class="bi bi-star-fill"></i> ';
+                                    }
+                                    if ($halfStar) {
+                                        echo '<i class="bi bi-star-half"></i> ';
+                                    }
+                                    ?>
+                                </div>
+                            </div>
                         </div>
                     <?php endforeach; ?>
                 </div>
@@ -426,7 +473,7 @@ while ($row = sqlsrv_fetch_array($appointmentStmt, SQLSRV_FETCH_ASSOC)) {
                             $statusKey = strtolower(trim($row['status']));
                             $statusClass = $statusClasses[$statusKey] ?? 'status-default';
 
-                            $isClickable = in_array($statusKey, ['pending', 'accepted','cancelled','declined','completed']);
+                            $isClickable = in_array($statusKey, ['pending', 'accepted', 'cancelled', 'declined', 'completed']);
 
                             $professor = htmlspecialchars($row['prof_fname'] . " " . $row['prof_lname']);
                             $student = htmlspecialchars($row['stud_fname'] . " " . $row['stud_lname']);
@@ -755,8 +802,7 @@ while ($row = sqlsrv_fetch_array($appointmentStmt, SQLSRV_FETCH_ASSOC)) {
                             text: "Agenda Overview / month",
                             font: {
                                 family: "Poppins",
-                                size: 16,
-                                weight: "bold"
+                                size: 13
                             },
                             color: "#393242",
                         }
@@ -817,8 +863,7 @@ while ($row = sqlsrv_fetch_array($appointmentStmt, SQLSRV_FETCH_ASSOC)) {
                             text: "Appointment Status Overview / month",
                             font: {
                                 family: "Poppins",
-                                size: 16,
-                                weight: "bold"
+                                size: 12,
                             },
                             color: "#393242",
                             padding: {

@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         '2025-12-30', // Rizal Day
         '2025-12-31', // Last Day of the Year
     ];
-    
+
     try {
         if (in_array($start_date, $philippineHolidays)) {
             throw new Exception("Cannot schedule on a Philippine holiday.");
@@ -62,10 +62,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $queries = [
-            "room" => ["SELECT COUNT(*) AS count FROM Schedules WHERE room_id = ? AND start_date = ? AND end_date = ? AND ((? BETWEEN start_time AND end_time) OR (? BETWEEN start_time AND end_time)) AND sched_id != ?", [$room_id, $start_date, $end_date, $start_time, $end_time, $sched_id]],
-            "faculty" => ["SELECT COUNT(*) AS count FROM Schedules WHERE rfid_no = ? AND start_date = ? AND end_date = ? AND ((? BETWEEN start_time AND end_time) OR (? BETWEEN start_time AND end_time)) AND sched_id != ?", [$rfid_no, $start_date, $end_date, $start_time, $end_time, $sched_id]],
-            "section" => ["SELECT COUNT(*) AS count FROM Schedules WHERE section_id = ? AND start_date = ? AND end_date = ? AND ((? BETWEEN start_time AND end_time) OR (? BETWEEN start_time AND end_time)) AND sched_id != ?", [$section_id, $start_date, $end_date, $start_time, $end_time, $sched_id]]
+            "room" => [
+                "SELECT COUNT(*) AS count FROM Schedules 
+                 WHERE room_id = ? 
+                 AND start_date = ? 
+                 AND end_date = ? 
+                 AND NOT (? >= end_time OR ? <= start_time) 
+                 AND sched_id != ?",
+                [$room_id, $start_date, $end_date, $start_time, $end_time, $sched_id]
+            ],
+            "faculty" => [
+                "SELECT COUNT(*) AS count FROM Schedules 
+                 WHERE rfid_no = ? 
+                 AND start_date = ? 
+                 AND end_date = ? 
+                 AND NOT (? >= end_time OR ? <= start_time) 
+                 AND sched_id != ?",
+                [$rfid_no, $start_date, $end_date, $start_time, $end_time, $sched_id]
+            ],
+            "section" => [
+                "SELECT COUNT(*) AS count FROM Schedules 
+                 WHERE section_id = ? 
+                 AND start_date = ? 
+                 AND end_date = ? 
+                 AND NOT (? >= end_time OR ? <= start_time) 
+                 AND sched_id != ?",
+                [$section_id, $start_date, $end_date, $start_time, $end_time, $sched_id]
+            ]
         ];
+
 
         foreach ($queries as $key => [$sql, $params]) {
             $stmt = sqlsrv_query($conn, $sql, $params);

@@ -24,43 +24,34 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $appointment_code = filter_input(INPUT_POST, 'appointment_code', FILTER_SANITIZE_STRING);
         $agenda           = filter_input(INPUT_POST, 'agenda', FILTER_SANITIZE_STRING);
         $status           = filter_input(INPUT_POST, 'status', FILTER_SANITIZE_STRING);
-        
+        $start_time       = filter_input(INPUT_POST, 'start_time', FILTER_SANITIZE_STRING);
+        $end_time         = filter_input(INPUT_POST, 'end_time', FILTER_SANITIZE_STRING);
+
         // Fetch the current appointment record to obtain its details
-        $selectSql = "SELECT prof_rfid_no, start_time, end_time, date_logged 
+        $selectSql = "SELECT prof_rfid_no, date_logged 
                       FROM Appointments 
                       WHERE appointment_code = ?";
         $selectParams = array($appointment_code);
         $selectStmt = sqlsrv_query($conn, $selectSql, $selectParams);
+        
         if ($selectStmt === false) {
             die(print_r(sqlsrv_errors(), true));
         }
+        
         $appointment = sqlsrv_fetch_array($selectStmt, SQLSRV_FETCH_ASSOC);
+        
         if (!$appointment) {
             redirectWithMessage("Appointment not found.", "error", "../pages/admin-update-appointment.php", $appointment_code);
         }
-        
+
+        $prof_rfid_no = $appointment['prof_rfid_no'];
+        $date_logged  = $appointment['date_logged'];
+
+        // Ensure date_logged is formatted properly
+        $date_logged_str = ($date_logged instanceof DateTime) ? $date_logged->format('Y-m-d') : $date_logged;
+
         // If the new status is "Accepted", perform the overlap check.
         if (strtolower($status) === 'accepted') {
-            $prof_rfid_no = $appointment['prof_rfid_no'];
-            $start_time   = $appointment['start_time'];
-            $end_time     = $appointment['end_time'];
-            $date_logged  = $appointment['date_logged'];
-            
-            // Convert time objects to strings (assuming they are DateTime objects)
-            $start_time_str = $start_time instanceof DateTime ? $start_time->format('H:i:s') : $start_time;
-            $end_time_str   = $end_time instanceof DateTime ? $end_time->format('H:i:s') : $end_time;
-            
-            // Format date_logged to Y-m-d if needed
-            if ($date_logged instanceof DateTime) {
-                $date_logged_str = $date_logged->format('Y-m-d');
-            } else {
-                $date_logged_str = $date_logged;
-            }
-            
-            // Overlap logic:
-            // New appointment's start time is less than an existing appointment's end time
-            // AND new appointment's end time is greater than an existing appointment's start time.
-            // Exclude the current appointment record from the check.
             $checkSql = "SELECT appointment_code 
                          FROM Appointments 
                          WHERE prof_rfid_no = ? 
@@ -71,24 +62,26 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $checkParams = array(
                 $prof_rfid_no,
                 $date_logged_str,
-                $start_time_str,
-                $end_time_str,
+                $start_time,
+                $end_time,
                 $appointment_code
             );
             $checkStmt = sqlsrv_query($conn, $checkSql, $checkParams);
+            
             if ($checkStmt === false) {
                 die(print_r(sqlsrv_errors(), true));
             }
+            
             if (sqlsrv_has_rows($checkStmt)) {
                 redirectWithMessage("This professor already has an accepted appointment scheduled during that time.", "error", "../pages/admin-update-appointment.php", $appointment_code);
             }
         }
-        
-        // Proceed to update the appointment with the new agenda and status.
+
+        // Proceed to update the appointment with the new agenda, status, start_time, and end_time.
         $updateSql = "UPDATE Appointments 
-                      SET agenda = ?, status = ? 
+                      SET agenda = ?, status = ?, start_time = ?, end_time = ? 
                       WHERE appointment_code = ?";
-        $updateParams = array($agenda, $status, $appointment_code);
+        $updateParams = array($agenda, $status, $start_time, $end_time, $appointment_code);
         $updateStmt = sqlsrv_query($conn, $updateSql, $updateParams);
         
         if ($updateStmt) {
