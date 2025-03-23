@@ -227,7 +227,6 @@ $agendaHasData = count($agendaCounts) > 0 ? 'true' : 'false';
                     <span>Dashboard</span>
                 </a>
             </div>
-
             <!-- Attendance Records -->
             <div class="nav-button">
                 <a href="admin-attendance-records.php">
@@ -235,7 +234,6 @@ $agendaHasData = count($agendaCounts) > 0 ? 'true' : 'false';
                     <span>Attendance Records</span>
                 </a>
             </div>
-
             <!-- Appointment -->
             <div class="nav-button">
                 <a href="admin-appointment.php">
@@ -243,7 +241,6 @@ $agendaHasData = count($agendaCounts) > 0 ? 'true' : 'false';
                     <span>Appointment</span>
                 </a>
             </div>
-
             <!-- Announcement -->
             <div class="nav-button">
                 <a href="admin-announcement.php">
@@ -251,7 +248,6 @@ $agendaHasData = count($agendaCounts) > 0 ? 'true' : 'false';
                     <span>Announcement</span>
                 </a>
             </div>
-
             <!-- Faculty -->
             <div class="nav-button">
                 <a href="admin-faculty.php">
@@ -259,7 +255,6 @@ $agendaHasData = count($agendaCounts) > 0 ? 'true' : 'false';
                     <span>Faculty Members</span>
                 </a>
             </div>
-
             <!-- Schedule -->
             <div class="nav-button">
                 <a href="admin-schedule.php">
@@ -267,7 +262,6 @@ $agendaHasData = count($agendaCounts) > 0 ? 'true' : 'false';
                     <span>Schedule</span>
                 </a>
             </div>
-
             <!-- Sections -->
             <div class="nav-button">
                 <a href="admin-sections.php">
@@ -275,7 +269,6 @@ $agendaHasData = count($agendaCounts) > 0 ? 'true' : 'false';
                     <span>Sections</span>
                 </a>
             </div>
-
             <!-- Student -->
             <div class="nav-button">
                 <a href="admin-student.php">
@@ -283,7 +276,6 @@ $agendaHasData = count($agendaCounts) > 0 ? 'true' : 'false';
                     <span>Student</span>
                 </a>
             </div>
-
             <!-- Subjects -->
             <div class="nav-button">
                 <a href="admin-subjects.php">
@@ -291,17 +283,13 @@ $agendaHasData = count($agendaCounts) > 0 ? 'true' : 'false';
                     <span>Subjects</span>
                 </a>
             </div>
-
-            <?php if ($acc_type === 'Super Admin'): ?>
-                <!-- Admin Panel -->
-                <div class="nav-button">
-                    <a href="../authentication/admin-admins.php">
-                        <i class="fas fa-user-tie"></i>
-                        <span>Admin Panel</span>
-                    </a>
-                </div>
-            <?php endif; ?>
-
+            <!-- Admin Panel -->
+            <div class="nav-button">
+                <a href="admin-manage.php">
+                    <i class="fas fa-user-tie"></i>
+                    <span>Admin Panel</span>
+                </a>
+            </div>
             <!-- Logout -->
             <div class="nav-button">
                 <a href="../authentication/admin-logout.php">
@@ -309,7 +297,6 @@ $agendaHasData = count($agendaCounts) > 0 ? 'true' : 'false';
                     <span>Logout</span>
                 </a>
             </div>
-
             <div id="nav-content-highlight"></div>
         </div>
     </div>

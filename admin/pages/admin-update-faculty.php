@@ -78,7 +78,6 @@ if ($stmtDepartments !== false) {
                     <span>Dashboard</span>
                 </a>
             </div>
-
             <!-- Attendance Records -->
             <div class="nav-button">
                 <a href="admin-attendance-records.php">
@@ -86,7 +85,6 @@ if ($stmtDepartments !== false) {
                     <span>Attendance Records</span>
                 </a>
             </div>
-
             <!-- Appointment -->
             <div class="nav-button">
                 <a href="admin-appointment.php">
@@ -94,7 +92,6 @@ if ($stmtDepartments !== false) {
                     <span>Appointment</span>
                 </a>
             </div>
-
             <!-- Announcement -->
             <div class="nav-button">
                 <a href="admin-announcement.php">
@@ -102,7 +99,6 @@ if ($stmtDepartments !== false) {
                     <span>Announcement</span>
                 </a>
             </div>
-
             <!-- Faculty -->
             <div class="nav-button">
                 <a href="admin-faculty.php">
@@ -110,7 +106,6 @@ if ($stmtDepartments !== false) {
                     <span>Faculty Members</span>
                 </a>
             </div>
-
             <!-- Schedule -->
             <div class="nav-button">
                 <a href="admin-schedule.php">
@@ -118,7 +113,6 @@ if ($stmtDepartments !== false) {
                     <span>Schedule</span>
                 </a>
             </div>
-
             <!-- Sections -->
             <div class="nav-button">
                 <a href="admin-sections.php">
@@ -126,7 +120,6 @@ if ($stmtDepartments !== false) {
                     <span>Sections</span>
                 </a>
             </div>
-
             <!-- Student -->
             <div class="nav-button">
                 <a href="admin-student.php">
@@ -134,7 +127,6 @@ if ($stmtDepartments !== false) {
                     <span>Student</span>
                 </a>
             </div>
-
             <!-- Subjects -->
             <div class="nav-button">
                 <a href="admin-subjects.php">
@@ -142,17 +134,13 @@ if ($stmtDepartments !== false) {
                     <span>Subjects</span>
                 </a>
             </div>
-
-            <?php if ($acc_type === 'Super Admin'): ?>
-                <!-- Admin Panel -->
-                <div class="nav-button">
-                    <a href="../authentication/admin-admins.php">
-                        <i class="fas fa-user-tie"></i>
-                        <span>Admin Panel</span>
-                    </a>
-                </div>
-            <?php endif; ?>
-
+            <!-- Admin Panel -->
+            <div class="nav-button">
+                <a href="admin-manage.php">
+                    <i class="fas fa-user-tie"></i>
+                    <span>Admin Panel</span>
+                </a>
+            </div>
             <!-- Logout -->
             <div class="nav-button">
                 <a href="../authentication/admin-logout.php">
@@ -160,7 +148,6 @@ if ($stmtDepartments !== false) {
                     <span>Logout</span>
                 </a>
             </div>
-
             <div id="nav-content-highlight"></div>
         </div>
     </div>

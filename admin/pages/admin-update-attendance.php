@@ -86,7 +86,6 @@ $dateLogged = $attendance['date_logged']->format('Y-m-d');
                     <span>Dashboard</span>
                 </a>
             </div>
-
             <!-- Attendance Records -->
             <div class="nav-button">
                 <a href="admin-attendance-records.php">
@@ -94,7 +93,6 @@ $dateLogged = $attendance['date_logged']->format('Y-m-d');
                     <span>Attendance Records</span>
                 </a>
             </div>
-
             <!-- Appointment -->
             <div class="nav-button">
                 <a href="admin-appointment.php">
@@ -102,7 +100,6 @@ $dateLogged = $attendance['date_logged']->format('Y-m-d');
                     <span>Appointment</span>
                 </a>
             </div>
-
             <!-- Announcement -->
             <div class="nav-button">
                 <a href="admin-announcement.php">
@@ -110,7 +107,6 @@ $dateLogged = $attendance['date_logged']->format('Y-m-d');
                     <span>Announcement</span>
                 </a>
             </div>
-
             <!-- Faculty -->
             <div class="nav-button">
                 <a href="admin-faculty.php">
@@ -118,7 +114,6 @@ $dateLogged = $attendance['date_logged']->format('Y-m-d');
                     <span>Faculty Members</span>
                 </a>
             </div>
-
             <!-- Schedule -->
             <div class="nav-button">
                 <a href="admin-schedule.php">
@@ -126,7 +121,6 @@ $dateLogged = $attendance['date_logged']->format('Y-m-d');
                     <span>Schedule</span>
                 </a>
             </div>
-
             <!-- Sections -->
             <div class="nav-button">
                 <a href="admin-sections.php">
@@ -134,7 +128,6 @@ $dateLogged = $attendance['date_logged']->format('Y-m-d');
                     <span>Sections</span>
                 </a>
             </div>
-
             <!-- Student -->
             <div class="nav-button">
                 <a href="admin-student.php">
@@ -142,7 +135,6 @@ $dateLogged = $attendance['date_logged']->format('Y-m-d');
                     <span>Student</span>
                 </a>
             </div>
-
             <!-- Subjects -->
             <div class="nav-button">
                 <a href="admin-subjects.php">
@@ -150,17 +142,13 @@ $dateLogged = $attendance['date_logged']->format('Y-m-d');
                     <span>Subjects</span>
                 </a>
             </div>
-
-            <?php if ($acc_type === 'Super Admin'): ?>
-                <!-- Admin Panel -->
-                <div class="nav-button">
-                    <a href="../authentication/admin-admins.php">
-                        <i class="fas fa-user-tie"></i>
-                        <span>Admin Panel</span>
-                    </a>
-                </div>
-            <?php endif; ?>
-
+            <!-- Admin Panel -->
+            <div class="nav-button">
+                <a href="admin-manage.php">
+                    <i class="fas fa-user-tie"></i>
+                    <span>Admin Panel</span>
+                </a>
+            </div>
             <!-- Logout -->
             <div class="nav-button">
                 <a href="../authentication/admin-logout.php">
@@ -168,7 +156,6 @@ $dateLogged = $attendance['date_logged']->format('Y-m-d');
                     <span>Logout</span>
                 </a>
             </div>
-
             <div id="nav-content-highlight"></div>
         </div>
     </div>

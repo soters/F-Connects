@@ -230,7 +230,6 @@ while ($row = sqlsrv_fetch_array($appointmentStmt, SQLSRV_FETCH_ASSOC)) {
                     <span>Dashboard</span>
                 </a>
             </div>
-
             <!-- Attendance Records -->
             <div class="nav-button">
                 <a href="admin-attendance-records.php">
@@ -238,7 +237,6 @@ while ($row = sqlsrv_fetch_array($appointmentStmt, SQLSRV_FETCH_ASSOC)) {
                     <span>Attendance Records</span>
                 </a>
             </div>
-
             <!-- Appointment -->
             <div class="nav-button">
                 <a href="admin-appointment.php">
@@ -246,7 +244,6 @@ while ($row = sqlsrv_fetch_array($appointmentStmt, SQLSRV_FETCH_ASSOC)) {
                     <span>Appointment</span>
                 </a>
             </div>
-
             <!-- Announcement -->
             <div class="nav-button">
                 <a href="admin-announcement.php">
@@ -254,7 +251,6 @@ while ($row = sqlsrv_fetch_array($appointmentStmt, SQLSRV_FETCH_ASSOC)) {
                     <span>Announcement</span>
                 </a>
             </div>
-
             <!-- Faculty -->
             <div class="nav-button">
                 <a href="admin-faculty.php">
@@ -262,7 +258,6 @@ while ($row = sqlsrv_fetch_array($appointmentStmt, SQLSRV_FETCH_ASSOC)) {
                     <span>Faculty Members</span>
                 </a>
             </div>
-
             <!-- Schedule -->
             <div class="nav-button">
                 <a href="admin-schedule.php">
@@ -270,7 +265,6 @@ while ($row = sqlsrv_fetch_array($appointmentStmt, SQLSRV_FETCH_ASSOC)) {
                     <span>Schedule</span>
                 </a>
             </div>
-
             <!-- Sections -->
             <div class="nav-button">
                 <a href="admin-sections.php">
@@ -278,7 +272,6 @@ while ($row = sqlsrv_fetch_array($appointmentStmt, SQLSRV_FETCH_ASSOC)) {
                     <span>Sections</span>
                 </a>
             </div>
-
             <!-- Student -->
             <div class="nav-button">
                 <a href="admin-student.php">
@@ -286,7 +279,6 @@ while ($row = sqlsrv_fetch_array($appointmentStmt, SQLSRV_FETCH_ASSOC)) {
                     <span>Student</span>
                 </a>
             </div>
-
             <!-- Subjects -->
             <div class="nav-button">
                 <a href="admin-subjects.php">
@@ -294,17 +286,13 @@ while ($row = sqlsrv_fetch_array($appointmentStmt, SQLSRV_FETCH_ASSOC)) {
                     <span>Subjects</span>
                 </a>
             </div>
-
-            <?php if ($acc_type === 'Super Admin'): ?>
-                <!-- Admin Panel -->
-                <div class="nav-button">
-                    <a href="../authentication/admin-admins.php">
-                        <i class="fas fa-user-tie"></i>
-                        <span>Admin Panel</span>
-                    </a>
-                </div>
-            <?php endif; ?>
-
+            <!-- Admin Panel -->
+            <div class="nav-button">
+                <a href="admin-manage.php">
+                    <i class="fas fa-user-tie"></i>
+                    <span>Admin Panel</span>
+                </a>
+            </div>
             <!-- Logout -->
             <div class="nav-button">
                 <a href="../authentication/admin-logout.php">
@@ -312,7 +300,6 @@ while ($row = sqlsrv_fetch_array($appointmentStmt, SQLSRV_FETCH_ASSOC)) {
                     <span>Logout</span>
                 </a>
             </div>
-
             <div id="nav-content-highlight"></div>
         </div>
 
