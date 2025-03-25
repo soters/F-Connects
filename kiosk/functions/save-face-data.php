@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $rfid_no = $data['rfid_no'];
     $images = $data['images'];
-    $directory = "../labeled_images/{$rfid_no}";
+    $directory = "../../labeled_images/{$rfid_no}";
 
     // Create directory for the faculty if it doesn't exist
     if (!file_exists($directory)) {

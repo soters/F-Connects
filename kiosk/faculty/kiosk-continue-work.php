@@ -2,6 +2,7 @@
 session_start();
 require_once '../../connection/connection.php';
 
+
 $rfid_no = $_GET['rfid_no'] ?? null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

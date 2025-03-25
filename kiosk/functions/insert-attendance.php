@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once('../../connection/connection.php');
+date_default_timezone_set('Asia/Manila');
 
 // Get the RFID number from the request
 $rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
@@ -89,7 +90,6 @@ if ($attendance && is_null($attendance['time_out'])) {
     header("Location: ../faculty/kiosk-time-out-info.php?rfid_no=" . urlencode($rfid_no) . "&attd_ref=" . urlencode($attendance['attd_ref']));
     exit();
 }
-
 
 // If no prior attendance record, process time-in logic
 // Query to find the earliest schedule for today

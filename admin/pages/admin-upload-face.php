@@ -44,6 +44,18 @@ if ($stmtDepartments !== false) {
         $departments[] = $row;
     }
 }
+
+// Fetch faculty images from FaceData
+$sqlFaceData = "SELECT image_path FROM FaceData WHERE rfid_no = ?";
+$paramsFaceData = [$rfid_no];
+$stmtFaceData = sqlsrv_query($conn, $sqlFaceData, $paramsFaceData);
+
+$faceImages = [];
+if ($stmtFaceData !== false) {
+    while ($row = sqlsrv_fetch_array($stmtFaceData, SQLSRV_FETCH_ASSOC)) {
+        $faceImages[] = $row['image_path'];
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -58,6 +70,95 @@ if ($stmtDepartments !== false) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../assets/css/admin-design.css">
+    <style>
+        #image-preview {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .preview {
+            width: 100px;
+            /* Adjust size as needed */
+            height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .modal2 {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content2 {
+            background: white;
+            margin: 10% auto;
+            padding: 20px;
+            width: 50%;
+            border-radius: 10px;
+            text-align: center;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .image-upload-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .upload-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .choose-btn {
+            background-color: #4b3c88;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+
+        .preview-2 {
+            text-align: center;
+            font-weight: 600;
+            color: #322e36;
+            font-family: "Poppins", sans-serif;
+        }
+
+        #uploadBtn {
+            border-radius: 4px;
+            margin-top: 20px;
+            background-color: #2b5876;
+            color: #ffc52d;
+            font-family: "Poppins", sans-serif;
+            font-weight: 700;
+            padding: 10px;
+            border: none;
+            width: 100%;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
@@ -154,201 +255,51 @@ if ($stmtDepartments !== false) {
 
     <!-- Main Content -->
     <div id="main-content" class="main-content">
-        <form id="updateForm" action="../functions/update-faculty.php" method="POST" enctype="multipart/form-data">
+        <form id="updateForm" action="../functions/update-face-data.php" method="POST" enctype="multipart/form-data">
             <div class="action-widgets-2">
                 <div class="widget-button">
-                    <h1 class="sub-title">Faculty / Update</h1>
+                    <h1 class="sub-title">Faculty / Face Data</h1>
                     <div class="buttons">
-                        <button class="create-btn-3" type="submit">Update</button>
-                        <a href="admin-faculty.php" class="discard-btn">Cancel</a>
+                        <a href="admin-update-faculty.php?rfid_no=<?= isset($_GET['rfid_no']) ? urlencode($_GET['rfid_no']) : '' ?>"
+                            class="discard-btn">Back</a>
                     </div>
                 </div>
             </div>
             <div id="messageBox" class="message-box"></div>
             <div class="faculty-container-1">
                 <div class="buttons">
-                    <a href="javascript:void(0);" class="pass-btn"
-                        onclick="openResetModal(<?= isset($_GET['rfid_no']) ? htmlspecialchars($_GET['rfid_no']) : 'null'; ?>)">
-                        Reset Password
-                    </a>
-                    <!--<a href="javascript:void(0);" class="red-btn"
+                    <a href="javascript:void(0);" class="red-btn"
                         onclick="openDeleteModal(<?= isset($_GET['rfid_no']) ? htmlspecialchars($_GET['rfid_no']) : 'null'; ?>)">
-                        Delete
-                    </a>-->
-                    <a href="javascript:void(0);" class="arc-btn"
-                        onclick="openArchiveModal(<?= isset($_GET['rfid_no']) ? htmlspecialchars($_GET['rfid_no']) : 'null'; ?>)">
-                        Archive
+                        Delete Face Data
                     </a>
-                    <a href="admin-upload-face.php?rfid_no=<?= isset($_GET['rfid_no']) ? urlencode($_GET['rfid_no']) : '' ?>"
-                        class="face-btn">
-                        Face Data
+                    <a href="javascript:void(0);" class="face-btn"
+                        onclick="openUploadModal2(<?= isset($_GET['rfid_no']) ? htmlspecialchars($_GET['rfid_no']) : 'null'; ?>)">
+                        Upload Face Data
+                    </a>
+                    <a href="../camera/kiosk-first-facial.php?rfid_no=<?= isset($_GET['rfid_no']) ? htmlspecialchars($_GET['rfid_no']) : ''; ?>"
+                        class="arc-btn">
+                        Open Camera
                     </a>
                     <!--<button class="pass-btn" type="button">Account Informations</button>-->
                 </div>
+
                 <div class="faculty-container-2">
+
+                    <h1 class="info-title">Faculty Face Data</h1>
+                    <hr>
                     <div class="picture-container">
                         <div id="image-preview">
-                            <img id="preview"
-                                src="<?= htmlspecialchars($data['picture_path']) ?: '../../assets/images/add-image.jpg' ?>"
-                                alt="Image Preview">
-                        </div>
-                        <label for="picture_path" class="custom-file-upload">Choose Image</label>
-                        <input type="file" id="picture_path" name="picture_path" accept="image/*"
-                            onchange="previewImage(event)">
-                    </div>
+                            <?php
+                            if (!empty($faceImages)) {
+                                foreach ($faceImages as $imagePath) {
+                                    echo '<img class="preview" src="' . htmlspecialchars($imagePath) . '" alt="Faculty Image">';
+                                }
+                            } else {
+                                // Default image if no images are found
+                                echo '<p class="preview-2">No Face Data Available</p>';
 
-                    <br>
-                    <div class="faculty-name-container">
-                        <div>
-                            <label for="rfid_no">RFID No.</label>
-                            <input class="name-input" type="tel" id="rfid_no" name="rfid_no"
-                                value="<?= htmlspecialchars($data['rfid_no']) ?>" readonly>
-                        </div>
-                        <div>
-                            <label for="employment_type">Employment Type</label>
-                            <select id="employment_type" name="employment_type" class="name-input">
-                                <option value="Full Time" <?= $data['employment_type'] == "Full Time" ? 'selected' : '' ?>>
-                                    Full Time</option>
-                                <option value="Part Time" <?= $data['employment_type'] == "Part Time" ? 'selected' : '' ?>>
-                                    Part Time</option>
-                            </select>
-                        </div>
-                    </div>
-                    <hr>
-
-                    <h1 class="info-title">Faculty Name</h1>
-                    <hr>
-
-                    <div class="faculty-name-container">
-                        <div>
-                            <label for="fname">First Name</label>
-                            <input class="name-input" type="text" id="fname" name="fname"
-                                value="<?= htmlspecialchars($data['fname']) ?>" required>
-                        </div>
-                        <div>
-                            <label for="mname">Middle Name</label>
-                            <input class="name-input" type="text" id="mname" name="mname"
-                                value="<?= htmlspecialchars($data['mname']) ?>">
-                        </div>
-                        <div>
-                            <label for="lname">Last Name</label>
-                            <input class="name-input" type="text" id="lname" name="lname"
-                                value="<?= htmlspecialchars($data['lname']) ?>" required>
-                        </div>
-                        <div>
-                            <label for="suffix">Suffix</label>
-                            <select id="suffix" name="suffix" class="name-input">
-                                <option value="">None</option>
-                                <option value="Sr." <?= $data['suffix'] == "Sr." ? 'selected' : '' ?>>Sr.</option>
-                                <option value="Jr." <?= $data['suffix'] == "Jr." ? 'selected' : '' ?>>Jr.</option>
-                                <option value="III" <?= $data['suffix'] == "III" ? 'selected' : '' ?>>III</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <h1 class="info-title">Other Information</h1>
-                    <hr>
-                    <div class="faculty-name-container">
-                        <div>
-                            <label for="sex">Gender</label>
-                            <select id="sex" name="sex" class="name-input">
-                                <option value="Male" <?= $data['sex'] == "Male" ? 'selected' : '' ?>>Male</option>
-                                <option value="Female" <?= $data['sex'] == "Female" ? 'selected' : '' ?>>Female</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="phone_no">Contact Number</label>
-                            <input class="name-input" type="tel" id="phone_no" name="phone_no"
-                                value="<?= htmlspecialchars($data['phone_no']) ?>" required>
-                        </div>
-                        <div>
-                            <label for="dob">Birth Date</label>
-                            <input class="name-input" type="date" id="dob" name="dob"
-                                value="<?= $data['dob']->format('Y-m-d') ?>">
-                        </div>
-                        <div>
-                            <label for="email">Email</label>
-                            <input class="name-input" type="email" id="email" name="email"
-                                value="<?= htmlspecialchars($data['email']) ?>" required>
-                        </div>
-                        <div>
-                            <label for="acc_type">Position</label>
-                            <select id="acc_type" name="acc_type" class="name-input">
-                                <option value="Professor" <?= $data['acc_type'] == "Professor" ? 'selected' : '' ?>>
-                                    Professor</option>
-                                <option value="Program Chair" <?= $data['acc_type'] == "Program Chair" ? 'selected' : '' ?>>
-                                    Program Chair</option>
-                                <option value="Dean" <?= $data['acc_type'] == "Dean" ? 'selected' : '' ?>>Dean</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="dept_id">Department</label>
-                            <select id="dept_id" name="dept_id" class="name-input" required>
-                                <?php foreach ($departments as $dept): ?>
-                                    <option value="<?= htmlspecialchars($dept['dept_id']) ?>"
-                                        <?= $data['dept_id'] == $dept['dept_id'] ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($dept['department_name']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                    </div>
-
-                    <h1 class="info-title">Address</h1>
-                    <hr>
-                    <div class="faculty-name-container">
-                        <div class="faculty-name-box">
-                            <label for="region">Region</label>
-                            <select id="region" name="region" class="name-input" required>
-                                <option value="NCR" <?= $data['region'] == "NCR" ? 'selected' : '' ?>>NCR</option>
-                                <option value="CAR" <?= $data['region'] == "CAR" ? 'selected' : '' ?>>CAR</option>
-                                <option value="Region I" <?= $data['region'] == "Region I" ? 'selected' : '' ?>>Region I
-                                </option>
-                                <option value="Region II" <?= $data['region'] == "Region II" ? 'selected' : '' ?>>Region II
-                                </option>
-                                <option value="Region III" <?= $data['region'] == "Region III" ? 'selected' : '' ?>>Region
-                                    III</option>
-                                <option value="Region IV-A" <?= $data['region'] == "Region IV-A" ? 'selected' : '' ?>>
-                                    Region IV-A</option>
-                                <option value="Region IV-B" <?= $data['region'] == "Region IV-B" ? 'selected' : '' ?>>
-                                    Region IV-B</option>
-                                <option value="Region V" <?= $data['region'] == "Region V" ? 'selected' : '' ?>>Region V
-                                </option>
-                                <option value="Region VI" <?= $data['region'] == "Region VI" ? 'selected' : '' ?>>Region VI
-                                </option>
-                                <option value="Region VII" <?= $data['region'] == "Region VII" ? 'selected' : '' ?>>Region
-                                    VII</option>
-                                <option value="Region VIII" <?= $data['region'] == "Region VIII" ? 'selected' : '' ?>>
-                                    Region VIII</option>
-                            </select>
-                        </div>
-                        <div class="faculty-name-box">
-                            <label for="city">City</label>
-                            <select id="city" name="city" class="name-input" required>
-                                <option value="Caloocan City" <?= $data['city'] == "Caloocan City" ? 'selected' : '' ?>>
-                                    Caloocan City</option>
-                                <option value="Quezon City" <?= $data['city'] == "Quezon City" ? 'selected' : '' ?>>Quezon
-                                    City</option>
-                                <option value="Manila" <?= $data['city'] == "Manila" ? 'selected' : '' ?>>Manila</option>
-                            </select>
-                        </div>
-                        <div class="faculty-name-box">
-                            <label for="province">Province</label>
-                            <select id="province" name="province" class="name-input" required>
-                                <option value="None" <?= $data['province'] == "None" ? 'selected' : '' ?>>None</option>
-                                <option value="Abra" <?= $data['province'] == "Abra" ? 'selected' : '' ?>>Abra</option>
-                                <!-- Add other provinces as needed -->
-                            </select>
-                        </div>
-                        <div>
-                            <label for="zip_code">Zip Code</label>
-                            <input class="name-input" type="text" id="zip_code" name="zip_code"
-                                value="<?= htmlspecialchars($data['zip_code']) ?>" required>
-                        </div>
-                        <div>
-                            <label for="address_dtl">Address Detail</label>
-                            <input class="name-input-2" type="text" id="address_dtl" name="address_dtl"
-                                value="<?= htmlspecialchars($data['address_dtl']) ?>" required>
+                            }
+                            ?>
                         </div>
                     </div>
                 </div>
@@ -357,6 +308,46 @@ if ($stmtDepartments !== false) {
     </div>
 
     <div id="modalOverlay" class="modal-overlay"></div>
+
+    <!-- Upload Face Data Modal -->
+    <div id="uploadModal" class="modal2">
+        <div class="modal-content2">
+            <span class="close" onclick="closeUploadModal()">&times;</span>
+            <h2>Upload Face Data</h2>
+            <p>Select 3 images to upload.</p>
+
+            <form id="uploadForm" action="../functions/update-face-data.php" method="POST"
+                enctype="multipart/form-data">
+                <input type="hidden" name="rfid_no" id="rfidInput">
+
+                <div class="image-upload-container">
+                    <div class="upload-box">
+                        <label for="image1">
+                            <img src="../../assets/images/add-image.jpg" id="preview1" class="preview" alt="Image 1">
+                        </label>
+                        <input type="file" name="images[]" id="image1" accept="image/*" onchange="previewImage(1)">
+
+                    </div>
+                    <div class="upload-box">
+                        <label for="image2">
+                            <img src="../../assets/images/add-image.jpg" id="preview2" class="preview" alt="Image 2">
+                        </label>
+                        <input type="file" name="images[]" id="image2" accept="image/*" onchange="previewImage(2)">
+
+                    </div>
+                    <div class="upload-box">
+                        <label for="image3">
+                            <img src="../../assets/images/add-image.jpg" id="preview3" class="preview" alt="Image 3">
+                        </label>
+                        <input type="file" name="images[]" id="image3" accept="image/*" onchange="previewImage(3)">
+                    </div>
+                    <input type="hidden" name="rfid_no" id="rfidInput"
+                        value="<?php echo htmlspecialchars($rfid_no); ?>">
+                </div>
+                <button type="submit" id="uploadBtn" disabled>Upload</button>
+            </form>
+        </div>
+    </div>
 
     <!-- Archive Confirmation Modal -->
     <div id="archiveModal" class="custom-modal">
@@ -370,7 +361,7 @@ if ($stmtDepartments !== false) {
         </div>
     </div>
 
-    <!--Delete Confirmation Modal -->
+    Delete Confirmation Modal
     <div id="deleteModal" class="custom-modal">
         <div class="modal-content">
             <h2>Confirm Delete</h2>
@@ -495,7 +486,7 @@ if ($stmtDepartments !== false) {
     document.getElementById("confirmDelete").addEventListener("click", function () {
         let rfidNo = this.getAttribute("data-rfid"); // Get stored RFID
         window.location.href = `../functions/delete-face-data.php?rfid_no=${rfidNo}`; // Redirect with RFID
-    }); 
+    });
 
     function openResetModal(rfidNo) {
         document.getElementById("resetModal").style.display = "block"; // Show modal
@@ -513,6 +504,34 @@ if ($stmtDepartments !== false) {
         let rfidNo = this.getAttribute("data-rfid"); // Get stored RFID
         window.location.href = `../functions/reset-faculty-pass.php?rfid_no=${rfidNo}`; // Redirect with RFID
     });
+</script>
+<script>
+    function openUploadModal2() {
+        document.getElementById("uploadModal").style.display = "block";
+    }
+    function closeUploadModal() {
+        document.getElementById("uploadModal").style.display = "none";
+    }
+    function previewImage(index) {
+        let input = document.getElementById("image" + index);
+        let preview = document.getElementById("preview" + index);
+        if (input.files && input.files[0]) {
+            let reader = new FileReader();
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+        checkUploadStatus();
+    }
+    function checkUploadStatus() {
+        let images = [
+            document.getElementById("image1").files.length,
+            document.getElementById("image2").files.length,
+            document.getElementById("image3").files.length
+        ];
+        document.getElementById("uploadBtn").disabled = !(images[0] && images[1] && images[2]);
+    }
 </script>
 
 </html>

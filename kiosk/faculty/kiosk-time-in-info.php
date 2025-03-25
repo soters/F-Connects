@@ -2,66 +2,69 @@
 declare(strict_types=1);
 session_start();
 require_once('../../connection/connection.php');
+date_default_timezone_set('Asia/Manila');
 
-$rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
-$attd_ref = filter_input(INPUT_GET, 'attd_ref', FILTER_SANITIZE_STRING);
+$rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_DEFAULT);
+$attd_ref = filter_input(INPUT_GET, 'attd_ref', FILTER_DEFAULT);
 
-try {
-    // SQL Query
-    $query = "
-        SELECT 
-            f.rfid_no, 
-            f.fname, 
-            f.mname, 
-            f.lname, 
-            f.suffix, 
-            f.picture_path,
-            atd.date_logged AS attendance_date, 
-            atd.time_in, 
-            atd.status
-        FROM Faculty f
-        LEFT JOIN AttendanceToday atd 
-        ON f.rfid_no = atd.rfid_no
-        WHERE f.rfid_no = ? AND atd.date_logged = CAST(GETDATE() AS DATE)
-    ";
+// Debugging: Check if the values are received
+if (!$rfid_no) {
+    die("Error: RFID number is missing or invalid.");
+}
+if (!$attd_ref) {
+    die("Error: Attendance reference is missing or invalid.");
+}
 
-    // Prepare and execute the query
-    $params = [$rfid_no];
-    $stmt = sqlsrv_query($conn, $query, $params);
+// SQL Query
+$query = "
+    SELECT 
+        f.rfid_no, 
+        f.fname, 
+        f.mname, 
+        f.lname, 
+        f.suffix, 
+        f.picture_path,
+        atd.date_logged AS attendance_date, 
+        atd.time_in, 
+        atd.status
+    FROM Faculty f
+    LEFT JOIN AttendanceToday atd 
+    ON f.rfid_no = atd.rfid_no
+    WHERE f.rfid_no = ? AND atd.date_logged = CONVERT(DATE, GETDATE())
+";
 
-    if ($stmt === false) {
-        throw new Exception(print_r(sqlsrv_errors(), true));
+// Prepare and execute the query
+$params = [$rfid_no];
+$stmt = sqlsrv_query($conn, $query, $params);
+
+if ($stmt === false) {
+    die("SQL Error: " . print_r(sqlsrv_errors(), true)); // Show actual SQL error
+}
+
+// Store fetched data
+$data = [];
+while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+    // Ensure attendance_date is properly formatted
+    if ($row['attendance_date'] instanceof DateTime) {
+        $row['attendance_date'] = $row['attendance_date']->format('Y-m-d');
     }
-
-    // Fetch the result
-    $result = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
-
-    if ($result) {
-        $name = htmlspecialchars(
-            $result['fname'] . ' ' .
-            ($result['mname'] ? $result['mname'] . ' ' : '') .
-            $result['lname'] .
-            ($result['suffix'] ? ', ' . $result['suffix'] : ''),
-            ENT_QUOTES,
-            'UTF-8'
-        );
-        $picture = $result['picture_path'] ?: '../../assets/images/Prof.png';
-        $attendanceDate = htmlspecialchars($result['attendance_date']->format('Y-m-d'), ENT_QUOTES, 'UTF-8');
-        $timeIn = htmlspecialchars($result['time_in'] ? $result['time_in']->format('h:i A') : 'N/A', ENT_QUOTES, 'UTF-8');
-        $status = htmlspecialchars($result['status'] ?: 'N/A', ENT_QUOTES, 'UTF-8');
-    } else {
-        throw new Exception("No attendance data found for today.");
+    if ($row['time_in'] instanceof DateTime) {
+        $row['time_in'] = $row['time_in']->format('H:i:s');
     }
-} catch (Exception $e) {
-    $_SESSION['error_message'] = $e->getMessage();
-    header("Location: kiosk-faculty.php?rfid_no=" . urlencode($rfid_no));
-    exit;
-} finally {
-    sqlsrv_free_stmt($stmt);
-    sqlsrv_close($conn);
+    $data[] = $row;
+}
+
+// Free resources
+sqlsrv_free_stmt($stmt);
+sqlsrv_close($conn);
+
+// Check if data exists
+if (!empty($data)) {
+
+} else {
+    die("No attendance data found for today. Debug RFID: " . htmlspecialchars($rfid_no));
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -99,16 +102,34 @@ try {
             <h2 class="t-main-message">Confirm Time In</h2>
             <p class="t-sub-message">Time in and start timer</p>
             <div class="t-info-box">
-                <img src="<?php echo $picture; ?>" alt="Profile Img" class="t-avatar">
+                <img src="<?php echo htmlspecialchars($data[0]['picture_path'] ?? 'default.png'); ?>" alt="Profile Img"
+                    class="t-avatar">
                 <div class="details">
-                    <h3 class="t-name"><?php echo $name; ?></h3>
+                    <h3 class="t-name">
+                        <?php
+                        echo htmlspecialchars(
+                            ($data[0]['fname'] ?? '') . ' ' .
+                            ($data[0]['mname'] ? $data[0]['mname'] . ' ' : '') . // Middle name handling
+                            ($data[0]['lname'] ?? '') . ' ' .
+                            ($data[0]['suffix'] ?? '')
+                        );
+                        ?>
+                    </h3>
                     <div class="t-time-info">
                         <div class="t-date">
                             <span class="t-icon">&#x1F4C5;</span>
-                            <span><?php echo date('l, d F Y', strtotime($attendanceDate)); ?></span>
+                            <span>
+                                <?php
+                                echo isset($data[0]['attendance_date'])
+                                    ? date('l, d F Y', strtotime($data[0]['attendance_date']))
+                                    : 'N/A';
+                                ?>
+                            </span>
                         </div>
                         <div class="t-time">
-                            <span><?php echo $timeIn; ?></span>
+                            <span>
+                                <?php echo htmlspecialchars($data[0]['time_in'] ?? 'N/A'); ?>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -118,7 +139,6 @@ try {
             </a>
         </div>
     </div>
-
 
 
     <!--<div id="top-right-button">

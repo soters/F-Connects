@@ -14,7 +14,7 @@ $rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="view-transition" content="same-origin" />
     <!-- Custom Links -->
-    <link rel="stylesheet" href="../../assets/css/kiosk-design.css" />
+    <link rel="stylesheet" href="../../assets/css/kiosk-design.css"/>
     <link rel="shortcut icon" href="../../assets/images/F-Connect.ico" type="image/x-icon" />
     <title>F - Connect</title>
 </head>
@@ -38,13 +38,13 @@ $rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
     </nav>
 
     <div id="body-container">
-
-        <div class="first-facial-container">
-            <h1>Face Data Required</h1>
-            <p>Take a photo first to enable Time In/Out functionality.</p>
-            <br>
-            <a href="kiosk-reminder-1.php?rfid_no=<?php echo urlencode($rfid_no); ?>" class="no-underline">
-                <button class="ff-button">Take a photo</button>
+        <p id="action-message-rfid">Facial data successfully saved!</p>
+        <br>
+        <div class="action-box-s">
+            <a href="../../admin/pages/admin-upload-face.php?rfid_no=<?php echo $rfid_no; ?>" class="no-underline">
+                <button class="buttonDesign">
+                    Proceed
+                </button>
             </a>
         </div>
 
@@ -53,15 +53,6 @@ $rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
                 data-bs-placement="left">
                 <i class="bi bi-question-lg"></i>
         </div>-->
-
-        <div id="top-left-button">
-            <a href="kiosk-faculty.php?rfid_no=<?php echo urlencode($rfid_no); ?>" class="no-underline">
-                <button type="button" class="small-button" data-bs-toggle="tooltip" title="Back"
-                    data-bs-placement="right">
-                    <i class="bi bi-arrow-left-short"></i>
-                </button>
-            </a>
-        </div>
 
         <!--<footer>
             <p id="collaboration-text">In collaboration with Colegio de Sta. Teresa de Avila</p>
@@ -109,7 +100,6 @@ $rfid_no = filter_input(INPUT_GET, 'rfid_no', FILTER_SANITIZE_STRING);
             });
 
         </script>
-
 </body>
 
 </html>
