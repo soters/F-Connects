@@ -2,10 +2,9 @@
 declare(strict_types=1);
 session_start();
 require_once('../../connection/connection.php');
-
-$rfid_no = isset($_GET['rfid_no']) ? htmlspecialchars($_GET['rfid_no']) : '';
-
+date_default_timezone_set('Asia/Manila');
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -18,7 +17,6 @@ $rfid_no = isset($_GET['rfid_no']) ? htmlspecialchars($_GET['rfid_no']) : '';
     <link rel="stylesheet" href="../../assets/css/kiosk-design.css" />
     <link rel="shortcut icon" href="../../assets/images/F-Connect.ico" type="image/x-icon" />
     <title>F - Connect</title>
-
 </head>
 
 <body class="fade-out">
@@ -38,20 +36,45 @@ $rfid_no = isset($_GET['rfid_no']) ? htmlspecialchars($_GET['rfid_no']) : '';
     </nav>
 
     <div id="appointment-container">
-        <p id="action-message-info-2">Attendance Submitted!</p>
+        <p id="action-message-info">Account Information</p>
+        <i>
+            <p id="action-message-info-small">Provide your account information</p>
+        </i>
         <br>
-        <br>
-        <div class="code-card">
-            <img src="../../assets/images/calendar.png" alt="Calendar Icon" class="code-icon">
-            <p class="code-message-success">
-                Your attendance has been successfully submitted!
-            </p>
-        </div>
+        <form id="student-form" method="POST" action="../functions/check-email.php">
+            <p id="input-info">Email:</p>
+            <input id="student-info" name="email" type="email" required>
 
-        <!-- Submit Button -->
-        <button class="appoint-btn" type="button" onclick="window.location.href='../kiosk-index.php';">
-            <span class="btn-text">OKAY</span>
-        </button>
+            <p id="input-info">Password:</p>
+            <div style="position: relative; display: flex; align-items: center;">
+                <input id="student-info-password" name="password" type="password" required
+                    style="width: 100%; padding-right: 40px;">
+                <i id="togglePassword" class="bi bi-eye" style="position: absolute; right: 10px; cursor: pointer;"></i>
+            </div>
+
+            <!-- Submit Button -->
+            <button class="appoint-btn" type="submit">
+                <span class="btn-text">OKAY</span>
+            </button>
+        </form>
+
+        <!-- Show/Hide Password Script -->
+        <script>
+            document.getElementById("togglePassword").addEventListener("click", function () {
+                let passwordInput = document.getElementById("student-info-password");
+                let icon = this;
+
+                if (passwordInput.type === "password") {
+                    passwordInput.type = "text";
+                    icon.classList.remove("bi-eye");
+                    icon.classList.add("bi-eye-slash");
+                } else {
+                    passwordInput.type = "password";
+                    icon.classList.remove("bi-eye-slash");
+                    icon.classList.add("bi-eye");
+                }
+            });
+        </script>
 
     </div>
 
@@ -61,17 +84,17 @@ $rfid_no = isset($_GET['rfid_no']) ? htmlspecialchars($_GET['rfid_no']) : '';
                 <i class="bi bi-question-lg"></i>
         </div>-->
 
-    <!--<div id="top-left-button">
-        <a href="kiosk-student.php?rfid_no=<?= urlencode($rfid_no) ?>" class="no-underline">
+    <div id="top-left-button">
+        <a href="../kiosk-index.php" class="no-underline">
             <button type="button" class="small-button" data-bs-toggle="tooltip" title="Back" data-bs-placement="right">
                 <i class="bi bi-arrow-left-short"></i>
             </button>
         </a>
-    </div>-->
+    </div>
 
     <!--<footer>
         <p id="collaboration-text">In collaboration with Colegio de Sta. Teresa de Avila</p>
-    </footer> -->
+    </footer>-->
 
     <!-- Scripts -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -97,14 +120,34 @@ $rfid_no = isset($_GET['rfid_no']) ? htmlspecialchars($_GET['rfid_no']) : '';
             }
         }, 3000); // 2 seconds delay before hiding
     </script>
+    <script>
+        /** RFID Input Auto-Submit */
+        const rfidInput = document.getElementById('rfid-id');
+        const rfidForm = document.getElementById('rfid-form');
 
+        if (rfidInput && rfidForm) {
+            document.addEventListener('keydown', (event) => {
+                if (event.target === document.body) {
+                    const key = event.key;
+
+                    if (key === 'Enter') {
+                        // Submit the form when Enter is pressed
+                        if (rfidInput.value.trim() !== '') {
+                            rfidForm.submit();
+                        }
+                    } else {
+                        // Append keystrokes to the hidden input field
+                        rfidInput.value += key;
+                    }
+                }
+            });
+        }
+    </script>
     <script>
         document.querySelectorAll('a.no-underline').forEach(link => {
             link.addEventListener('click', function (e) {
                 e.preventDefault(); // Prevent immediate navigation
-                const target
-
-                Url = this.href; // Store the URL
+                const targetUrl = this.href; // Store the URL
 
                 // Add the 'hidden' class to start the fade-out effect
                 document.body.classList.add('hidden');

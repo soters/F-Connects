@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     } else {
         // Redirect back to the kiosk page
-        header("Location: ../faculty/kiosk-faculty.php?rfid_no=" . urlencode($rfid_no));
+        header("Location: ../kiosk-index.php");
         exit();
     }
 }
@@ -57,7 +57,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">

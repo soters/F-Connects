@@ -50,7 +50,7 @@ $rfid_no = isset($_GET['rfid_no']) ? htmlspecialchars($_GET['rfid_no']) : '';
 
         <!-- Submit Button -->
         <button class="appoint-btn" type="button"
-            onclick="window.location.href='kiosk-faculty.php?rfid_no=<?= urlencode($rfid_no) ?>';">
+            onclick="window.location.href='../kiosk-index.php';">
             <span class="btn-text">OKAY</span>
         </button>
 

@@ -3,33 +3,38 @@ declare(strict_types=1);
 session_start();
 require_once('../../connection/connection.php');
 
-// Retrieve the RFID ID from POST data and sanitize it
-$rfid_id = filter_input(INPUT_POST, 'rfid_id', FILTER_SANITIZE_STRING);
+// Retrieve and sanitize input
+$email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
+$password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_STRING);
 
-if (!$rfid_id) {
-    setErrorAndRedirect('Please try again, RFID does not exist.');
+if (!$email || !$password) {
+    setErrorAndRedirect('Invalid email or password. Please try again.');
 }
 
 try {
-    // Check if RFID exists in the student table
-    $query = "SELECT TOP 1 1 FROM Students WHERE rfid_no = ?";
-    $stmt = sqlsrv_prepare($conn, $query, array(&$rfid_id));
+    // Check StudentAccount
+    $query = "SELECT SA.password, S.rfid_no FROM StudentAccount SA INNER JOIN Students S ON SA.email = S.email WHERE SA.email = ?";
+    $stmt = sqlsrv_prepare($conn, $query, array(&$email));
     
-    if (sqlsrv_execute($stmt) && sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
-        setPageRedirect("../student/kiosk-student.php?rfid_no=" . urlencode($rfid_id));
-        exit;
+    if (sqlsrv_execute($stmt) && $row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+        if (password_verify($password, $row['password'])) {
+            setPageRedirect("../student/kiosk-student.php?rfid_no=" . urlencode($row['rfid_no']));
+            exit;
+        }
     }
 
-    // Check if RFID exists in the faculty table
-    $query = "SELECT TOP 1 1 FROM Faculty WHERE rfid_no = ?";
-    $stmt = sqlsrv_prepare($conn, $query, array(&$rfid_id));
-
-    if (sqlsrv_execute($stmt) && sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
-        validateFacultyAttendanceAndSchedule($conn, $rfid_id);
-        exit;
+    // Check FacultyAccount
+    $query = "SELECT FA.password, F.rfid_no FROM FacultyAccount FA INNER JOIN Faculty F ON FA.email = F.email WHERE FA.email = ?";
+    $stmt = sqlsrv_prepare($conn, $query, array(&$email));
+    
+    if (sqlsrv_execute($stmt) && $row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+        if (password_verify($password, $row['password'])) {
+            validateFacultyAttendanceAndSchedule($conn, $row['rfid_no']);
+            exit;
+        }
     }
 
-    setErrorAndRedirect('RFID does not exist in either the student or faculty database.');
+    setErrorAndRedirect('Invalid email or password. Please try again.');
 } catch (Exception $e) {
     error_log("Database Error: " . $e->getMessage());
     setErrorAndRedirect('An error occurred. Please contact the administrator.');
@@ -59,7 +64,6 @@ function validateFacultyAttendanceAndSchedule($conn, string $rfid_no): void
         $attendanceResult = sqlsrv_fetch_array($attendanceStmt, SQLSRV_FETCH_ASSOC);
 
         if ($attendanceResult && $attendanceResult['time_in'] !== null && $attendanceResult['time_out'] !== null) {
-            // Already timed in and out, redirect to continue work
             header("Location: ../faculty/kiosk-continue-work.php?rfid_no=" . urlencode($rfid_no));
             exit;
         }
@@ -79,7 +83,6 @@ function validateFacultyAttendanceAndSchedule($conn, string $rfid_no): void
         $scheduleResult = sqlsrv_fetch_array($scheduleStmt, SQLSRV_FETCH_ASSOC);
 
         if ($scheduleResult && $scheduleResult['count'] > 0) {
-            // If past 8:30 PM, deny access
             if ($currentTime > '20:30:00') {
                 $_SESSION['error_message'] = "School hours already ended.";
                 header("Location: ../kiosk-index.php");
@@ -125,8 +128,7 @@ function setErrorAndRedirect(string $message): void
 
 function setPageRedirect(string $location): void
 {
-    echo '
-    <html>
+    echo '<html>
     <head>
         <style>
             body {
@@ -162,7 +164,5 @@ function setPageRedirect(string $location): void
             }
         </script>
     </body>
-    </html>
-    ';
+    </html>';
 }
-?>

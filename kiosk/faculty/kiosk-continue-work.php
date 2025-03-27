@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     } else {
         // Redirect back to the kiosk page
-        header("Location: ../faculty/kiosk-faculty.php?rfid_no=" . urlencode($rfid_no));
+        header("Location: ../kiosk-index.php");
         exit();
     }
 

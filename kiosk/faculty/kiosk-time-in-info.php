@@ -128,7 +128,10 @@ if (!empty($data)) {
                         </div>
                         <div class="t-time">
                             <span>
-                                <?php echo htmlspecialchars($data[0]['time_in'] ?? 'N/A'); ?>
+                                <?php
+                                $timeIn = $data[0]['time_in'] ?? null;
+                                echo $timeIn ? date("h:i A", strtotime($timeIn)) : 'N/A';
+                                ?>
                             </span>
                         </div>
                     </div>

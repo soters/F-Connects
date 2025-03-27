@@ -48,14 +48,13 @@ date_default_timezone_set('Asia/Manila');
     </div>
 
     <div id="top-right-button">
-        <button type="button" class="how" title="Need help?" data-bs-placement="left">
-            <a href="../../manual/manual-index.php" style="text-decoration: none; color: inherit;">How to use the
-                kiosk?</a>
+        <button type="button" class="how" data-bs-placement="left">
+            <a href="./other/kiosk-manual-entry.php" class="no-underline" id="how">Forgot your RFID Card?</a>
         </button>
 
         <!--<button type="button" class="how" data-bs-toggle="tooltip" title="Need help?" data-bs-placement="left">
-            How to use the kiosk?-->
-        </button>
+            How to use the kiosk?
+        </button>-->
     </div>
 
     <div class="overlay" id="overlay" onclick="toggleModal()"></div>

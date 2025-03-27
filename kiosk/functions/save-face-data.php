@@ -11,19 +11,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $images = $data['images'];
     $directory = "../../labeled_images/{$rfid_no}";
 
-    // Create directory for the faculty if it doesn't exist
-    if (!file_exists($directory)) {
-        mkdir($directory, 0777, true);
-    }
-
     // Include your database connection file
     require_once('../../connection/connection.php');
 
     try {
-        foreach ($images as $index => $imageData) {
+        // Check if RFID exists in FaceData
+        $checkSql = "SELECT image_path FROM FaceData WHERE rfid_no = ?";
+        $checkStmt = sqlsrv_query($conn, $checkSql, array($rfid_no));
+
+        if ($checkStmt === false) {
+            echo json_encode(['success' => false, 'message' => 'Database error.']);
+            die(print_r(sqlsrv_errors(), true));
+        }
+
+        // Delete existing images
+        while ($row = sqlsrv_fetch_array($checkStmt, SQLSRV_FETCH_ASSOC)) {
+            $filePath = $row['image_path'];
+            if (file_exists($filePath)) {
+                unlink($filePath); // Delete file from directory
+            }
+        }
+
+        // Delete records from FaceData
+        $deleteSql = "DELETE FROM FaceData WHERE rfid_no = ?";
+        $deleteStmt = sqlsrv_query($conn, $deleteSql, array($rfid_no));
+
+        if ($deleteStmt === false) {
+            echo json_encode(['success' => false, 'message' => 'Failed to delete existing records.']);
+            die(print_r(sqlsrv_errors(), true));
+        }
+
+        // Create directory if it doesn't exist
+        if (!file_exists($directory)) {
+            mkdir($directory, 0777, true);
+        }
+
+        // Insert new images
+        foreach ($images as $imageData) {
             $imageData = str_replace('data:image/jpeg;base64,', '', $imageData);
             $imageData = base64_decode($imageData);
-            $fileName = "image_{$index}.jpg";
+            $fileName = "image_" . time() . "_" . bin2hex(random_bytes(4)) . ".jpg";
             $filePath = "{$directory}/{$fileName}";
 
             if (!file_put_contents($filePath, $imageData)) {
@@ -31,25 +58,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
             }
 
-            // Insert the image path into the FaceData table
-            $sql = "INSERT INTO FaceData (rfid_no, image_path, upload_date, upload_time) 
-                    VALUES (?, ?, GETDATE(), CONVERT(TIME, GETDATE()))";
+            // Insert new image record into FaceData
+            $insertSql = "INSERT INTO FaceData (rfid_no, image_path, upload_date, upload_time) 
+                          VALUES (?, ?, GETDATE(), CONVERT(TIME, GETDATE()))";
             $params = array($rfid_no, $filePath);
-            $stmt = sqlsrv_query($conn, $sql, $params);
+            $insertStmt = sqlsrv_query($conn, $insertSql, $params);
 
-            if ($stmt === false) {
+            if ($insertStmt === false) {
                 echo json_encode(['success' => false, 'message' => 'Database error.']);
                 die(print_r(sqlsrv_errors(), true));
             }
-
-            // Optional: Log successful insert
-            error_log("Image path saved: {$filePath}");
         }
 
-        echo json_encode(['success' => true, 'message' => 'Images saved successfully.']);
+        echo json_encode(['success' => true, 'message' => 'Images updated successfully.']);
     } catch (Exception $e) {
-        error_log("Database error: " . $e->getMessage());
-        echo json_encode(['success' => false, 'message' => 'Database error.']);
+        error_log("Error: " . $e->getMessage());
+        echo json_encode(['success' => false, 'message' => 'An error occurred.']);
     }
 }
-?>

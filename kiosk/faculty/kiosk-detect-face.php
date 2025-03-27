@@ -79,7 +79,7 @@ if (!$image_path) {
     </div>
 
     <div id="top-left-button">
-        <a href="kiosk-faculty.php?rfid_no=<?php echo urlencode($rfid_no); ?>" class="no-underline">
+        <a href="../kiosk-index.php" class="no-underline">
             <button type="button" class="small-button" title="Back">
                 <i class="bi bi-arrow-left-short"></i>
             </button>
