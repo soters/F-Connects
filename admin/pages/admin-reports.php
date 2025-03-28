@@ -174,7 +174,7 @@ $attendanceData = json_encode($attendanceCounts);
                 <select class="form-select" id="reportType">
                     <option value="weekly">Weekly</option>
                     <option value="monthly">Monthly</option>
-                    <!--<option value="yearly">Yearly</option>-->
+                    <option value="yearly">Yearly</option>
                     <option value="custom">Custom Date Range</option> <!-- New Option -->
                 </select>
 
@@ -439,14 +439,12 @@ $attendanceData = json_encode($attendanceCounts);
                         body: tableData.slice(1),
                         theme: "grid",
                         headStyles: {
-                            fillColor: [255, 255, 255],
+                            fillColor: [240, 240, 240],
                             textColor: [0, 0, 0],
                             fontStyle: 'bold',
+                            halign: 'left',
                             lineWidth: 0.1,
-                            lineColor: [0, 0, 0],
-                            halign: 'center',
-                            valign: 'middle',
-                            cellPadding: 4
+                            lineColor: [0, 0, 0]
                         },
                         bodyStyles: {
                             textColor: [0, 0, 0],
@@ -470,13 +468,12 @@ $attendanceData = json_encode($attendanceCounts);
                         body: [],
                         theme: 'grid',
                         headStyles: {
-                            fillColor: [255, 255, 255],
+                            fillColor: [240, 240, 240],
                             textColor: [0, 0, 0],
                             fontStyle: 'bold',
+                            halign: 'left',
                             lineWidth: 0.1,
-                            lineColor: [0, 0, 0],
-                            halign: 'right',
-                            valign: 'middle'
+                            lineColor: [0, 0, 0]
                         },
                         styles: {
                             fontSize: 9
@@ -521,13 +518,12 @@ $attendanceData = json_encode($attendanceCounts);
                             theme: 'grid',
                             styles: { fontSize: 9 },
                             headStyles: {
+                                fillColor: [240, 240, 240],
                                 textColor: [0, 0, 0],
                                 fontStyle: 'bold',
+                                halign: 'right',
                                 lineWidth: 0.1,
-                                lineColor: [0, 0, 0],
-                                fillColor: [255, 255, 255],
-                                fontStyle: 'bold',
-                                halign: 'right'
+                                lineColor: [0, 0, 0]
                             },
                             bodyStyles: {
                                 textColor: [0, 0, 0],
@@ -863,14 +859,12 @@ $attendanceData = json_encode($attendanceCounts);
                             body: tableData.slice(1),
                             theme: "grid",
                             headStyles: {
-                                fillColor: [255, 255, 255],
+                                fillColor: [240, 240, 240],
                                 textColor: [0, 0, 0],
                                 fontStyle: 'bold',
+                                halign: 'left',
                                 lineWidth: 0.1,
-                                lineColor: [0, 0, 0],
-                                halign: 'center',
-                                valign: 'middle',
-                                cellPadding: 4
+                                lineColor: [0, 0, 0]
                             },
                             bodyStyles: {
                                 textColor: [0, 0, 0],
@@ -900,13 +894,12 @@ $attendanceData = json_encode($attendanceCounts);
                         body: [],
                         theme: 'grid',
                         headStyles: {
-                            fillColor: [255, 255, 255],
+                            fillColor: [240, 240, 240],
                             textColor: [0, 0, 0],
                             fontStyle: 'bold',
-                            lineWidth: 0.1,
-                            lineColor: [0, 0, 0],
                             halign: 'right',
-                            valign: 'middle'
+                            lineWidth: 0.1,
+                            lineColor: [0, 0, 0]
                         },
                         styles: {
                             fontSize: 9
@@ -957,7 +950,7 @@ $attendanceData = json_encode($attendanceCounts);
                         ],
                         theme: 'grid',
                         headStyles: {
-                            fillColor: [255, 255, 255],
+                            fillColor: [240, 240, 240],
                             textColor: [0, 0, 0],
                             fontStyle: 'bold',
                             halign: 'left',
@@ -970,10 +963,10 @@ $attendanceData = json_encode($attendanceCounts);
                             halign: 'left',
                             lineWidth: 0.1,
                             lineColor: [0, 0, 0],
-                            fontSize: 10
+                            fontSize: 9
                         },
                         styles: {
-                            fontSize: 10,
+                            fontSize: 9,
                         }
                     });
 
@@ -1189,6 +1182,16 @@ $attendanceData = json_encode($attendanceCounts);
             let facultyRFID = facultySelect?.value;
             let facultyName = facultySelect?.options[facultySelect.selectedIndex]?.text || "Unknown Faculty";
 
+            // Validate inputs
+            if (!selectedMonth) {
+                alert("Please select a month.");
+                return;
+            }
+            if (!facultyRFID) {
+                alert("Please select a faculty member.");
+                return;
+            }
+
             // Extract year from selectedMonth (format: YYYY-MM)
             const [selectedYear, selectedMonthOnly] = selectedMonth.split("-");
 
@@ -1199,7 +1202,12 @@ $attendanceData = json_encode($attendanceCounts);
 
             // Fetch attendance records for the selected month, year, and faculty RFID
             fetch(`../functions/fetch-records-by-month.php?month=${selectedMonth}&year=${selectedYear}&rfid_no=${facultyRFID}`)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     const {
                         facultyInfo,
@@ -1218,7 +1226,6 @@ $attendanceData = json_encode($attendanceCounts);
 
                     // --- Header ---
                     addReportHeader(doc, "Attendance Report", `Monthly Report - ${selectedMonth}`);
-
 
                     let y = 68;
 
@@ -1250,11 +1257,28 @@ $attendanceData = json_encode($attendanceCounts);
 
                     y = Math.max(y, rightY) + 10;
 
-                    const recordsByDate = {};
+                    const recordsByWeek = {};
+
+                    function getWeekNumber(date) {
+                        const d = new Date(date);
+                        const dayNum = d.getUTCDay() || 7; // Make Sunday (0) into 7
+                        d.setUTCDate(d.getUTCDate() + 4 - dayNum); // Set to nearest Thursday
+                        const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+                        const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+                        return weekNo;
+                    }
+
+                    // Group records by week number
                     attendanceReport.forEach(record => {
                         const date = new Date(record.date).toLocaleDateString("en-US");
-                        if (!recordsByDate[date]) {
-                            recordsByDate[date] = {
+                        const weekNumber = getWeekNumber(record.date);
+
+                        if (!recordsByWeek[weekNumber]) {
+                            recordsByWeek[weekNumber] = {};
+                        }
+
+                        if (!recordsByWeek[weekNumber][date]) {
+                            recordsByWeek[weekNumber][date] = {
                                 records: [],
                                 time_in: record.time_in,
                                 time_out: record.time_out,
@@ -1262,7 +1286,7 @@ $attendanceData = json_encode($attendanceCounts);
                             };
                         }
 
-                        recordsByDate[date].records.push({
+                        recordsByWeek[weekNumber][date].records.push({
                             type: record.type,
                             start: formatTime(record.start_time),
                             end: formatTime(record.end_time),
@@ -1314,113 +1338,113 @@ $attendanceData = json_encode($attendanceCounts);
                         }
                     });
 
-                    // ✅ Late is also considered present for attendancePercentage
                     const attendedDays = totalPresent + totalLate;
                     const attendancePercentage = totalWorkingDays ? (attendedDays / totalWorkingDays) * 100 : 0;
 
-                    Object.entries(recordsByDate).forEach(([date, info]) => {
-                        const pageHeight = doc.internal.pageSize.height;
-                        const estimatedHeight = 50; // Estimate for both tables + spacing
+                    // Process each week
+                    Object.entries(recordsByWeek).forEach(([weekNumber, dates]) => {
 
-                        if (y + estimatedHeight > pageHeight - 20) {
-                            doc.addPage();
-                            y = 20;
-                        }
+                        // Process each date in the week
+                        Object.entries(dates).forEach(([date, info]) => {
+                            const pageHeight = doc.internal.pageSize.height;
+                            const estimatedHeight = 50; // Estimate for both tables + spacing
 
-                        // Date label
-                        doc.setFontSize(10);
-                        doc.setFont("helvetica", "bold");
-                        doc.text(`Date ${date}`, 14, y);
-                        y += 5;
-
-                        // ──────────────────────────────────────────────
-                        // WORKED HOURS TABLE - LEFT SIDE
-                        // ──────────────────────────────────────────────
-                        const body = info.records.map(r => [r.type, r.start, r.end, r.sched_hours, r.worked_hours]);
-
-                        const totalWorkedHoursPerTable = body.reduce((sum, r) => {
-                            const val = parseFloat(r[4]);
-                            return !isNaN(val) ? sum + val : sum;
-                        }, 0);
-
-                        grandTotalWorkedHours += totalWorkedHoursPerTable;
-
-                        doc.autoTable({
-                            startY: y,
-                            head: [["Type", "Start", "End", "Sched", "Worked"]],
-                            body: body,
-                            theme: "grid",
-                            headStyles: {
-                                fillColor: [240, 240, 240],
-                                textColor: [0, 0, 0],
-                                fontStyle: 'bold',
-                                halign: 'left',
-                                lineWidth: 0.1,
-                                lineColor: [0, 0, 0]
-                            },
-                            bodyStyles: {
-                                fillColor: [255, 255, 255],
-                                textColor: [0, 0, 0],
-                                halign: 'left',
-                                lineWidth: 0.1,
-                                lineColor: [0, 0, 0],
-                                fontSize: 9
-                            },
-                            styles: { fontSize: 9 },
-                            margin: { left: 14, right: 100 },
-                            didDrawCell: (data) => {
-                                if (data.row.index === body.length - 1 && data.column.index === 0) {
-                                    doc.setFont("helvetica", "bold");
-                                    doc.text("Total Worked Hours:", 14, data.cell.y + data.cell.height + 6);
-                                    doc.text(
-                                        body.reduce((sum, r) => sum + parseFloat(r[4]), 0).toFixed(2),
-                                        60,
-                                        data.cell.y + data.cell.height + 6
-                                    );
-                                }
+                            if (y + estimatedHeight > pageHeight - 20) {
+                                doc.addPage();
+                                y = 20;
                             }
+
+                            // Week number and date label - now on same line
+                            doc.setFontSize(10);
+                            doc.setFont("helvetica", "bold");
+                            doc.text(`Week ${weekNumber} - ${date}`, 14, y);
+                            y += 7; // Slightly more space than before
+
+                            // WORKED HOURS TABLE - LEFT SIDE
+                            const body = info.records.map(r => [r.type, r.start, r.end, r.sched_hours, r.worked_hours]);
+
+                            const totalWorkedHoursPerTable = body.reduce((sum, r) => {
+                                const val = parseFloat(r[4]);
+                                return !isNaN(val) ? sum + val : sum;
+                            }, 0);
+
+                            grandTotalWorkedHours += totalWorkedHoursPerTable;
+
+                            doc.autoTable({
+                                startY: y,
+                                head: [["Type", "Start", "End", "Sched", "Worked"]],
+                                body: body,
+                                theme: "grid",
+                                headStyles: {
+                                    fillColor: [240, 240, 240],
+                                    textColor: [0, 0, 0],
+                                    fontStyle: 'bold',
+                                    halign: 'left',
+                                    lineWidth: 0.1,
+                                    lineColor: [0, 0, 0]
+                                },
+                                bodyStyles: {
+                                    fillColor: [255, 255, 255],
+                                    textColor: [0, 0, 0],
+                                    halign: 'left',
+                                    lineWidth: 0.1,
+                                    lineColor: [0, 0, 0],
+                                    fontSize: 9
+                                },
+                                styles: { fontSize: 9 },
+                                margin: { left: 14, right: 100 },
+                                didDrawCell: (data) => {
+                                    if (data.row.index === body.length - 1 && data.column.index === 0) {
+                                        doc.setFont("helvetica", "bold");
+                                        doc.text("Total Worked Hours:", 14, data.cell.y + data.cell.height + 6);
+                                        doc.text(
+                                            totalWorkedHoursPerTable.toFixed(2),
+                                            60,
+                                            data.cell.y + data.cell.height + 6
+                                        );
+                                    }
+                                }
+                            });
+
+                            const tableEndY = doc.lastAutoTable.finalY;
+
+                            // KIOSK ATTENDANCE TABLE - RIGHT SIDE
+                            const kioskBody = [
+                                ["Time In", formatTime(info.time_in)],
+                                ["Time Out", formatTime(info.time_out)],
+                                ["Status", info.status]
+                            ];
+
+                            doc.autoTable({
+                                startY: y,
+                                head: [["KIOSK Attendance", "Details"]],
+                                body: kioskBody,
+                                theme: "grid",
+                                styles: { fontSize: 9 },
+                                headStyles: {
+                                    fillColor: [240, 240, 240],
+                                    textColor: [0, 0, 0],
+                                    fontStyle: 'bold',
+                                    halign: 'left',
+                                    lineWidth: 0.1,
+                                    lineColor: [0, 0, 0]
+                                },
+                                bodyStyles: {
+                                    fillColor: [255, 255, 255],
+                                    textColor: [0, 0, 0],
+                                    halign: 'left',
+                                    lineWidth: 0.1,
+                                    lineColor: [0, 0, 0]
+                                },
+                                margin: { left: 110 }
+                            });
+
+                            y = Math.max(doc.lastAutoTable.finalY, tableEndY) + 20;
                         });
-
-                        const tableEndY = doc.lastAutoTable.finalY;
-
-                        // ──────────────────────────────────────────────
-                        // KIOSK ATTENDANCE TABLE - RIGHT SIDE
-                        // ──────────────────────────────────────────────
-                        const kioskBody = [
-                            ["Time In", formatTime(info.time_in)],
-                            ["Time Out", formatTime(info.time_out)],
-                            ["Status", info.status]
-                        ];
-
-                        doc.autoTable({
-                            startY: y,
-                            head: [["KIOSK Attendance", "Details"]],
-                            body: kioskBody,
-                            theme: "grid",
-                            styles: { fontSize: 9 },
-                            headStyles: {
-                                fillColor: [240, 240, 240],
-                                textColor: [0, 0, 0],
-                                fontStyle: 'bold',
-                                halign: 'left',
-                                lineWidth: 0.1,
-                                lineColor: [0, 0, 0]
-                            },
-                            bodyStyles: {
-                                fillColor: [255, 255, 255],
-                                textColor: [0, 0, 0],
-                                halign: 'left',
-                                lineWidth: 0.1,
-                                lineColor: [0, 0, 0]
-                            },
-                            margin: { left: 110 }
-                        });
-
-                        y = Math.max(doc.lastAutoTable.finalY, tableEndY) + 20;
                     });
 
-                    // Summary Section as a Table
-                    y = doc.lastAutoTable.finalY + 25;
+                    // Summary Section
+                    y = doc.lastAutoTable.finalY + 20;
 
                     doc.setFontSize(12);
                     doc.setFont("helvetica", "bold");
@@ -1461,9 +1485,9 @@ $attendanceData = json_encode($attendanceCounts);
                         margin: { left: 14, right: 14 }
                     });
 
-                    // ========== FOOTER (Prepared By) ==========
+                    // Footer
                     const pageHeight = doc.internal.pageSize.height;
-                    const footerY = pageHeight - 40; // or any value near the bottom
+                    const footerY = pageHeight - 40;
 
                     doc.setFontSize(10);
                     doc.text("Prepared by:", 15, footerY);
@@ -1474,12 +1498,18 @@ $attendanceData = json_encode($attendanceCounts);
                     doc.text("Dean", 15, footerY + 17);
 
                     addPageNumbers(doc);
-                    doc.save(`Monthly_Attendance_Report_${selectedMonth}.pdf`);
+                    doc.save(`Monthly_Attendance_Report_${facultyName.replace(/\s+/g, '_')}_${selectedMonth}.pdf`);
                 })
                 .catch(err => {
                     console.error("Error:", err);
-                    alert("Error generating report.");
+                    alert("Error generating report. Please try again.");
                 });
+
+            function formatTime(timeString) {
+                if (!timeString) return "N/A";
+                const time = new Date(`1970-01-01T${timeString}`);
+                return time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
         }
 
         // ------------------------ ATTENDANCE WEEKLY REPORT FUNCTION ------------------------
@@ -1794,111 +1824,270 @@ $attendanceData = json_encode($attendanceCounts);
             let facultyRFID = facultySelect?.value;
             let facultyName = facultySelect?.options[facultySelect.selectedIndex]?.text || "Unknown Faculty";
 
+            // Validate inputs
             if (!selectedYear) {
                 alert("Please select a year.");
                 return;
             }
-
             if (!facultyRFID) {
                 alert("Please select a faculty member.");
                 return;
             }
 
-            // Fetch attendance records for the selected year
+            // Get current date to determine which months to show
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear();
+            const currentMonth = currentDate.getMonth(); // 0-11 (January=0)
+
+            // Show loading indicator
+            const originalButtonText = facultySelect.nextElementSibling.innerHTML;
+            facultySelect.nextElementSibling.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating Report...';
+
+            // Fetch attendance records
             fetch(`../functions/fetch-records-by-year.php?year=${selectedYear}&rfid_no=${facultyRFID}`)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Server returned ${response.status} status`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
-                    console.log("Fetched Data:", data);
+                    // Reset button text
+                    facultySelect.nextElementSibling.innerHTML = originalButtonText;
 
-                    if (!data.attendanceRecords || data.attendanceRecords.length === 0) {
-                        alert("No attendance records found for this year.");
-                        return;
+                    // Validate response structure
+                    if (!data || typeof data !== 'object') {
+                        throw new Error("Invalid response from server");
                     }
 
-                    // Add Report Header
-                    addReportHeader(doc, `Yearly Attendance Report - ${selectedYear}`);
-                    doc.setFontSize(12);
-                    doc.setFont("helvetica", "bold");
-                    doc.text(`Faculty: ${facultyName}`, 14, 62);
-
-                    let y = 70;
-                    let recordsByMonth = {};
-
-                    // Group records by month
-                    data.attendanceRecords.forEach(record => {
-                        let month = new Date(record.date_logged).toLocaleString('en-us', { month: 'long' });
-                        if (!recordsByMonth[month]) {
-                            recordsByMonth[month] = [];
-                        }
-                        recordsByMonth[month].push([
-                            record.date_logged || "N/A",
-                            formatTime(record.time_in),
-                            formatTime(record.time_out),
-                            record.total_hours || "0",
-                            record.status || "N/A"
-                        ]);
-                    });
-
-                    // Generate tables for each month
-                    Object.keys(recordsByMonth).forEach((month, index, monthsArray) => {
-                        if (y + 40 > doc.internal.pageSize.height) { // Check if there's space for the month header
-                            doc.addPage();
-                            y = 20;
-                        }
-
-                        doc.setFontSize(12);
-                        doc.setFont("helvetica", "bold");
-                        doc.text(month, 14, y);
-                        y += 5;
-
-                        let tableStartY = y;
-                        doc.autoTable({
-                            startY: y,
-                            head: [["Date", "Time In", "Time Out", "Total Hours", "Status"]],
-                            body: recordsByMonth[month],
-                            theme: "grid",
-                            styles: { fontSize: 8 },
-                            margin: { bottom: 10 },
-                            didDrawPage: (data) => {
-                                y = data.cursor.y + 10; // Update y position after the table
-                            }
-                        });
-
-                        // If the next table won't fit on this page, move to a new one
-                        if (index < monthsArray.length - 1 && y + 40 > doc.internal.pageSize.height) {
-                            doc.addPage();
-                            y = 20;
-                        }
-                    });
-
-                    // Attendance Summary Section
-                    if (y + 40 > doc.internal.pageSize.height) {
-                        doc.addPage();
-                        y = 20;
+                    if (data.error) {
+                        throw new Error(data.error);
                     }
 
-                    doc.setFontSize(12);
-                    doc.setFont("helvetica", "bold");
-                    doc.text("Attendance Status Count", 14, y);
+                    // Destructure all data from API response
+                    const {
+                        facultyInfo = {},
+                        monthlySummary = [],
+                        yearlyTotals = {},
+                        statusCounts = {},
+                        grandTotalHours = "0.00"
+                    } = data;
+
+                    // Validate required data
+                    if (!facultyInfo.fname || !facultyInfo.lname) {
+                        throw new Error("Faculty information is incomplete");
+                    }
+
+                    // Convert all numeric values to numbers to ensure toFixed() works
+                    const processedYearlyTotals = {
+                        total_days: parseInt(yearlyTotals.total_days) || 0,
+                        present: parseInt(yearlyTotals.present) || 0,
+                        absent: parseInt(yearlyTotals.absent) || 0,
+                        late: parseInt(yearlyTotals.late) || 0,
+                        scheduled_hours: parseFloat(yearlyTotals.scheduled_hours) || 0,
+                        worked_hours: parseFloat(yearlyTotals.worked_hours) || 0,
+                        attendance_percentage: parseFloat(yearlyTotals.attendance_percentage) || 0
+                    };
+
+                    // --- Header ---
+                    addReportHeader(doc, "Attendance Report", `Yearly Report - ${selectedYear}`);
+
+                    let y = 68;
+
+                    // --- Faculty Info ---
+                    doc.setFontSize(10);
                     doc.setFont("helvetica", "normal");
-                    y += 8;
+                    doc.text("Faculty:", 15, y);
+                    doc.setFont("helvetica", "bold");
+                    doc.text(`${facultyInfo.fname} ${facultyInfo.lname}`, 35, y);
+                    y += 6;
 
-                    Object.entries(data.statusCounts).forEach(([status, count]) => {
-                        doc.text(`${status}: ${count}`, 20, y);
-                        y += 6;
-                    });
+                    doc.setFont("helvetica", "normal");
+                    doc.text("RFID No:", 15, y);
+                    doc.setFont("helvetica", "bold");
+                    doc.text(facultyInfo.rfid_no, 35, y);
 
-                    y += 8;
+                    let rightY = 68;
+                    doc.setFont("helvetica", "normal");
+                    doc.text("Employment Type:", 148, rightY);
+                    doc.setFont("helvetica", "bold");
+                    doc.text(facultyInfo.employment_type, 180, rightY);
+                    rightY += 6;
+
+                    doc.setFont("helvetica", "normal");
+                    doc.text("Email:", 134, rightY);
+                    doc.setFont("helvetica", "italic");
+                    doc.text(facultyInfo.email, 145, rightY);
+
+                    y = Math.max(y, rightY) + 10;
+
+                    // Status Overview (using statusCounts from API)
                     doc.setFontSize(12);
                     doc.setFont("helvetica", "bold");
-                    doc.text(`Grand Total of Hours: ${data.grandTotalHours || 0} hrs`, 14, y);
+                    doc.text("Attendance Overview", 14, y);
+                    y += 8;
+
+                    const statusBody = [
+                        ["Present", statusCounts.Present || 0],
+                        ["Absent", statusCounts.Absent || 0],
+                        ["Late", statusCounts.Late || 0],
+                        ["Total Hours", grandTotalHours || "0.00"]
+                    ];
+
+                    doc.autoTable({
+                        startY: y,
+                        head: [["Status", "Count"]],
+                        body: statusBody,
+                        theme: "grid",
+                        styles: { fontSize: 10 },
+                        headStyles: {
+                            fillColor: [240, 240, 240],
+                            textColor: [0, 0, 0],
+                            fontStyle: 'bold',
+                            halign: 'left',
+                            lineWidth: 0.1,
+                            lineColor: [0, 0, 0]
+                        },
+                        bodyStyles: {
+                            fillColor: [255, 255, 255],
+                            textColor: [0, 0, 0],
+                            halign: 'left',
+                            lineWidth: 0.1,
+                            lineColor: [0, 0, 0]
+                        },
+                        margin: { left: 14 }
+                    });
+
+                    y = doc.lastAutoTable.finalY + 8;
+
+                    // Monthly Summary Table - Only show months up to current month if same year
+                    doc.setFontSize(12);
+                    doc.setFont("helvetica", "bold");
+                    doc.text("Monthly Summary", 14, y);
+                    y += 5;
+
+                    const monthNames = ["January", "February", "March", "April", "May", "June",
+                        "July", "August", "September", "October", "November", "December"];
+
+                    // Determine how many months to show
+                    const monthsToShow = (selectedYear == currentYear) ? currentMonth + 1 : 12;
+
+                    const summaryBody = [];
+                    for (let i = 0; i < monthsToShow; i++) {
+                        const monthData = monthlySummary[i] || {
+                            present: 0,
+                            absent: 0,
+                            late: 0,
+                            scheduled_hours: 0,
+                            worked_hours: 0,
+                            attendance_percentage: 0
+                        };
+
+                        // Convert all numeric values to numbers
+                        const present = parseInt(monthData.present) || 0;
+                        const absent = parseInt(monthData.absent) || 0;
+                        const late = parseInt(monthData.late) || 0;
+                        const scheduled_hours = parseFloat(monthData.scheduled_hours) || 0;
+                        const worked_hours = parseFloat(monthData.worked_hours) || 0;
+                        const attendance_percentage = parseFloat(monthData.attendance_percentage) || 0;
+
+                        summaryBody.push([
+                            monthNames[i],
+                            present + absent + late, // Total days
+                            present,
+                            absent,
+                            late,
+                            scheduled_hours.toFixed(2),
+                            worked_hours.toFixed(2),
+                            attendance_percentage.toFixed(2) + "%"
+                        ]);
+                    }
+
+                    doc.autoTable({
+                        startY: y,
+                        head: [["Month", "Days", "Present", "Absent", "Late", "Sched Hrs", "Worked Hrs", "Attendance %"]],
+                        body: summaryBody,
+                        theme: "grid",
+                        styles: { fontSize: 8 },
+                        headStyles: {
+                            fillColor: [240, 240, 240],
+                            textColor: [0, 0, 0],
+                            fontStyle: 'bold',
+                            halign: 'center',
+                            lineWidth: 0.1,
+                            lineColor: [0, 0, 0]
+                        },
+                        bodyStyles: {
+                            fillColor: [255, 255, 255],
+                            textColor: [0, 0, 0],
+                            halign: 'center',
+                            lineWidth: 0.1,
+                            lineColor: [0, 0, 0]
+                        },
+                        margin: { left: 14 }
+                    });
+
+                    y = doc.lastAutoTable.finalY + 8;
+
+                    // Yearly Summary (using processedYearlyTotals)
+                    doc.setFontSize(12);
+                    doc.setFont("helvetica", "bold");
+                    doc.text("Yearly Summary", 14, y);
+                    y += 5;
+
+                    const yearlySummaryBody = [
+                        ["Total Working Days", processedYearlyTotals.total_days],
+                        ["Total Present", processedYearlyTotals.present],
+                        ["Total Absent", processedYearlyTotals.absent],
+                        ["Total Late", processedYearlyTotals.late],
+                        ["Total Scheduled Hours", processedYearlyTotals.scheduled_hours.toFixed(2) + " hrs"],
+                        ["Total Rendered Hours", processedYearlyTotals.worked_hours.toFixed(2) + " hrs"],
+                        ["Yearly Attendance Percentage", processedYearlyTotals.attendance_percentage.toFixed(2) + "%"]
+                    ];
+
+                    doc.autoTable({
+                        startY: y,
+                        head: [["Category", "Value"]],
+                        body: yearlySummaryBody,
+                        theme: "grid",
+                        styles: { fontSize: 10 },
+                        headStyles: {
+                            fillColor: [240, 240, 240],
+                            textColor: [0, 0, 0],
+                            fontStyle: 'bold',
+                            halign: 'left',
+                            lineWidth: 0.1,
+                            lineColor: [0, 0, 0]
+                        },
+                        bodyStyles: {
+                            fillColor: [255, 255, 255],
+                            textColor: [0, 0, 0],
+                            halign: 'left',
+                            lineWidth: 0.1,
+                            lineColor: [0, 0, 0]
+                        },
+                        margin: { left: 14, right: 14 }
+                    });
+
+                    // Footer
+                    const pageHeight = doc.internal.pageSize.height;
+                    const footerY = pageHeight - 40;
+
+                    doc.setFontSize(10);
+                    doc.text("Prepared by:", 15, footerY);
+                    doc.setFont("helvetica", "bold");
+                    doc.text("HAROLD R. LUCERO, MIT", 15, footerY + 10);
+                    doc.setFont("helvetica", "normal");
+                    doc.line(15, footerY + 11, 75, footerY + 11);
+                    doc.text("Dean", 15, footerY + 17);
 
                     addPageNumbers(doc);
-                    doc.save(`Yearly_Attendance_Report_${selectedYear}.pdf`);
+                    doc.save(`Yearly_Attendance_Report_${facultyName.replace(/\s+/g, '_')}_${selectedYear}.pdf`);
                 })
-                .catch(error => {
-                    console.error("Error fetching data:", error);
-                    alert("Error generating yearly report.");
+                .catch(err => {
+                    facultySelect.nextElementSibling.innerHTML = originalButtonText;
+                    console.error("Error:", err);
+                    alert(`Error generating report: ${err.message}`);
                 });
         }
 
@@ -2236,8 +2425,8 @@ $attendanceData = json_encode($attendanceCounts);
             doc.setTextColor(0, 0, 0);
             doc.setFont("helvetica", "bold");
             doc.setFontSize(10);
-            doc.text("AY: 2024-2025", pageWidth / 2, 55, null, null, "center");
-            doc.text("TERM : SECOND SEMESTER", pageWidth / 2, 60, null, null, "center");
+            doc.text("AY: 2024-2025", pageWidth / 2, 50, null, null, "center");
+            doc.text("TERM : SECOND SEMESTER", pageWidth / 2, 55, null, null, "center");
 
             // === Subtitle on left, Generated on right ===
             doc.setFont("helvetica", "italic");

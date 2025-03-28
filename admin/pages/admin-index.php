@@ -633,7 +633,7 @@ $query = "
         SUM(CASE WHEN A.rfid_no IS NULL THEN 1 ELSE 0 END) AS Not_Timed_In
     FROM Faculty F
     LEFT JOIN AttendanceToday A ON F.rfid_no = A.rfid_no 
-    AND A.date_logged = CAST(GETDATE() AS DATE)
+    AND A.date_logged = CONVERT(DATE, GETDATE())
 ";
 
 $stmts = sqlsrv_query($conn, $query);
