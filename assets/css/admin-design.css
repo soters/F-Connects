@@ -1208,6 +1208,35 @@ label[for="nav-footer-toggle"] {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+.wbtn {
+  background-color: #22c55e; /* Primary Green Color */
+  color: white;
+  font-size: 14px;
+  border: none;
+  padding: 5px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  font-family: "Poppins", sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 0px;
+}
+
+.wbtn:hover {
+  background-color: #16a34a; /* Darker Green Shade on Hover */
+  transform: scale(1.05); /* Slight enlargement */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.wbtn:active {
+  transform: scale(0.98); /* Small press effect */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+
 .navbar-1 {
   display: flex;
   justify-content: left;
