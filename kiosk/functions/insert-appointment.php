@@ -14,7 +14,7 @@ try {
 
         // Get today's date in the format YYYY-MM-DD
         $today_date = date('Y-m-d'); // Define today's date before queries
-     
+
         // Check if the user already has two appointments for today
         $count_sql = "SELECT COUNT(*) AS appointment_count FROM Appointments 
                       WHERE stud_rfid_no = ? 
@@ -105,10 +105,10 @@ try {
 
         // Set the status to "Pending"
         $status = "Pending";
-
         // Prepare the SQL query to insert the new appointment
-        $sql = "INSERT INTO Appointments (appointment_code, prof_rfid_no, stud_rfid_no, start_time, end_time, agenda, status, date_logged)
-                VALUES (?, ?, ?, ?, ?, ?, ?, GETDATE())";
+        $sql = "INSERT INTO Appointments (appointment_code, prof_rfid_no, stud_rfid_no, start_time, end_time, agenda, status, date_logged, notif_time)
+        VALUES (?, ?, ?, ?, ?, ?, ?, GETDATE(), SYSDATETIME())";
+
 
         // Prepare the parameters for the insert query
         $params = [

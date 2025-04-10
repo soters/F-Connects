@@ -45,7 +45,7 @@ if ($attendance && is_null($attendance['time_out'])) {
     }
 
     $end_time_data = sqlsrv_fetch_array($end_time_stmt, SQLSRV_FETCH_ASSOC);
-    $latest_end_time = $end_time_data['latest_end_time'] ? $end_time_data['latest_end_time']->format('H:i:s') : '23:59:59';
+    $latest_end_time = $end_time_data['latest_end_time']->format('H:i:s');
 
     if (strtotime($current_time) < strtotime($latest_end_time)) {
         // Redirect to confirmation page
@@ -68,17 +68,18 @@ if ($attendance && is_null($attendance['time_out'])) {
 
     // Update appointments
     $update_appointments_query = "
-        UPDATE Appointments
-        SET 
-            status = 'Declined',
-            notif_time = GETDATE(),
-            is_read = 0,
-            is_read_student = 0
-        WHERE 
-            prof_rfid_no = ? 
-            AND date_logged = ?
-            AND status IN ('Pending', 'Accepted')
-    ";
+    UPDATE Appointments
+    SET 
+        status = 'Declined',
+        notif_time = GETDATE(),
+        is_read = 0,
+        is_read_student = 0
+    WHERE 
+        prof_rfid_no = ? 
+        AND date_logged = ?
+        AND status IN ('Pending', 'Accepted')
+";
+
     $update_appointments_params = [$rfid_no, $current_date];
     $update_appointments_stmt = sqlsrv_query($conn, $update_appointments_query, $update_appointments_params);
 
@@ -86,17 +87,18 @@ if ($attendance && is_null($attendance['time_out'])) {
         die(print_r(sqlsrv_errors(), true));
     }
 
+    // Close the statements and connection
     sqlsrv_free_stmt($update_stmt);
     sqlsrv_free_stmt($update_appointments_stmt);
     sqlsrv_close($conn);
 
-    // Redirect to success message
+    // Redirect to success message with attd_ref
     header("Location: ../faculty/kiosk-time-out-info.php?rfid_no=" . urlencode($rfid_no) . "&attd_ref=" . urlencode($attendance['attd_ref']));
     exit();
 }
 
 // If no prior attendance record, process time-in logic
-// Query to find the earliest schedule for today (optional but no longer required)
+// Query to find the earliest schedule for today
 $query = "
     SELECT TOP 1 sched_id, start_time, start_date
     FROM Schedules
@@ -111,20 +113,24 @@ if ($stmt === false) {
 }
 
 $schedule = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+if (!$schedule) {
+    // No schedule found for today
+    $_SESSION['error_message'] = "No schedule found for today.";
+    header("Location: ../faculty/kiosk-faculty.php?rfid_no=" . urlencode($rfid_no));
+    exit();
+}
 
-// Use scheduled start time if available; otherwise use current time as fallback
-$start_time = isset($schedule['start_time']) 
-    ? $schedule['start_time']->format('H:i:s') 
-    : $current_time;
+// Format the start_time as a string
+$start_time = $schedule['start_time']->format('H:i:s');
 
-// Add a 15-minute grace period
+// Add a 15-minute grace period to the start time
 $grace_time = date('H:i:s', strtotime($start_time . ' +15 minutes'));
 
-// Determine status
+// Determine the status based on the adjusted grace time
 $status = (strtotime($current_time) > strtotime($grace_time)) ? 'Late' : 'Present';
 
-// Insert attendance
-$attd_ref = uniqid('ATTD_');
+// Insert attendance record into AttendanceToday table
+$attd_ref = uniqid('ATTD_'); // Generate a unique attendance reference
 $insert_query = "
     INSERT INTO AttendanceToday (attd_ref, rfid_no, time_in, status, date_logged)
     VALUES (?, ?, ?, ?, ?)
@@ -136,11 +142,12 @@ if ($insert_stmt === false) {
     die(print_r(sqlsrv_errors(), true));
 }
 
+// Close the statement and connection
 sqlsrv_free_stmt($stmt);
 sqlsrv_free_stmt($insert_stmt);
 sqlsrv_close($conn);
 
-// Redirect to success page
+// Redirect to a success page with attd_ref
 header("Location: ../faculty/kiosk-time-in-info.php?rfid_no=" . urlencode($rfid_no) . "&attd_ref=" . urlencode($attd_ref));
 exit();
 ?>

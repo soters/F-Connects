@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         '2025-01-01', // New Year's Day
         '2025-01-29', // Chinese New Year
         '2025-02-25', // EDSA People Power Revolution Anniversary
-        '2025-04-09', // Araw ng Kagitingan
+        '2025-04-09', //Araw ng Kagitingan
         '2025-04-17', // Maundy Thursday
         '2025-04-18', // Good Friday
         '2025-04-19', // Black Saturday

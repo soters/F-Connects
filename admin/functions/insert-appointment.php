@@ -78,11 +78,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // 5. Generate appointment code and insert into database
         $appointment_code = str_pad(mt_rand(0, 999999999999), 12, '0', STR_PAD_LEFT);
+        $notif_time = date('Y-m-d H:i:s'); // Get current timestamp
+
         $insert_sql = "INSERT INTO Appointments 
-                       (appointment_code, prof_rfid_no, stud_rfid_no, start_time, end_time, agenda, status, date_logged) 
-                       VALUES (?, ?, ?, ?, ?, ?, 'Pending', ?)";
-        $params = [$appointment_code, $prof_rfid_no, $stud_rfid_no, $start_time, $end_time, $agenda, $today_date];
+               (appointment_code, prof_rfid_no, stud_rfid_no, start_time, end_time, agenda, status, date_logged, notif_time) 
+               VALUES (?, ?, ?, ?, ?, ?, 'Pending', ?, ?)";
+
+        $params = [
+            $appointment_code,
+            $prof_rfid_no,
+            $stud_rfid_no,
+            $start_time,
+            $end_time,
+            $agenda,
+            $today_date,
+            $notif_time // Add notif_time here
+        ];
+
         $insert_stmt = sqlsrv_query($conn, $insert_sql, $params);
+        
 
         if ($insert_stmt) {
             $message = "Appointment successfully created!";

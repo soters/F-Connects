@@ -14,6 +14,71 @@ if (!$rfid_no) {
 $current_date = date('Y-m-d');
 $current_time = date('H:i:s');
 
+// ✅ NEW: Validate if faculty has schedule today and not past school hours
+try {
+    $scheduleQuery = "
+        SELECT COUNT(*) AS count 
+        FROM Schedules 
+        WHERE rfid_no = ? AND start_date = ?
+    ";
+    $scheduleStmt = sqlsrv_query($conn, $scheduleQuery, [$rfid_no, $current_date]);
+
+    if ($scheduleStmt === false) {
+        throw new Exception(print_r(sqlsrv_errors(), true));
+    }
+
+    $scheduleResult = sqlsrv_fetch_array($scheduleStmt, SQLSRV_FETCH_ASSOC);
+
+    if (!$scheduleResult || $scheduleResult['count'] == 0) {
+        $_SESSION['error_message'] = "You do not have any scheduled classes for today.";
+        sqlsrv_free_stmt($scheduleStmt);
+        sqlsrv_close($conn);
+        header("Location: ../kiosk-index.php");
+        exit;
+    }
+
+    if ($current_time > '20:30:00') {
+        $_SESSION['error_message'] = "School hours already ended.";
+        sqlsrv_free_stmt($scheduleStmt);
+        sqlsrv_close($conn);
+        header("Location: ../kiosk-index.php");
+        exit;
+    }
+
+    sqlsrv_free_stmt($scheduleStmt);
+} catch (Exception $e) {
+    $_SESSION['error_message'] = "Error: " . $e->getMessage();
+    header("Location: ../kiosk-index.php");
+    exit;
+}
+
+// Check if the user has already timed in and out for today
+try {
+    $attendanceQuery = "
+        SELECT time_in, time_out 
+        FROM AttendanceToday 
+        WHERE rfid_no = ? AND CONVERT(DATE, date_logged) = ?
+    ";
+    $attendanceStmt = sqlsrv_query($conn, $attendanceQuery, [$rfid_no, $current_date]);
+
+    if ($attendanceStmt === false) {
+        throw new Exception(print_r(sqlsrv_errors(), true));
+    }
+
+    $attendanceResult = sqlsrv_fetch_array($attendanceStmt, SQLSRV_FETCH_ASSOC);
+
+    if ($attendanceResult && $attendanceResult['time_in'] !== null && $attendanceResult['time_out'] !== null) {
+        sqlsrv_free_stmt($attendanceStmt);
+        sqlsrv_close($conn);
+        header("Location: ../faculty/kiosk-continue-work.php?rfid_no=" . urlencode($rfid_no));
+        exit;
+    }
+} catch (Exception $e) {
+    $_SESSION['error_message'] = "Error: " . $e->getMessage();
+    header("Location: ../kiosk-index.php");
+    exit;
+}
+
 // Check if the RFID already has a record in AttendanceToday
 $check_query = "
     SELECT attd_ref, time_in, time_out
@@ -31,7 +96,6 @@ $attendance = sqlsrv_fetch_array($check_stmt, SQLSRV_FETCH_ASSOC);
 
 if ($attendance && is_null($attendance['time_out'])) {
     // Faculty has already timed in but not timed out
-    // Find the latest end_time for the day
     $end_time_query = "
         SELECT MAX(end_time) AS latest_end_time
         FROM Schedules
@@ -48,12 +112,10 @@ if ($attendance && is_null($attendance['time_out'])) {
     $latest_end_time = $end_time_data['latest_end_time'] ? $end_time_data['latest_end_time']->format('H:i:s') : '23:59:59';
 
     if (strtotime($current_time) < strtotime($latest_end_time)) {
-        // Redirect to confirmation page
         header("Location: ../faculty/kiosk-confirm-time-out.php?rfid_no=" . urlencode($rfid_no) . "&attd_ref=" . urlencode($attendance['attd_ref']));
         exit();
     }
 
-    // Update the record with the time_out if it's after the scheduled end time
     $update_query = "
         UPDATE AttendanceToday
         SET time_out = ?
@@ -66,7 +128,6 @@ if ($attendance && is_null($attendance['time_out'])) {
         die(print_r(sqlsrv_errors(), true));
     }
 
-    // Update appointments
     $update_appointments_query = "
         UPDATE Appointments
         SET 
@@ -90,13 +151,11 @@ if ($attendance && is_null($attendance['time_out'])) {
     sqlsrv_free_stmt($update_appointments_stmt);
     sqlsrv_close($conn);
 
-    // Redirect to success message
     header("Location: ../faculty/kiosk-time-out-info.php?rfid_no=" . urlencode($rfid_no) . "&attd_ref=" . urlencode($attendance['attd_ref']));
     exit();
 }
 
 // If no prior attendance record, process time-in logic
-// Query to find the earliest schedule for today (optional but no longer required)
 $query = "
     SELECT TOP 1 sched_id, start_time, start_date
     FROM Schedules
@@ -113,8 +172,8 @@ if ($stmt === false) {
 $schedule = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
 
 // Use scheduled start time if available; otherwise use current time as fallback
-$start_time = isset($schedule['start_time']) 
-    ? $schedule['start_time']->format('H:i:s') 
+$start_time = isset($schedule['start_time'])
+    ? $schedule['start_time']->format('H:i:s')
     : $current_time;
 
 // Add a 15-minute grace period
@@ -140,7 +199,6 @@ sqlsrv_free_stmt($stmt);
 sqlsrv_free_stmt($insert_stmt);
 sqlsrv_close($conn);
 
-// Redirect to success page
 header("Location: ../faculty/kiosk-time-in-info.php?rfid_no=" . urlencode($rfid_no) . "&attd_ref=" . urlencode($attd_ref));
 exit();
 ?>

@@ -54,7 +54,7 @@ try {
     }
 } catch (Exception $e) {
     $_SESSION['error_message'] = $e->getMessage();
-    header("Location: kiosk-faculty.php?rfid_no=" . urlencode($rfid_no));
+    header("Location: ../kiosk-index.php");
     exit;
 } finally {
     sqlsrv_free_stmt($stmt);
