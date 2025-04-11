@@ -9,6 +9,7 @@ $stud_rf = filter_input(INPUT_POST, 'stud_rf', FILTER_SANITIZE_STRING);
 
 try {
     // Query to fetch attendance records with time_out IS NULL and date_logged is today
+    // Also checks if the RFID exists in Schedules table for a 'Consultation' today
     $query = "
     SELECT 
         attd_ref,
@@ -30,9 +31,16 @@ try {
     FROM AttendanceToday
     JOIN Faculty ON AttendanceToday.rfid_no = Faculty.rfid_no
     WHERE time_out IS NULL
-    AND CAST(date_logged AS DATE) = CAST(GETDATE() AS DATE)
-    AND archived = 0
-    AND Faculty.employment_type = 'Full Time'
+        AND CAST(date_logged AS DATE) = CAST(GETDATE() AS DATE)
+        AND archived = 0
+        AND Faculty.employment_type = 'Full Time'
+        AND EXISTS (
+            SELECT 1 FROM Schedules 
+            WHERE 
+                Schedules.rfid_no = AttendanceToday.rfid_no 
+                AND type = 'Consultation'
+                AND CAST(start_date AS DATE) = CAST(GETDATE() AS DATE)
+        )
     ORDER BY date_logged DESC";
 
     // Execute the query with sqlsrv
@@ -61,6 +69,7 @@ try {
     die("Error fetching data: " . $e->getMessage());
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">

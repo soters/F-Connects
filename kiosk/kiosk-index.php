@@ -723,10 +723,12 @@ date_default_timezone_set('Asia/Manila');
             border-radius: 15px;
             width: 100%;
             max-width: 550px;
-            box-shadow: 0 10px 30px rgba(74, 144, 226, 0.2);
+            box-shadow: 0 10px 30px rgba(255, 221, 51, 0.2);
+            /* Changed to a yellowish shadow */
             transform: translateY(20px);
             transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            border-top: 6px solid #4A90E2;
+            border-top: 6px solid #FFD700;
+            /* Changed to a yellow border */
             overflow: hidden;
         }
 
@@ -783,16 +785,19 @@ date_default_timezone_set('Asia/Manila');
             justify-content: center;
             gap: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            background: linear-gradient(135deg, #4A90E2, #5B86E5);
+            background: linear-gradient(135deg, #FFD700, #FFDD55);
+            /* Yellow gradient */
             color: white;
             width: 100%;
             margin-bottom: 20px;
         }
 
         .info-modal-button:hover {
-            background: linear-gradient(135deg, #5B86E5, #4A90E2);
+            background: linear-gradient(135deg, #FFDD55, #FFD700);
+            /* Reverse the gradient on hover */
             transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(74, 144, 226, 0.4);
+            box-shadow: 0 6px 15px rgba(255, 221, 51, 0.4);
+            /* Lighter yellow shadow */
         }
 
         .info-modal-button:active {
@@ -855,10 +860,10 @@ date_default_timezone_set('Asia/Manila');
     <div class="info-modal-overlay" id="infoModal">
         <div class="info-modal-content">
             <div class="info-modal-header">
-                <div class="info-icon-circle" style="color: #4A90E2;">
+                <div class="info-icon-circle" style="color: #FFD700;">
                     <i class="bi bi-info-circle"></i>
                 </div>
-                <h3>Information</h3>
+                <h3>Wrong User Type</h3>
             </div>
             <div class="info-modal-body">
                 <p>' . htmlspecialchars($_SESSION['info_message'], ENT_QUOTES, 'UTF-8') . '</p>

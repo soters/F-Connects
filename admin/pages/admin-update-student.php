@@ -167,10 +167,10 @@ if ($stmtSections !== false) {
             <div id="messageBox" class="message-box"></div>
             <div class="faculty-container-1">
                 <div class="buttons">
-                    <a href="javascript:void(0);" class="pass-btn"
+                    <!--<a href="javascript:void(0);" class="pass-btn"
                         onclick="openResetModal(<?= isset($_GET['rfid_no']) ? htmlspecialchars($_GET['rfid_no']) : 'null'; ?>)">
                         Reset Password
-                    </a>
+                    </a>-->
                     <!--<a href="javascript:void(0);" class="red-btn"
                         onclick="openDeleteModal(<?= isset($_GET['rfid_no']) ? htmlspecialchars($_GET['rfid_no']) : 'null'; ?>)">
                         Delete

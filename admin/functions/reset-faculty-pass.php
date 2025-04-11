@@ -6,7 +6,7 @@ function resetPassword($rfid_no) {
     global $conn; // Using the connection from connection.php
 
     // Define the new password
-    $new_password = password_hash("12345", PASSWORD_DEFAULT); // Hashing for security
+    $new_password = password_hash("12345", PASSWORD_BCRYPT, ['cost' => 12]);
 
     // Begin a transaction
     sqlsrv_begin_transaction($conn);
