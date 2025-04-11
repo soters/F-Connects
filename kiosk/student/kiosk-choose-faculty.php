@@ -38,7 +38,7 @@ try {
             SELECT 1 FROM Schedules 
             WHERE 
                 Schedules.rfid_no = AttendanceToday.rfid_no 
-                AND type = 'Consultation'
+                AND type = 'Consultation Time'
                 AND CAST(start_date AS DATE) = CAST(GETDATE() AS DATE)
         )
     ORDER BY date_logged DESC";
