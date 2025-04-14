@@ -121,8 +121,98 @@ ORDER BY Students.sex ASC, Students.lname ASC, Students.fname ASC";
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
     <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css'>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../../assets/css/admin-design.css">
+    <style>
+        /* Tooltip container */
+        [data-tooltip] {
+            position: relative;
+            display: inline-block;
+        }
+
+        /* Tooltip text */
+        [data-tooltip]::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s;
+        }
+
+        /* Show tooltip on hover */
+        [data-tooltip]:hover::after {
+            opacity: 1;
+            visibility: visible;
+            margin-bottom: 10px;
+        }
+
+        /* Modal styling with Poppins font */
+        .modal-1 {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            font-family: 'Poppins', sans-serif;
+            /* Added Poppins */
+        }
+
+        .modal-content-1 {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 5px;
+            width: 80%;
+            max-width: 400px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            font-family: 'Poppins', sans-serif;
+            /* Added Poppins */
+        }
+
+        .close-modal-1 {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            /* Added Poppins */
+        }
+
+        .close-modal-1:hover {
+            /* Fixed missing dot */
+            color: black;
+        }
+
+        #exportModalMessage {
+            text-align: center;
+            padding: 20px 0;
+            font-size: 15px;
+            color: #333;
+            font-family: 'Poppins', sans-serif;
+            /* Added Poppins */
+        }
+
+        /* Make success messages bold (matches your JS) */
+        #exportModalMessage strong {
+            font-weight: 600;
+            /* Poppins semi-bold */
+        }
+    </style>
 </head>
 
 <body>
@@ -270,8 +360,13 @@ ORDER BY Students.sex ASC, Students.lname ASC, Students.fname ASC";
                     <h1 class="info-title-3">Students</h1>
                     <div class="widget-button">
                         <div class="action-buttons">
-                            <a id="exportExcel" class="excel-btn">Excel</a>
-                            <a class="pdf-btn">PDF</a>
+                            <a id="exportExcel" class="excel-btn" onmouseover="showTooltip(this, 'Export to Excel')"
+                                onmouseout="hideTooltip()">Excel</a>
+                            <a class="pdf-btn" onmouseover="showTooltip(this, 'Export to PDF')"
+                                onmouseout="hideTooltip()">PDF</a>
+                            <div id="customTooltip"
+                                style="position: absolute; display: none; background: #333; color: #fff; padding: 5px; border-radius: 3px;">
+                            </div>
                         </div>
                         <div class="faculty-container" style="display: none;">
                             <?php if (!empty($students)): ?>
@@ -376,6 +471,13 @@ ORDER BY Students.sex ASC, Students.lname ASC, Students.fname ASC";
                 <button id="confirmDelete" class="btn-confirm">Yes, Delete</button>
                 <button onclick="closeDeleteModal()" class="btn-cancel">Cancel</button>
             </div>
+        </div>
+    </div>
+
+    <div id="exportModal" class="modal-1" style="display:none;">
+        <div class="modal-content-1">
+            <span class="close-modal-1">&times;</span>
+            <div id="exportModalMessage"></div>
         </div>
     </div>
 
@@ -490,163 +592,282 @@ ORDER BY Students.sex ASC, Students.lname ASC, Students.fname ASC";
 </script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+        // Get modal elements
+        const modal = document.getElementById("exportModal");
+        const modalMessage = document.getElementById("exportModalMessage");
+        const closeModal = document.querySelector(".close-modal-1");
+
+        // Modal functions  
+        function showModal(message, isSuccess) {
+            modalMessage.innerHTML = message;
+            modal.style.display = "block";
+            modalMessage.style.color = isSuccess ? "#4CAF50" : "#F44336";
+        }
+
+        function hideModal() {
+            modal.style.display = "none";
+        }
+
+        // Close modal when clicking X or outside
+        closeModal.onclick = hideModal;
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                hideModal();
+            }
+        };
+
+        // Export Excel functionality
         let exportExcelButton = document.getElementById("exportExcel");
         if (exportExcelButton) {
             exportExcelButton.addEventListener("click", function () {
-                let table = document.getElementById("studentTables"); // Ensure the correct ID
+                let table = document.getElementById("studentTables");
 
-                // Debugging: Check if table exists
                 if (!table) {
+                    showModal("Error: Table not found!", false);
                     console.error("Error: Table with ID 'studentTable' not found.");
-                    alert("Table not found!");
                     return;
                 }
 
-                // Debugging: Check table content
                 let rows = table.querySelectorAll("tr");
                 if (rows.length === 0) {
+                    showModal("Error: Table is empty!", false);
                     console.error("Error: Table is empty.");
-                    alert("Table is empty!");
                     return;
                 }
 
-                // Convert table to Excel
-                let sheet = XLSX.utils.table_to_sheet(table);
-                let workbook = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(workbook, sheet, "Students");
+                try {
+                    // Convert table to Excel
+                    let sheet = XLSX.utils.table_to_sheet(table);
 
-                // Get section name from the hidden span
-                let sectionName = document.getElementById("sectionName")?.innerText.trim() || "Section";
+                    // Apply professional formatting
+                    if (!sheet['!cols']) sheet['!cols'] = [];
+                    for (let i = 0; i < rows[0].cells.length; i++) {
+                        sheet['!cols'][i] = { wch: 20 };
+                    }
 
-                // Replace spaces with underscores for a safe filename
-                let fileName = `${sectionName.replace(/\s+/g, '_')}_Students.xlsx`;
+                    // Header styling
+                    let headerRange = XLSX.utils.decode_range(sheet['!ref']);
+                    for (let C = headerRange.s.c; C <= headerRange.e.c; ++C) {
+                        let cellAddress = XLSX.utils.encode_cell({ r: 0, c: C });
+                        if (!sheet[cellAddress]) continue;
 
-                XLSX.writeFile(workbook, fileName);
+                        sheet[cellAddress].s = {
+                            font: { bold: true, color: { rgb: "FFFFFF" } },
+                            fill: { fgColor: { rgb: "4472C4" } },
+                            alignment: { horizontal: "center" }
+                        };
+                    }
+
+                    // Add borders
+                    for (let R = headerRange.s.r; R <= headerRange.e.r; ++R) {
+                        for (let C = headerRange.s.c; C <= headerRange.e.c; ++C) {
+                            let cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
+                            if (!sheet[cellAddress]) continue;
+
+                            if (!sheet[cellAddress].s) sheet[cellAddress].s = {};
+                            sheet[cellAddress].s.border = {
+                                top: { style: "thin", color: { rgb: "000000" } },
+                                bottom: { style: "thin", color: { rgb: "000000" } },
+                                left: { style: "thin", color: { rgb: "000000" } },
+                                right: { style: "thin", color: { rgb: "000000" } }
+                            };
+                        }
+                    }
+
+                    sheet['!freeze'] = { xSplit: 0, ySplit: 1, topLeftCell: "A2", activePane: "bottomRight" };
+
+                    let workbook = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(workbook, sheet, "Students");
+
+                    let sectionName = document.getElementById("sectionName")?.innerText.trim() || "Section";
+                    let fileName = `${sectionName.replace(/\s+/g, '_')}_Students.xlsx`;
+
+                    XLSX.writeFile(workbook, fileName);
+
+                    showModal(
+                        "<strong style='color: #333; font-weight: bold;'>Excel Report Generated Successfully!</strong>" +
+                        "<br><br>The file '<i>" + fileName + "</i>' has been DOWNLOADED.",
+                        true
+                    );
+
+                } catch (error) {
+                    showModal("Error generating Excel file. Please try again.", false);
+                    console.error("Error generating Excel file:", error);
+                }
             });
         }
     });
 </script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+        // Reuse the existing modal from Excel export
+        const modal = document.getElementById("exportModal");
+        const modalMessage = document.getElementById("exportModalMessage");
+        const closeModal = document.querySelector(".close-modal");
+
+        // Modal functions (reuse existing ones)
+        function showModal(message, isSuccess) {
+            modalMessage.innerHTML = message;
+            modal.style.display = "block";
+            modalMessage.style.color = isSuccess ? "#2E7D32" : "#F44336"; // Green for success, red for error
+        }
+
+        function hideModal() {
+            modal.style.display = "none";
+        }
+
+        // PDF Export functionality
         let exportPDFButton = document.querySelector(".pdf-btn");
         if (exportPDFButton) {
             exportPDFButton.addEventListener("click", function () {
-                const { jsPDF } = window.jspdf;
-                let doc = new jsPDF();
+                try {
+                    const { jsPDF } = window.jspdf;
+                    let doc = new jsPDF();
 
-                if (typeof doc.autoTable !== "function") {
-                    console.error("Error: autoTable plugin not loaded. Check script imports.");
-                    return;
-                }
-
-                let table = document.querySelector(".custom-table-2");
-                if (!table) {
-                    alert("Error: No student table found.");
-                    return;
-                }
-
-                let rows = table.querySelectorAll(".custom-table-body .custom-table-row");
-
-                let data = [];
-                data.push(["Student No.", "Student Name", "Email", "Gender"]); // Table headers
-
-                rows.forEach(row => {
-                    let cells = row.querySelectorAll(".custom-table-cell");
-                    let rowData = Array.from(cells).map(cell => cell.innerText);
-                    data.push(rowData);
-                });
-
-                let sectionName = document.getElementById("sectionName")?.innerText.trim() || "BSIT 1-1";
-                let fileName = `${sectionName.replace(/\s+/g, '_')}_Students.pdf`;
-
-                // === HEADER ===
-                doc.setFont("times", "bold");
-                doc.setFontSize(18);
-                doc.text("COLEGIO DE STA. TERESA DE AVILA", 105, 15, null, null, "center");
-
-                doc.setFont("helvetica", "normal");
-                doc.setFontSize(10);
-                doc.text("6 Kingfisher St. cor. Skylark St., Zabarte Subd., Novaliches, Quezon City", 105, 20, null, null, "center");
-
-                doc.setFont("helvetica", "bold");
-                doc.setFontSize(16);
-                doc.text("COLLEGE OF INFORMATION TECHNOLOGY", 105, 30, null, null, "center");
-
-                doc.setFillColor(0, 0, 0); // Black bar
-                doc.rect(15, 35, 180, 10, 'F');
-                doc.setFontSize(14);
-                doc.setTextColor(255, 255, 255);
-                doc.text(sectionName, 105, 42, null, null, "center");
-
-                doc.setTextColor(0, 0, 0); // Reset to black
-                doc.setFont("helvetica", "bold");
-                doc.setFontSize(10);
-                doc.text("AY: 2024-2025", 105, 50, null, null, "center");
-                doc.text("TERM : FIRST SEMESTER", 105, 55, null, null, "center");
-
-                // === Generated Date ===
-                let today = new Date();
-                let generatedDate = today.toLocaleDateString('en-PH', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                });
-                doc.setFont("helvetica", "normal");
-                doc.setFontSize(9);
-                doc.text(`Generated on: ${generatedDate}`, 15, 63);
-
-                // === STUDENT TABLE ===
-                doc.autoTable({
-                    startY: 68,
-                    head: [data[0]],
-                    body: data.slice(1),
-                    theme: "grid", // Adds borders to the table
-                    headStyles: {
-                        fillColor: [255, 255, 255], // White background
-                        textColor: [0, 0, 0],       // Black text
-                        fontStyle: 'bold',
-                        lineWidth: 0.1,             // Light border lines
-                        lineColor: [0, 0, 0],
-                        halign: 'center',           // Center align text
-                        valign: 'middle',           // Vertically center text
-                        cellPadding: 4             // Adjust padding for the header
-                    },
-                    bodyStyles: {
-                        textColor: [0, 0, 0],
-                        lineWidth: 0.1,
-                        lineColor: [0, 0, 0]
-                    },
-                    styles: {
-                        fontSize: 10,
-                        halign: 'left'
+                    if (typeof doc.autoTable !== "function") {
+                        showModal("Error: PDF generation plugin not loaded.", false);
+                        console.error("Error: autoTable plugin not loaded. Check script imports.");
+                        return;
                     }
-                });
 
+                    let table = document.querySelector(".custom-table-2");
+                    if (!table) {
+                        showModal("Error: No student table found.", false);
+                        return;
+                    }
 
-                // === FOOTER (LEFT SIDE) ===
-                let finalY = doc.lastAutoTable.finalY + 20;
+                    let rows = table.querySelectorAll(".custom-table-body .custom-table-row");
+                    if (rows.length === 0) {
+                        showModal("Error: No student data found.", false);
+                        return;
+                    }
 
-                doc.setFont("helvetica", "normal");
-                doc.setFontSize(11);
-                doc.text("Prepared by:", 15, finalY);
+                    let data = [];
+                    data.push(["Student No.", "Student Name", "Email", "Gender"]); // Table headers
 
-                doc.setFont("helvetica", "bold");
-                doc.text("HAROLD R. LUCERO, MIT", 22, finalY + 10);
+                    rows.forEach(row => {
+                        let cells = row.querySelectorAll(".custom-table-cell");
+                        let rowData = Array.from(cells).map(cell => cell.innerText);
+                        data.push(rowData);
+                    });
 
-                // Line under name (adjusted width for left alignment)
-                let lineWidth = 60;
-                doc.setLineWidth(0.5);
-                doc.line(15, finalY + 12, 15 + lineWidth, finalY + 12);
+                    let sectionName = document.getElementById("sectionName")?.innerText.trim() || "BSIT 1-1";
+                    let fileName = `${sectionName.replace(/\s+/g, '_')}_Students.pdf`;
 
-                doc.setFont("helvetica", "normal");
-                doc.setFontSize(11);
-                doc.text("Dean", 40, finalY + 18);
+                    // === HEADER ===
+                    doc.setFont("times", "bold");
+                    doc.setFontSize(18);
+                    doc.text("COLEGIO DE STA. TERESA DE AVILA", 105, 15, null, null, "center");
 
-                // Save PDF
-                doc.save(fileName);
+                    doc.setFont("helvetica", "normal");
+                    doc.setFontSize(10);
+                    doc.text("6 Kingfisher St. cor. Skylark St., Zabarte Subd., Novaliches, Quezon City", 105, 20, null, null, "center");
+
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(16);
+                    doc.text("COLLEGE OF INFORMATION TECHNOLOGY", 105, 30, null, null, "center");
+
+                    doc.setFillColor(0, 0, 0); // Black bar
+                    doc.rect(15, 35, 180, 10, 'F');
+                    doc.setFontSize(14);
+                    doc.setTextColor(255, 255, 255);
+                    doc.text(sectionName, 105, 42, null, null, "center");
+
+                    doc.setTextColor(0, 0, 0); // Reset to black
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(10);
+                    doc.text("AY: 2024-2025", 105, 50, null, null, "center");
+                    doc.text("TERM : FIRST SEMESTER", 105, 55, null, null, "center");
+
+                    // === Generated Date ===
+                    let today = new Date();
+                    let generatedDate = today.toLocaleDateString('en-PH', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                    doc.setFont("helvetica", "normal");
+                    doc.setFontSize(9);
+                    doc.text(`Generated on: ${generatedDate}`, 15, 63);
+
+                    // === STUDENT TABLE ===
+                    doc.autoTable({
+                        startY: 68,
+                        head: [data[0]],
+                        body: data.slice(1),
+                        theme: "grid",
+                        headStyles: {
+                            fillColor: [255, 255, 255],
+                            textColor: [0, 0, 0],
+                            fontStyle: 'bold',
+                            lineWidth: 0.1,
+                            lineColor: [0, 0, 0],
+                            halign: 'center',
+                            valign: 'middle',
+                            cellPadding: 4
+                        },
+                        bodyStyles: {
+                            textColor: [0, 0, 0],
+                            lineWidth: 0.1,
+                            lineColor: [0, 0, 0]
+                        },
+                        styles: {
+                            fontSize: 10,
+                            halign: 'left'
+                        }
+                    });
+
+                    // === FOOTER ===
+                    let finalY = doc.lastAutoTable.finalY + 20;
+
+                    doc.setFont("helvetica", "normal");
+                    doc.setFontSize(11);
+                    doc.text("Prepared by:", 15, finalY);
+
+                    doc.setFont("helvetica", "bold");
+                    doc.text("HAROLD R. LUCERO, MIT", 22, finalY + 10);
+
+                    // Line under name
+                    let lineWidth = 60;
+                    doc.setLineWidth(0.5);
+                    doc.line(15, finalY + 12, 15 + lineWidth, finalY + 12);
+
+                    doc.setFont("helvetica", "normal");
+                    doc.setFontSize(11);
+                    doc.text("Dean", 40, finalY + 18);
+
+                    // Save PDF
+                    doc.save(fileName);
+
+                    // Show success message in the existing modal
+                    showModal(
+                        "<strong style='color: #333; font-weight: bold;'>PDF Report Generated Successfully!</strong>" +
+                        "<br><br>The file '<i>" + fileName + "</i>' has been DOWNLOADED.",
+                        true
+                    );
+
+                } catch (error) {
+                    showModal("Error generating PDF file. Please try again.", false);
+                    console.error("Error generating PDF:", error);
+                }
             });
         }
     });
+</script>
+<script>
+    function showTooltip(element, text) {
+        const tooltip = document.getElementById('customTooltip');
+        tooltip.textContent = text;
+        tooltip.style.display = 'block';
+
+        const rect = element.getBoundingClientRect();
+        tooltip.style.left = `${rect.left + window.scrollX}px`;
+        tooltip.style.top = `${rect.top + window.scrollY - 30}px`;
+    }
+
+    function hideTooltip() {
+        document.getElementById('customTooltip').style.display = 'none';
+    }
 </script>
 
 </html>

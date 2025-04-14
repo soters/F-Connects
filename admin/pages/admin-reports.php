@@ -67,7 +67,64 @@ $attendanceData = json_encode($attendanceCounts);
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css">
     <link rel="stylesheet" href="../../assets/css/admin-design.css">
+    <style>
+        /* Modal styling with Poppins font */
+        .modal-1 {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            font-family: 'Poppins', sans-serif;
+            /* Added Poppins */
+        }
 
+        .modal-content-1 {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 5px;
+            width: 80%;
+            max-width: 400px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            font-family: 'Poppins', sans-serif;
+            /* Added Poppins */
+        }
+
+        .close-modal-1 {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            /* Added Poppins */
+        }
+
+        .close-modal-1:hover {
+            /* Fixed missing dot */
+            color: black;
+        }
+
+        #exportModalMessage {
+            text-align: center;
+            padding: 20px 0;
+            font-size: 15px;
+            color: #333;
+            font-family: 'Poppins', sans-serif;
+            /* Added Poppins */
+        }
+
+        /* Make success messages bold (matches your JS) */
+        #exportModalMessage strong {
+            font-weight: 600;
+            /* Poppins semi-bold */
+        }
+    </style>
 </head>
 
 <body>
@@ -236,6 +293,13 @@ $attendanceData = json_encode($attendanceCounts);
         </div>
     </div>
 </body>
+
+<div id="exportModal" class="modal-1" style="display:none;">
+    <div class="modal-content-1">
+        <span class="close-modal-1"></span>
+        <div id="exportModalMessage"></div>
+    </div>
+</div>
 
 <script>
     const navToggle = document.getElementById('nav-toggle');
@@ -425,15 +489,18 @@ $attendanceData = json_encode($attendanceCounts);
             let dateInput = document.getElementById("appointmentReportDate")?.value;
 
             if (!dateInput) {
-                alert("Please select a valid date.");
+                showModal("Please select a valid date.", false);
                 return;
             }
+
+            // Show loading state
+            showModal("Generating report... Please wait.", true);
 
             fetch(`../functions/fetch-appointment-by-date.php?date=${dateInput}`)
                 .then(response => response.json())
                 .then(data => {
                     if (!data.appointments || data.appointments.length === 0) {
-                        alert("No appointments found for this date.");
+                        showModal("No appointments found for this date.", false);
                         return;
                     }
 
@@ -586,15 +653,52 @@ $attendanceData = json_encode($attendanceCounts);
                     doc.text("Dean", 15, footerY + 17);
 
                     addPageNumbers(doc);
-                    doc.save(`Appointment_Daily_Report_${dateInput}.pdf`);
+                    // Save PDF
+                    const fileName = `Appointment_Daily_Report_${dateInput}.pdf`;
+                    doc.save(fileName);
 
+                    // Show success message
+                    showModal(
+                        "<strong style='color: #333; font-weight: 600;'>Appointment Report Generated Successfully!</strong>" +
+                        "<br><br>Daily report for <i>" + formattedDate + "</i> has been DOWNLOADED." +
+                        "<br><br>File: <code>" + fileName + "</code>",
+                        true
+                    );
                 })
                 .catch(error => {
                     console.error("Error fetching data:", error);
-                    alert("Error generating report.");
+                    showModal("Error generating report. Please try again.", false);
                 });
         }
 
+        function showModal(message, isSuccess) {
+            const modal = document.getElementById("exportModal");
+            const modalMessage = document.getElementById("exportModalMessage");
+
+            // Clear any existing timeout to prevent multiple timers running
+            if (modal.timeoutId) {
+                clearTimeout(modal.timeoutId);
+            }
+
+            // Set the modal content and display it
+            modalMessage.innerHTML = message;
+            modal.style.display = "block";
+            modalMessage.style.color = isSuccess ? "#333" : "#F44336";
+
+            // Auto-hide after 5 seconds
+            modal.timeoutId = setTimeout(() => {
+                modal.style.display = "none";
+            }, 5000); // 5000 milliseconds = 5 seconds
+
+            // Still allow manual closing
+            const closeBtn = document.querySelector(".close-modal-1");
+            if (closeBtn) {
+                closeBtn.onclick = () => {
+                    clearTimeout(modal.timeoutId);
+                    modal.style.display = "none";
+                };
+            }
+        }
         // ------------------------ APPOINTMENT MONTHLY REPORT FUNCTION ------------------------
         function generateAppointmentMonthlyReport() {
             const { jsPDF } = window.jspdf;
@@ -822,6 +926,34 @@ $attendanceData = json_encode($attendanceCounts);
 
         // ------------------------ APPOINTMENT FACULTY REPORT FUNCTION ------------------------
         function generateAppointmentFacultyReport() {
+            // Get modal elements
+            const modal = document.getElementById("exportModal");
+            const modalMessage = document.getElementById("exportModalMessage");
+            const closeBtn = document.querySelector(".close-modal-1");
+
+            // Modal control functions
+            function showModal(message, isSuccess) {
+                // Clear any existing timeout
+                if (modal.timeoutId) clearTimeout(modal.timeoutId);
+
+                modalMessage.innerHTML = message;
+                modal.style.display = "block";
+                modalMessage.style.color = isSuccess ? "#333" : "#F44336";
+
+                // Auto-close after 5 seconds
+                modal.timeoutId = setTimeout(() => {
+                    modal.style.display = "none";
+                }, 5000);
+            }
+
+            function closeModal() {
+                if (modal.timeoutId) clearTimeout(modal.timeoutId);
+                modal.style.display = "none";
+            }
+
+            // Set up event listeners
+            closeBtn?.addEventListener("click", closeModal);
+            modal?.addEventListener("click", (e) => e.target === modal && closeModal());
             const { jsPDF } = window.jspdf;
             let doc = new jsPDF();
             let facultyId = document.getElementById("prof_rfid_no")?.value;
@@ -1019,11 +1151,19 @@ $attendanceData = json_encode($attendanceCounts);
                     doc.text("Dean", 15, footerY + 17);
 
                     addPageNumbers(doc);
-                    doc.save(`Faculty_Appointment_Report_${facultyName}.pdf`);
+                    const fileName = `Faculty_Appointment_Report_${facultyName.replace(/\s+/g, '_')}.pdf`;
+                    doc.save(fileName);
+
+                    showModal(
+                        `<strong style="color:#333;font-weight:600">Faculty Report Generated!</strong><br>
+                 Report for <i>${facultyName}</i> has been downloaded.<br>
+                 <code>${fileName}</code>`,
+                        true
+                    );
                 })
                 .catch(error => {
-                    console.error("Error fetching data:", error);
-                    alert("Error generating report.");
+                    console.error("Error:", error);
+                    showModal("Error generating faculty report. Please try again.", false);
                 });
         }
 
@@ -1203,6 +1343,35 @@ $attendanceData = json_encode($attendanceCounts);
 
         // ------------------------ ATTENDANCE MONTHLY REPORT FUNCTION ------------------------
         function generateMonthlyReport() {
+            // Get modal elements
+            const modal = document.getElementById("exportModal");
+            const modalMessage = document.getElementById("exportModalMessage");
+            const closeBtn = document.querySelector(".close-modal-1");
+
+            // Modal control functions
+            function showModal(message, isSuccess) {
+                // Clear any existing timeout
+                if (modal.timeoutId) clearTimeout(modal.timeoutId);
+
+                modalMessage.innerHTML = message;
+                modal.style.display = "block";
+                modalMessage.style.color = isSuccess ? "#333" : "#F44336";
+
+                // Auto-close after 5 seconds
+                modal.timeoutId = setTimeout(() => {
+                    modal.style.display = "none";
+                }, 5000);
+            }
+
+            function closeModal() {
+                if (modal.timeoutId) clearTimeout(modal.timeoutId);
+                modal.style.display = "none";
+            }
+
+            // Set up event listeners
+            closeBtn?.addEventListener("click", closeModal);
+            modal?.addEventListener("click", (e) => e.target === modal && closeModal());
+
             const { jsPDF } = window.jspdf;
             let doc = new jsPDF();
 
@@ -1213,21 +1382,24 @@ $attendanceData = json_encode($attendanceCounts);
 
             // Validate inputs
             if (!selectedMonth) {
-                alert("Please select a month.");
+                showModal("Please select a month.", false);
                 return;
             }
             if (!facultyRFID) {
-                alert("Please select a faculty member.");
+                showModal("Please select a faculty member.", false);
                 return;
             }
+
 
             // Extract year from selectedMonth (format: YYYY-MM)
             const [selectedYear, selectedMonthOnly] = selectedMonth.split("-");
 
             if (!selectedYear || !selectedMonthOnly) {
-                alert("Invalid month format. Expected format: YYYY-MM");
+                showModal("Invalid month format. Expected format: YYYY-MM", false);
                 return;
             }
+
+            showModal("Generating monthly report...", true);
 
             // Fetch attendance records for the selected month, year, and faculty RFID
             fetch(`../functions/fetch-records-by-month.php?month=${selectedMonth}&year=${selectedYear}&rfid_no=${facultyRFID}`)
@@ -1249,7 +1421,7 @@ $attendanceData = json_encode($attendanceCounts);
                     } = data;
 
                     if (!attendanceReport || attendanceReport.length === 0) {
-                        alert("No attendance records found for this month.");
+                        showModal("No attendance records found for this month.", false);
                         return;
                     }
 
@@ -1527,11 +1699,19 @@ $attendanceData = json_encode($attendanceCounts);
                     doc.text("Dean", 15, footerY + 17);
 
                     addPageNumbers(doc);
-                    doc.save(`Monthly_Attendance_Report_${facultyName.replace(/\s+/g, '_')}_${selectedMonth}.pdf`);
+                    const fileName = `Monthly_Attendance_Report_${facultyName.replace(/\s+/g, '_')}_${selectedMonth}.pdf`;
+                    doc.save(fileName);
+
+                    showModal(
+                        `<strong style="color:#333;font-weight:600">Monthly Report Generated!</strong><br>
+                 Report for <i>${facultyName}</i> (${selectedMonth}) has been downloaded.<br>
+                 <code>${fileName}</code>`,
+                        true
+                    );
                 })
                 .catch(err => {
                     console.error("Error:", err);
-                    alert("Error generating report. Please try again.");
+                    showModal("Error generating monthly report. Please try again.", false);
                 });
 
             function formatTime(timeString) {
@@ -1543,6 +1723,34 @@ $attendanceData = json_encode($attendanceCounts);
 
         // ------------------------ ATTENDANCE WEEKLY REPORT FUNCTION ------------------------
         function generateWeeklyReport() {
+            // Get modal elements
+            const modal = document.getElementById("exportModal");
+            const modalMessage = document.getElementById("exportModalMessage");
+            const closeBtn = document.querySelector(".close-modal-1");
+
+            // Modal control functions
+            function showModal(message, isSuccess) {
+                // Clear any existing timeout
+                if (modal.timeoutId) clearTimeout(modal.timeoutId);
+
+                modalMessage.innerHTML = message;
+                modal.style.display = "block";
+                modalMessage.style.color = isSuccess ? "#333" : "#F44336";
+
+                // Auto-close after 5 seconds
+                modal.timeoutId = setTimeout(() => {
+                    modal.style.display = "none";
+                }, 5000);
+            }
+
+            function closeModal() {
+                if (modal.timeoutId) clearTimeout(modal.timeoutId);
+                modal.style.display = "none";
+            }
+
+            // Set up event listeners
+            closeBtn?.addEventListener("click", closeModal);
+            modal?.addEventListener("click", (e) => e.target === modal && closeModal());
             const { jsPDF } = window.jspdf;
             let doc = new jsPDF();
 
@@ -1551,11 +1759,23 @@ $attendanceData = json_encode($attendanceCounts);
             let facultyRFID = facultySelect?.value;
             let facultyName = facultySelect?.options[facultySelect.selectedIndex]?.text || "Unknown Faculty";
 
-            if (!weekInput) return alert("Please select a week.");
-            if (!facultyRFID) return alert("Please select a faculty member.");
+            // Validate inputs - using modal instead of alert
+            if (!weekInput) {
+                showModal("Please select a week.", false);
+                return;
+            }
+            if (!facultyRFID) {
+                showModal("Please select a faculty member.", false);
+                return;
+            }
 
             let [selectedYear, selectedWeek] = weekInput.split("-W");
-            if (!selectedYear || !selectedWeek) return alert("Invalid week format.");
+            if (!selectedYear || !selectedWeek) {
+                showModal("Invalid week format. Expected format: YYYY-W##", false);
+                return;
+            }
+
+            showModal("Generating weekly report...", true);
 
             fetch(`../functions/fetch-records-by-week.php?week=${selectedWeek}&year=${selectedYear}&rfid_no=${facultyRFID}`)
                 .then(response => response.json())
@@ -1571,7 +1791,7 @@ $attendanceData = json_encode($attendanceCounts);
                     } = data;
 
                     if (!attendanceReport || attendanceReport.length === 0) {
-                        alert("No attendance records found for this week.");
+                        showModal("No attendance records found for this week.", false);
                         return;
                     }
 
@@ -1833,18 +2053,57 @@ $attendanceData = json_encode($attendanceCounts);
                     doc.text("Dean", 15, footerY + 17);
 
                     addPageNumbers(doc);
-                    doc.save(`Weekly_Attendance_Report_Week_${selectedWeek}_${selectedYear}.pdf`);
+                    const fileName = `Weekly_Attendance_Report_Week_${selectedWeek}_${selectedYear}.pdf`;
+                    doc.save(fileName);
 
+                    showModal(
+                        `<strong style="color:#333;font-weight:600">Weekly Report Generated!</strong><br>
+                 Report for Week ${selectedWeek}, ${selectedYear} has been downloaded.<br>
+                 <code>${fileName}</code>`,
+                        true
+                    );
                 })
                 .catch(err => {
                     console.error("Error:", err);
-                    alert("Error generating report.");
+                    showModal("Error generating weekly report. Please try again.", false);
                 });
+
+            function formatTime(timeString) {
+                if (!timeString) return "N/A";
+                const time = new Date(`1970-01-01T${timeString}`);
+                return time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
         }
-
-
         // ------------------------ ATTENDANCE YEARLY REPORT FUNCTION ------------------------
         function generateYearlyReport() {
+            // Get modal elements
+            const modal = document.getElementById("exportModal");
+            const modalMessage = document.getElementById("exportModalMessage");
+            const closeBtn = document.querySelector(".close-modal-1");
+
+            // Modal control functions
+            function showModal(message, isSuccess) {
+                // Clear any existing timeout
+                if (modal.timeoutId) clearTimeout(modal.timeoutId);
+
+                modalMessage.innerHTML = message;
+                modal.style.display = "block";
+                modalMessage.style.color = isSuccess ? "#333" : "#F44336";
+
+                // Auto-close after 5 seconds
+                modal.timeoutId = setTimeout(() => {
+                    modal.style.display = "none";
+                }, 5000);
+            }
+
+            function closeModal() {
+                if (modal.timeoutId) clearTimeout(modal.timeoutId);
+                modal.style.display = "none";
+            }
+
+            // Set up event listeners
+            closeBtn?.addEventListener("click", closeModal);
+            modal?.addEventListener("click", (e) => e.target === modal && closeModal());
             const { jsPDF } = window.jspdf;
             let doc = new jsPDF();
 
@@ -1853,13 +2112,13 @@ $attendanceData = json_encode($attendanceCounts);
             let facultyRFID = facultySelect?.value;
             let facultyName = facultySelect?.options[facultySelect.selectedIndex]?.text || "Unknown Faculty";
 
-            // Validate inputs
+            // Validate inputs - using modal instead of alert
             if (!selectedYear) {
-                alert("Please select a year.");
+                showModal("Please select a year.", false);
                 return;
             }
             if (!facultyRFID) {
-                alert("Please select a faculty member.");
+                showModal("Please select a faculty member.", false);
                 return;
             }
 
@@ -2111,17 +2370,52 @@ $attendanceData = json_encode($attendanceCounts);
                     doc.text("Dean", 15, footerY + 17);
 
                     addPageNumbers(doc);
-                    doc.save(`Yearly_Attendance_Report_${facultyName.replace(/\s+/g, '_')}_${selectedYear}.pdf`);
+                    const fileName = `Yearly_Attendance_Report_${facultyName.replace(/\s+/g, '_')}_${selectedYear}.pdf`;
+                    doc.save(fileName);
+
+                    showModal(
+                        `<strong style="color:#333;font-weight:600">Yearly Report Generated!</strong><br>
+                 Report for ${selectedYear} has been downloaded.<br>
+                 <code>${fileName}</code>`,
+                        true
+                    );
                 })
                 .catch(err => {
-                    facultySelect.nextElementSibling.innerHTML = originalButtonText;
                     console.error("Error:", err);
-                    alert(`Error generating report: ${err.message}`);
+                    showModal(`Error generating report: ${err.message}`, false);
                 });
         }
 
         // ------------------------ ATTENDANCE CUSTOM REPORT FUNCTION ------------------------
         function generateCustomReport() {
+            // Get modal elements
+            const modal = document.getElementById("exportModal");
+            const modalMessage = document.getElementById("exportModalMessage");
+            const closeBtn = document.querySelector(".close-modal-1");
+
+            // Modal control functions
+            function showModal(message, isSuccess) {
+                // Clear any existing timeout
+                if (modal.timeoutId) clearTimeout(modal.timeoutId);
+
+                modalMessage.innerHTML = message;
+                modal.style.display = "block";
+                modalMessage.style.color = isSuccess ? "#333" : "#F44336";
+
+                // Auto-close after 5 seconds
+                modal.timeoutId = setTimeout(() => {
+                    modal.style.display = "none";
+                }, 5000);
+            }
+
+            function closeModal() {
+                if (modal.timeoutId) clearTimeout(modal.timeoutId);
+                modal.style.display = "none";
+            }
+
+            // Set up event listeners
+            closeBtn?.addEventListener("click", closeModal);
+            modal?.addEventListener("click", (e) => e.target === modal && closeModal());
             const { jsPDF } = window.jspdf;
             let doc = new jsPDF();
 
@@ -2131,15 +2425,18 @@ $attendanceData = json_encode($attendanceCounts);
             let facultyRFID = facultySelect?.value;
             let facultyName = facultySelect?.options[facultySelect.selectedIndex]?.text || "Unknown Faculty";
 
+
+            // Validate inputs - using modal instead of alert
             if (!startDate || !endDate) {
-                alert("Please select both start and end dates.");
+                showModal("Please select both start and end dates.", false);
+                return;
+            }
+            if (!facultyRFID) {
+                showModal("Please select a faculty member.", false);
                 return;
             }
 
-            if (!facultyRFID) {
-                alert("Please select a faculty member.");
-                return;
-            }
+            showModal("Generating custom report...", true);
 
             fetch(`../functions/fetch-records-by-range.php?start_date=${startDate}&end_date=${endDate}&rfid_no=${facultyRFID}`)
                 .then(response => response.json())
@@ -2155,7 +2452,7 @@ $attendanceData = json_encode($attendanceCounts);
                     } = data;
 
                     if (!attendanceReport || attendanceReport.length === 0) {
-                        alert("No attendance records found for the selected date range.");
+                        showModal("No attendance records found for the selected date range.", false);
                         return;
                     }
 
@@ -2416,12 +2713,27 @@ $attendanceData = json_encode($attendanceCounts);
                     doc.text("Dean", 15, footerY + 17);
 
                     addPageNumbers(doc);
-                    doc.save(`Custom_Attendance_Report_${startDate}_to_${endDate}.pdf`);
+
+                    const fileName = `Custom_Attendance_Report_${startDate}_to_${endDate}.pdf`;
+                    doc.save(fileName);
+
+                    showModal(
+                        `<strong style="color:#333;font-weight:600">Custom Report Generated!</strong><br>
+                 Report from ${startDate} to ${endDate} has been downloaded.<br>
+                 <code>${fileName}</code>`,
+                        true
+                    );
                 })
                 .catch(err => {
                     console.error("Error:", err);
-                    alert("Error generating report.");
+                    showModal("Error generating custom report. Please try again.", false);
                 });
+
+            function formatTime(timeString) {
+                if (!timeString) return "N/A";
+                const time = new Date(`1970-01-01T${timeString}`);
+                return time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
         }
 
 
