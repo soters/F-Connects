@@ -153,6 +153,23 @@ if (!$schedule) {
             </div>
             <div id="messageBox" class="message-box"></div>
             <div class="faculty-container-1">
+                <div class="buttons">
+                    <a href="javascript:void(0);" class="red-btn"
+                        onclick="openDeleteModal(<?= isset($_GET['sched_id']) ? htmlspecialchars($_GET['sched_id']) : 'null'; ?>)">
+                        Delete
+                    </a>
+                    <?php if (isset($_GET['sched_id'])): ?>
+                        <a href="admin-update-time-info.php?sched_id=<?= htmlspecialchars($_GET['sched_id']); ?>"
+                            class="red-btn">
+                            Attendance Information
+                        </a>
+                    <?php else: ?>
+                        <a href="#" class="red-btn" onclick="alert('No schedule ID provided'); return false;">
+                            Attendance Information
+                        </a>
+                    <?php endif; ?>
+                    <!--<button class="pass-btn" type="button">Section Information</button>-->
+                </div>
                 <div class="faculty-container-2">
                     <h1 class="info-title-2">Schedule Details</h1>
                     <hr>
@@ -249,6 +266,21 @@ if (!$schedule) {
                 </div>
             </div>
         </form>
+    </div>
+
+    <!-- Dark background overlay -->
+    <div id="modalOverlay" class="modal-overlay"></div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="custom-modal">
+        <div class="modal-content">
+            <h2>Confirm Delete</h2>
+            <p>Are you sure you want to delete this schedule?</p>
+            <div class="modal-actions">
+                <button id="confirmDelete" class="btn-confirm">Yes, Delete</button>
+                <button onclick="closeDeleteModal()" class="btn-cancel">Cancel</button>
+            </div>
+        </div>
     </div>
 
     <!-- Scroll to Top Button -->
@@ -378,13 +410,30 @@ if (!$schedule) {
         toggleFields(); // Call on page load to set correct state
     });
 </script>
-
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("rfid_no").value = "<?= $schedule['rfid_no'] ?>";
         document.getElementById("room_id").value = "<?= $schedule['room_id'] ?>";
         document.getElementById("section_id").value = "<?= $schedule['section_id'] ?>";
         document.getElementById("subject_code").value = "<?= $schedule['subject_code'] ?>";
+    });
+</script>
+<script>
+    function openDeleteModal(rfidNo) {
+        document.getElementById("deleteModal").style.display = "block"; // Show modal
+        document.getElementById("modalOverlay").style.display = "block"; // Show dark overlay
+        document.getElementById("confirmDelete").setAttribute("data-rfid", rfidNo); // Store RFID
+    }
+
+    function closeDeleteModal() {
+        document.getElementById("deleteModal").style.display = "none"; // Hide modal
+        document.getElementById("modalOverlay").style.display = "none"; // Hide dark overlay
+    }
+
+    // When "Yes, Delete" button is clicked, redirect to delete_faculty.php
+    document.getElementById("confirmDelete").addEventListener("click", function () {
+        let rfidNo = this.getAttribute("data-rfid"); // Get stored RFID
+        window.location.href = `../functions/delete-schedule.php?sched_id=${rfidNo}`; // Redirect with RFID
     });
 </script>
 

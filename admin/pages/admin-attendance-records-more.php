@@ -185,19 +185,17 @@ if ($stmt === false) {
                             $attdRef = htmlspecialchars($row['attd_ref']);
                             $rfidNo = htmlspecialchars($row['rfid_no']);
                             ?>
-                            <tr class="tbl-row">
+                            <tr class="tbl-row clickable-row"
+                                data-href="admin-update-attendance.php?attd_ref=<?= $attdRef ?>">
                                 <td class="small-text"><?= $professor ?></td>
                                 <td><?= $timeIn ?></td>
                                 <td><?= $timeOut ?></td>
                                 <td><?= $dateLogged ?></td>
-                                <td>
-                                    <!--<button class="archive-btn" data-attd-ref="<?= $attdRef ?>"
-                                        data-rfid-no="<?= $rfidNo ?>">Archive</button>-->
+                                <td class="no-click">
                                     <button class="delete-btn action-btnn delete-btn" data-attd-ref="<?= $attdRef ?>"
                                         data-rfid-no="<?= $rfidNo ?>"><i class="fas fa-trash"></i></button>
                                 </td>
-                                <td class="attendance-status <?= $statusClass ?>"><?= ucwords($statusKey) ?></td>
-                                <!-- Status at last column -->
+                                <td class="attendance-status <?= $statusClass ?> no-click"><?= ucwords($statusKey) ?></td>
                             </tr>
                         <?php endwhile; ?>
                     </tbody>
@@ -369,5 +367,30 @@ if ($stmt === false) {
         document.getElementById("deleteModal").style.display = "none";
     }
 </script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Make rows clickable
+    const rows = document.querySelectorAll('.clickable-row');
+    rows.forEach(row => {
+        row.addEventListener('click', function(e) {
+            // Check if the clicked element or its parents have the no-click class
+            if (!e.target.closest('.no-click')) {
+                window.location.href = this.dataset.href;
+            }
+        });
+    });
+});
+</script>
 
+<style>
+.clickable-row {
+    cursor: pointer;
+}
+.clickable-row:hover {
+    background-color: #f5f5f5;
+}
+.no-click {
+    cursor: default;
+}
+</style>
 </html>
