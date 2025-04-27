@@ -279,18 +279,14 @@ $attendanceData = json_encode($attendanceCounts);
                 <span class="close-appointment-modal">&times;</span>
             </div>
             <div class="modal-body1">
-
-                <label for="facultySelector">Select Faculty:</label>
-                <select id="facultySelector" name="rfid_no" class="form-select">
-                    <?php include '../functions/fetch-faculty.php'; ?>
-                </select>
-
+                
                 <label for="appointmentReportType">Select Report Type:</label>
                 <select class="form-select" id="appointmentReportType">
                     <option value="daily">Daily</option>
                     <option value="monthly">Monthly</option>
                     <option value="yearly">Yearly</option>
                     <option value="custom">Custom Date Range</option>
+                    <option value="faculty">By Faculty</option>
                 </select>
 
                 <div id="appointmentExtraFields" class="mt-3"></div> <!-- Dynamic Fields -->
@@ -408,11 +404,10 @@ $attendanceData = json_encode($attendanceCounts);
         const appointmentReportType = document.getElementById("appointmentReportType");
         const appointmentExtraFields = document.getElementById("appointmentExtraFields");
         const generateAppointmentPdf = document.getElementById("generateAppointmentPdf");
-        const facultySelector = document.getElementById("facultySelector");
 
         // Open & Close Modal
-        openAppointmentModal?.addEventListener("click", () => appointmentModal.style.display = "flex");
-        closeAppointmentModal?.addEventListener("click", () => appointmentModal.style.display = "none");
+        openAppointmentModal.addEventListener("click", () => appointmentModal.style.display = "flex");
+        closeAppointmentModal.addEventListener("click", () => appointmentModal.style.display = "none");
         window.addEventListener("click", (event) => {
             if (event.target === appointmentModal) appointmentModal.style.display = "none";
         });
@@ -428,28 +423,38 @@ $attendanceData = json_encode($attendanceCounts);
 
             } else if (selectedType === "monthly") {
                 appointmentExtraFields.innerHTML = `
-                <label>Select Month:</label>
-                <input type="month" id="appointmentReportMonth" class="form-control">
-            `;
+            <label>Select Month:</label>
+            <input type="month" id="appointmentReportMonth" class="form-control">
+        `;
                 generateAppointmentPdf.setAttribute("data-type", "monthly");
 
             } else if (selectedType === "yearly") {
                 appointmentExtraFields.innerHTML = `
-                <label>Select Year:</label>
-                <select id="appointmentReportYear" class="form-select">
-                    ${generateYearOptions()}
-                </select>
-            `;
+            <label>Select Year:</label>
+            <select id="appointmentReportYear" class="form-select">
+                ${generateYearOptions()}
+            </select>
+        `;
                 generateAppointmentPdf.setAttribute("data-type", "yearly");
 
-            } else if (selectedType === "custom") {
+            } else if (selectedType === "faculty") {
                 appointmentExtraFields.innerHTML = `
-                <label>Start Date:</label>
-                <input type="date" id="appointmentStartDate" class="form-control mb-2">
-                <label>End Date:</label>
-                <input type="date" id="appointmentEndDate" class="form-control">
-            `;
-                generateAppointmentPdf.setAttribute("data-type", "custom");
+            <label>Select Faculty:</label>
+            <select name="prof_rfid_no" id="prof_rfid_no" class="form-select">
+                <option value="" disabled selected>Loading...</option>
+            </select>`;
+                generateAppointmentPdf.setAttribute("data-type", "faculty");
+
+                // Fetch faculty data
+                fetch('../functions/fetch-faculty.php')
+                    .then(response => response.text())
+                    .then(options => {
+                        document.getElementById("prof_rfid_no").innerHTML = '<option value="" disabled selected>Select a Faculty Member</option>' + options;
+                    })
+                    .catch(error => {
+                        console.error("Error fetching faculty data:", error);
+                        document.getElementById("prof_rfid_no").innerHTML = '<option value="" disabled selected>Error loading data</option>';
+                    });
             }
         });
 
@@ -457,7 +462,7 @@ $attendanceData = json_encode($attendanceCounts);
         function generateYearOptions() {
             let currentYear = new Date().getFullYear();
             let options = '<option value="" disabled selected>Select a Year</option>';
-            for (let year = currentYear; year >= currentYear - 10; year--) {
+            for (let year = currentYear; year >= currentYear - 10; year--) { // Adjust range as needed
                 options += `<option value="${year}">${year}</option>`;
             }
             return options;
@@ -465,28 +470,23 @@ $attendanceData = json_encode($attendanceCounts);
 
         // Call the correct function based on report type
         generateAppointmentPdf.addEventListener("click", function () {
-            const facultyId = facultySelector.value;
-            if (!facultyId) {
-                showModal("Please select a faculty member.", false);
-                return;
-            }
-
             let reportType = this.getAttribute("data-type");
             if (reportType === "daily") {
-                generateAppointmentDailyReport(facultyId);
+                generateAppointmentDailyReport();
+            } else if (reportType === "faculty") {
+                generateAppointmentFacultyReport();
             } else if (reportType === "monthly") {
-                generateAppointmentMonthlyReport(facultyId);
+                generateAppointmentMonthlyReport();
             } else if (reportType === "yearly") {
-                generateAppointmentYearlyReport(facultyId);
-            } else if (reportType === "custom") {
-                generateAppointmentCustomReport(facultyId);
-            } else {
-                showModal("Please select a valid report type.", false);
+                generateAppointmentYearlyReport();
+            }
+            else {
+                alert("Please select a valid report type.");
             }
         });
 
         // ------------------------ APPOINTMENT DAILY REPORT FUNCTION ------------------------
-        function generateAppointmentDailyReport(facultyId) {
+        function generateAppointmentDailyReport() {
             const { jsPDF } = window.jspdf;
             let doc = new jsPDF();
             let dateInput = document.getElementById("appointmentReportDate")?.value;
@@ -496,9 +496,10 @@ $attendanceData = json_encode($attendanceCounts);
                 return;
             }
 
+            // Show loading state
             showModal("Generating report... Please wait.", true);
 
-            fetch(`../functions/fetch-appointment-by-date.php?date=${dateInput}&faculty=${facultyId}`)
+            fetch(`../functions/fetch-appointment-by-date.php?date=${dateInput}`)
                 .then(response => response.json())
                 .then(data => {
                     if (!data.appointments || data.appointments.length === 0) {
@@ -506,6 +507,7 @@ $attendanceData = json_encode($attendanceCounts);
                         return;
                     }
 
+                    // Format the date (e.g., March 17, 2025)
                     let formattedDate = new Date(dateInput).toLocaleDateString('en-PH', {
                         year: 'numeric',
                         month: 'long',
@@ -514,9 +516,9 @@ $attendanceData = json_encode($attendanceCounts);
 
                     addReportHeaderApt(doc, "Appointment Report", `Daily Report - ${formattedDate}`);
 
-                    // Table data
+                    // ========== APPOINTMENT TABLE ==========
                     let tableData = [
-                        ["FACULTY", "Student", "Time", "Agenda", "Status"]
+                        ["Faculty", "Student", "Time", "Agenda", "Status"]
                     ];
 
                     data.appointments.forEach(appointment => {
@@ -540,130 +542,129 @@ $attendanceData = json_encode($attendanceCounts);
                             textColor: [0, 0, 0],
                             fontStyle: 'bold',
                             halign: 'left',
-                            lineWidth: 0.2,
-                            lineColor: [0, 0, 0]  // Black border for header
+                            lineWidth: 0.1,
+                            lineColor: [0, 0, 0]
+                        },
+                        bodyStyles: {
+                            textColor: [0, 0, 0],
+                            lineWidth: 0.1,
+                            lineColor: [0, 0, 0]
+                        },
+                        styles: {
+                            fontSize: 8.5
+                        }
+                    });
+
+                    let currentY = doc.autoTable.previous.finalY + 2;
+
+                    // ========== AGENDA AND STATUS SUMMARY (Side-by-side) ==========
+                    let agendaCounts = data.agendaCounts || {};
+                    let statusCounts = data.statusCounts || {};
+
+                    const summaryTable = {
+                        startY: currentY,
+                        head: [["Agenda Summary", " ", "Status Summary", " "]],
+                        body: [],
+                        theme: 'grid',
+                        headStyles: {
+                            fillColor: [240, 240, 240],
+                            textColor: [0, 0, 0],
+                            fontStyle: 'bold',
+                            halign: 'left',
+                            lineWidth: 0.1,
+                            lineColor: [0, 0, 0]
+                        },
+                        styles: {
+                            fontSize: 9
                         },
                         bodyStyles: {
                             fillColor: [255, 255, 255],
                             textColor: [0, 0, 0],
-                            halign: 'left',
-                            lineWidth: 0.2,
-                            lineColor: [0, 0, 0]  // Black border for body
-                        },
-                        styles: {
-                            fontSize: 8.5,
-                            lineColor: [0, 0, 0]  // Ensures all other lines are black too
-                        },
-                        tableLineColor: [0, 0, 0],  // Main table borders
-                        tableLineWidth: 0.2         // Border width
-                    });
-                    let currentY = doc.autoTable.previous.finalY + 15;
+                            fontStyle: 'normal',
+                            lineWidth: 0.1,
+                            lineColor: [0, 0, 0],
+                            halign: 'right'
+                        }
+                    };
 
-                    // Status Summary Table
-                    if (data.statusCounts && data.statusCounts.length > 0) {
-                        doc.setFontSize(11);
-                        doc.setFont("helvetica", "bold");
-                        doc.text("Status Summary", 14, currentY);
-                        currentY += 7;
+                    const maxRows = Math.max(Object.keys(agendaCounts).length, Object.keys(statusCounts).length);
 
-                        let statusTableData = [["Status", "Count"]];
-                        data.statusCounts.forEach(item => {
-                            statusTableData.push([item.status, item.count]);
-                        });
+                    for (let i = 0; i < maxRows; i++) {
+                        const agendaKey = Object.keys(agendaCounts)[i] || "";
+                        const agendaVal = agendaKey ? agendaCounts[agendaKey] : "";
+
+                        const statusKey = Object.keys(statusCounts)[i] || "";
+                        const statusVal = statusKey ? statusCounts[statusKey] : "";
+
+                        summaryTable.body.push([
+                            agendaKey, agendaVal?.toString() || "",
+                            statusKey, statusVal?.toString() || ""
+                        ]);
+                    }
+
+                    doc.autoTable(summaryTable);
+
+                    currentY = doc.autoTable.previous.finalY + 2;
+
+                    // ========== TOP FACULTY WITH MOST COMPLETED APPOINTMENTS ==========
+                    if (data.topCompletedFaculty && data.topCompletedFaculty.length > 0) {
+                        const facultyTableData = data.topCompletedFaculty.map(name => [name]);
+
                         doc.autoTable({
                             startY: currentY,
-                            head: [statusTableData[0]],  // Header row
-                            body: statusTableData.slice(1),  // Data rows
-                            theme: "grid",
+                            head: [["Faculty with Most Completed Appointments"]],
+                            body: facultyTableData,
+                            theme: 'grid',
+                            styles: { fontSize: 9 },
                             headStyles: {
                                 fillColor: [240, 240, 240],
                                 textColor: [0, 0, 0],
                                 fontStyle: 'bold',
-                                halign: 'left',
-                                lineWidth: 0.2,
-                                lineColor: [0, 0, 0]  // Black border for header
+                                halign: 'right',
+                                lineWidth: 0.1,
+                                lineColor: [0, 0, 0]
                             },
                             bodyStyles: {
-                                fillColor: [255, 255, 255],  // White background
-                                textColor: [0, 0, 0],        // Black text
-                                halign: 'left',               // Left-aligned
-                                lineWidth: 0.2,               // Border width
-                                lineColor: [0, 0, 0]          // Black border for body
-                            },
-                            styles: {
-                                fontSize: 8.5,                // Consistent font size
-                                lineColor: [0, 0, 0]          // Black lines everywhere
-                            },
-                            columnStyles: {
-                                0: { cellWidth: 60 },  // Status column width
-                                1: { cellWidth: 30 }   // Count column width
-                            }
-                        });
-                        currentY = doc.autoTable.previous.finalY + 15;
-                    }
-
-                    // Agenda Summary Table
-                    if (data.agendaCounts && data.agendaCounts.length > 0) {
-                        doc.setFontSize(11);
-                        doc.setFont("helvetica", "bold");
-                        doc.text("Agenda Summary", 14, currentY);
-                        currentY += 7;
-
-                        let agendaTableData = [["Agenda", "Count"]];
-                        data.agendaCounts.forEach(item => {
-                            agendaTableData.push([item.agenda, item.count]);
-                        });
-
-                        doc.autoTable({
-                            startY: currentY,
-                            head: [agendaTableData[0]],  // Header row
-                            body: agendaTableData.slice(1),  // Data rows
-                            theme: "grid",
-                            headStyles: {
-                                fillColor: [240, 240, 240],
                                 textColor: [0, 0, 0],
                                 fontStyle: 'bold',
-                                halign: 'left',
-                                lineWidth: 0.2,
-                                lineColor: [0, 0, 0]  // Black border for header
-                            },
-                            bodyStyles: {
-                                fillColor: [255, 255, 255],  // White background
-                                textColor: [0, 0, 0],        // Black text
-                                halign: 'left',               // Left-aligned
-                                lineWidth: 0.2,               // Border width
-                                lineColor: [0, 0, 0]          // Black border for body
-                            },
-                            styles: {
-                                fontSize: 8.5,                // Consistent font size
-                                lineColor: [0, 0, 0]          // Black lines everywhere
-                            },
-                            columnStyles: {
-                                0: { cellWidth: 100 },  // Agenda column (wider)
-                                1: { cellWidth: 30 }    // Count column
+                                lineWidth: 0.1,
+                                lineColor: [0, 0, 0],
+                                fillColor: [255, 255, 255],
+                                fontStyle: 'normal',
+                                halign: 'right'
                             }
                         });
-                        currentY = doc.autoTable.previous.finalY + 10;
+
+                        currentY = doc.autoTable.previous.finalY + 3;
                     }
 
-                    // Add Grand Total after the summary tables
-                    doc.setFontSize(11);
+                    // ========== FOOTER (Prepared By) ==========
+                    const footerHeight = 30; // estimated height needed for the footer
+                    const pageHeight = doc.internal.pageSize.height;
+                    let footerY = currentY + 10;
+
+                    if (footerY + footerHeight > pageHeight) {
+                        doc.addPage();
+                        footerY = 20; // top margin of new page
+                    }
+
+                    doc.text("Prepared by:", 15, footerY);
                     doc.setFont("helvetica", "bold");
-                    doc.text(`Total Appointments: ${data.grandTotal || 0}`, 14, currentY);
-                    currentY += 10;
+                    doc.text("HAROLD R. LUCERO, MIT", 15, footerY + 10);
+                    doc.setFont("helvetica", "normal");
+                    doc.line(15, footerY + 11, 75, footerY + 11);
+                    doc.text("Dean", 15, footerY + 17);
 
-                    // Add footer
-                    addReportFooter(doc, currentY);
-
+                    addPageNumbers(doc);
                     // Save PDF
                     const fileName = `Appointment_Daily_Report_${dateInput}.pdf`;
                     doc.save(fileName);
 
+                    // Show success message
                     showModal(
-                        `<strong style='color: #333; font-weight: 600;'>Appointment Report Generated Successfully!</strong>
-                <br><br>Daily report for <i>${formattedDate}</i> has been DOWNLOADED.
-                <br><br>Total Appointments: <strong>${data.grandTotal || 0}</strong>
-                <br><br>File: <code>${fileName}</code>`,
+                        "<strong style='color: #333; font-weight: 600;'>Appointment Report Generated Successfully!</strong>" +
+                        "<br><br>Daily report for <i>" + formattedDate + "</i> has been DOWNLOADED." +
+                        "<br><br>File: <code>" + fileName + "</code>",
                         true
                     );
                 })
@@ -673,47 +674,52 @@ $attendanceData = json_encode($attendanceCounts);
                 });
         }
 
+        function showModal(message, isSuccess) {
+            const modal = document.getElementById("exportModal");
+            const modalMessage = document.getElementById("exportModalMessage");
+
+            // Clear any existing timeout to prevent multiple timers running
+            if (modal.timeoutId) {
+                clearTimeout(modal.timeoutId);
+            }
+
+            // Set the modal content and display it
+            modalMessage.innerHTML = message;
+            modal.style.display = "block";
+            modalMessage.style.color = isSuccess ? "#333" : "#F44336";
+
+            // Auto-hide after 5 seconds
+            modal.timeoutId = setTimeout(() => {
+                modal.style.display = "none";
+            }, 5000); // 5000 milliseconds = 5 seconds
+
+            // Still allow manual closing
+            const closeBtn = document.querySelector(".close-modal-1");
+            if (closeBtn) {
+                closeBtn.onclick = () => {
+                    clearTimeout(modal.timeoutId);
+                    modal.style.display = "none";
+                };
+            }
+        }
         // ------------------------ APPOINTMENT MONTHLY REPORT FUNCTION ------------------------
-        function generateAppointmentMonthlyReport(facultyId) {
+        function generateAppointmentMonthlyReport() {
             const { jsPDF } = window.jspdf;
             let doc = new jsPDF();
-
-            // Get input values
             let selectedMonth = document.getElementById("appointmentReportMonth")?.value;
-            let facultyName = facultySelector?.options[facultySelector?.selectedIndex]?.text || "All Faculty";
 
-            // Validate inputs
             if (!selectedMonth) {
-                showModal("Please select a month.", false);
-                return;
-            }
-            if (!facultyId) {
-                showModal("Please select a faculty member.", false);
+                alert("Please select a month.");
                 return;
             }
 
-            // Extract year and month
-            const [selectedYear, selectedMonthOnly] = selectedMonth.split("-");
-            if (!selectedYear || !selectedMonthOnly) {
-                showModal("Invalid month format. Expected format: YYYY-MM", false);
-                return;
-            }
-
-            showModal(`Generating monthly report for ${facultyName}...`, true);
-
-            fetch(`../functions/fetch-appointment-by-month.php?month=${selectedMonth}&faculty=${facultyId}`)
+            fetch(`../functions/fetch-appointment-by-month.php?month=${selectedMonth}`)
                 .then(response => response.json())
                 .then(data => {
                     if (!data.appointments || data.appointments.length === 0) {
-                        showModal(`No appointments found for ${facultyName} in the selected month.`, false);
+                        alert("No appointments found for this month.");
                         return;
                     }
-
-                    // Format month display
-                    const formattedMonth = new Date(selectedYear, selectedMonthOnly - 1).toLocaleDateString('en-PH', {
-                        month: 'long',
-                        year: 'numeric'
-                    });
 
                     // Group appointments by date
                     let groupedAppointments = {};
@@ -725,237 +731,109 @@ $attendanceData = json_encode($attendanceCounts);
                         groupedAppointments[date].push(appointment);
                     });
 
-                    // Main report pages
-                    let currentY = 65; // Initial Y position for first page
-                    let pageCount = 1;
+                    let y = 65; // Initial Y position for content
 
-                    // Add header only to first page
-                    const reportTitle = `Monthly Report - ${formattedMonth} (${facultyName})`;
-                    addReportHeaderApt(doc, "Appointment Report", reportTitle);
+                    Object.keys(groupedAppointments).forEach((date, index) => {
+                        let y = 20; // Reset Y position at the top
 
-                    // First process all daily appointment tables
-                    Object.keys(groupedAppointments).forEach((date) => {
-                        // Check if we need a new page before adding content
-                        const estimatedHeight = 10 + (groupedAppointments[date].length * 8);
-                        if (currentY + estimatedHeight > doc.internal.pageSize.height - 20) {
+                        // Only add a new page for subsequent dates, not the first one
+                        if (index > 0) {
                             doc.addPage();
-                            currentY = 20;
-                            pageCount++;
                         }
 
-                        // Date header
-                        doc.setFontSize(11);
-                        doc.setFont("helvetica", "bold");
-                        doc.text(`Appointments for ${date}`, 14, currentY);
-                        currentY += 7;
+                        // Add report header only on the first page
+                        if (index === 0) {
+                            addReportHeader(doc, `Monthly Appointment Report - ${selectedMonth}`);
+                            y = 65; // Adjust y to avoid overlapping the header
+                        }
 
-                        // Table data - using initials for student names
+                        // Title for the day's appointments
+                        doc.setFontSize(12);
+                        doc.setFont("helvetica", "bold");
+                        doc.text(`Appointments for ${date}`, 14, y);
+                        doc.setFontSize(10);
+                        y += 10; // Space after title
+
                         let tableData = [
-                            ["Student", "Time", "Agenda", "Status"]
+                            ["Code", "Faculty", "Student", "Start", "End", "Agenda", "Status"]
                         ];
 
                         groupedAppointments[date].forEach(appointment => {
-                            // Format student name as "J. Diocena"
-                            const studentName = appointment.stud_fname && appointment.stud_lname
-                                ? `${appointment.stud_fname.substring(0, 1)}. ${appointment.stud_lname}`
-                                : "N/A";
-
                             tableData.push([
-                                studentName,
-                                `${formatTime(appointment.start_time)} - ${formatTime(appointment.end_time)}`,
+                                appointment.appointment_code || "N/A",
+                                `${appointment.fname || ""} ${appointment.lname || ""}`.trim(),
+                                `${appointment.stud_fname || ""} ${appointment.stud_lname || ""}`.trim(),
+                                formatTime(appointment.start_time),
+                                formatTime(appointment.end_time),
                                 appointment.agenda || "N/A",
                                 appointment.status || "N/A"
                             ]);
                         });
 
-                        // Main table with optimized column widths
+                        // Generate table
                         doc.autoTable({
-                            startY: currentY,
+                            startY: y,
                             head: [tableData[0]],
                             body: tableData.slice(1),
                             theme: "grid",
-                            headStyles: {
-                                fillColor: [240, 240, 240],
-                                textColor: [0, 0, 0],
-                                fontStyle: 'bold',
-                                halign: 'left',
-                                lineWidth: 0.2,
-                                lineColor: [0, 0, 0]
-                            },
-                            bodyStyles: {
-                                fillColor: [255, 255, 255],
-                                textColor: [0, 0, 0],
-                                halign: 'left',
-                                lineWidth: 0.2,
-                                lineColor: [0, 0, 0]
-                            },
-                            styles: {
-                                fontSize: 8.5,
-                                lineColor: [0, 0, 0]
-                            },
-                            tableLineColor: [0, 0, 0],
-                            tableLineWidth: 0.2,
-                            margin: { left: 15, right: 15 },
-                            columnStyles: {
-                                0: { cellWidth: 30 },  // Student (initials)
-                                1: { cellWidth: 'auto' },  // Time (now fits in one line)
-                                2: { cellWidth: 60 },  // Agenda
-                                3: { cellWidth: 25 }   // Status
-                            },
-                            pageBreak: 'avoid'
+                            styles: { fontSize: 7 },
+                            margin: { bottom: 10 }
                         });
 
-                        currentY = doc.autoTable.previous.finalY + 10;
-                        addPageNumbers(doc, pageCount);
+                        y = doc.lastAutoTable.finalY + 10; // Ensure spacing after table
                     });
 
-                    // [Rest of the code remains exactly the same...]
-                    // Now add the summary section after all daily tables
-                    // Check if we need a new page for the summary
-                    if (currentY > doc.internal.pageSize.height - 100) {
-                        doc.addPage();
-                        currentY = 20;
-                        pageCount++;
-                    }
-
-                    // Summary title
-                    doc.setFontSize(11);
+                    // Add Summary Section on a new page
+                    doc.addPage();
+                    y = 20;
+                    doc.setFontSize(12);
                     doc.setFont("helvetica", "bold");
-                    doc.text("Monthly Summary", 14, currentY);
-                    currentY += 10;
+                    doc.text("Appointment Status Count", 14, y);
+                    doc.setFont("helvetica", "normal");
+                    y += 8;
+                    Object.entries(data.statusCounts).forEach(([status, count]) => {
+                        doc.text(`${status}: ${count}`, 20, y);
+                        y += 6;
+                    });
 
-                    // Status Summary Table
-                    if (data.statusCounts && data.statusCounts.length > 0) {
-                        doc.setFontSize(11);
-                        doc.setFont("helvetica", "bold");
-                        doc.text("Status Summary", 14, currentY);
-                        currentY += 7;
+                    y += 12; // Space before next section
 
-                        let statusTableData = [["Status", "Count"]];
-                        data.statusCounts.forEach(item => {
-                            statusTableData.push([item.status, item.count]);
-                        });
-
-                        doc.autoTable({
-                            startY: currentY,
-                            head: [statusTableData[0]],
-                            body: statusTableData.slice(1),
-                            theme: "grid",
-                            headStyles: {
-                                fillColor: [240, 240, 240],
-                                textColor: [0, 0, 0],
-                                fontStyle: 'bold',
-                                halign: 'left',
-                                lineWidth: 0.2,
-                                lineColor: [0, 0, 0]
-                            },
-                            bodyStyles: {
-                                fillColor: [255, 255, 255],
-                                textColor: [0, 0, 0],
-                                halign: 'left',
-                                lineWidth: 0.2,
-                                lineColor: [0, 0, 0]
-                            },
-                            styles: {
-                                fontSize: 8.5,
-                                lineColor: [0, 0, 0]
-                            },
-                            columnStyles: {
-                                0: { cellWidth: 60 },
-                                1: { cellWidth: 30 }
-                            }
-                        });
-                        currentY = doc.autoTable.previous.finalY + 15;
-                    }
-
-                    // Agenda Summary Table
-                    if (data.agendaCounts && data.agendaCounts.length > 0) {
-                        doc.setFontSize(11);
-                        doc.setFont("helvetica", "bold");
-                        doc.text("Agenda Summary", 14, currentY);
-                        currentY += 7;
-
-                        let agendaTableData = [["Agenda", "Count"]];
-                        data.agendaCounts.forEach(item => {
-                            agendaTableData.push([item.agenda, item.count]);
-                        });
-
-                        doc.autoTable({
-                            startY: currentY,
-                            head: [agendaTableData[0]],
-                            body: agendaTableData.slice(1),
-                            theme: "grid",
-                            headStyles: {
-                                fillColor: [240, 240, 240],
-                                textColor: [0, 0, 0],
-                                fontStyle: 'bold',
-                                halign: 'left',
-                                lineWidth: 0.2,
-                                lineColor: [0, 0, 0]
-                            },
-                            bodyStyles: {
-                                fillColor: [255, 255, 255],
-                                textColor: [0, 0, 0],
-                                halign: 'left',
-                                lineWidth: 0.2,
-                                lineColor: [0, 0, 0]
-                            },
-                            styles: {
-                                fontSize: 8.5,
-                                lineColor: [0, 0, 0]
-                            },
-                            columnStyles: {
-                                0: { cellWidth: 100 },
-                                1: { cellWidth: 30 }
-                            }
-                        });
-                        currentY = doc.autoTable.previous.finalY + 15;
-                    }
-
-                    // Grand Total
-                    doc.setFontSize(11);
+                    doc.setFontSize(12);
                     doc.setFont("helvetica", "bold");
-                    doc.text(`Total Appointments: ${data.grandTotal || 0}`, 14, currentY);
-                    currentY += 10;
+                    doc.text("Appointment Agenda Count", 14, y);
+                    doc.setFont("helvetica", "normal");
+                    y += 8;
+                    Object.entries(data.agendaCounts).forEach(([agenda, count]) => {
+                        doc.text(`${agenda}: ${count}`, 20, y);
+                        y += 6;
+                    });
 
-                    // Add footer
-                    addReportFooter(doc, currentY);
-
-                    // Save PDF
-                    const fileName = `Appointments_${selectedMonth}_${facultyName.replace(/\s+/g, '_')}.pdf`;
-                    doc.save(fileName);
-
-                    showModal(
-                        `<strong style="color:#333;font-weight:600">Report Generated!</strong><br>
-                ${formattedMonth} (${facultyName})<br>
-                Total: <strong>${data.grandTotal || 0}</strong> appointments<br>
-                <code>${fileName}</code>`,
-                        true
-                    );
+                    addPageNumbers(doc);
+                    doc.save(`Monthly_Appointment_Report_${selectedMonth}.pdf`);
                 })
                 .catch(error => {
-                    console.error("Error:", error);
-                    showModal("Error generating report. Please try again.", false);
+                    console.error("Error fetching data:", error);
+                    alert("Error generating monthly report.");
                 });
         }
+
         // ------------------------ YEARLY APPOINTMENT REPORT FUNCTION ------------------------
-        function generateAppointmentYearlyReport(facultyId) {
+
+        function generateAppointmentYearlyReport() {
             const { jsPDF } = window.jspdf;
             let doc = new jsPDF();
             let selectedYear = document.getElementById("appointmentReportYear")?.value;
 
             if (!selectedYear) {
-                showModal("Please select a year.", false);
+                alert("Please select a year.");
                 return;
             }
 
-            showModal("Generating yearly report... Please wait.", true);
-
-            fetch(`../functions/fetch-appointment-by-year.php?year=${selectedYear}&faculty=${facultyId}`)
+            fetch(`../functions/fetch-appointment-by-year.php?year=${selectedYear}`)
                 .then(response => response.json())
                 .then(data => {
                     if (!data.appointments || data.appointments.length === 0) {
-                        showModal("No appointments found for this year.", false);
+                        alert("No appointments found for this year.");
                         return;
                     }
 
@@ -969,306 +847,362 @@ $attendanceData = json_encode($attendanceCounts);
                         groupedAppointments[month].push(appointment);
                     });
 
-                    let firstPage = true;
+                    let y = 65;
+                    addReportHeader(doc, `Yearly Appointment Report - ${selectedYear}`);
+
                     Object.keys(groupedAppointments).forEach((month, index) => {
+                        let y = index === 0 ? 65 : 20; // ✅ First page: 65, Others: 20
                         if (index > 0) {
                             doc.addPage();
-                            firstPage = false;
                         }
 
-                        if (firstPage) {
-                            addReportHeaderApt(doc, "Appointment Report", `Yearly Report - ${selectedYear}`);
-                        }
-
-                        let y = firstPage ? 65 : 20;
-                        firstPage = false;
-
-                        // Month header
                         doc.setFontSize(12);
                         doc.setFont("helvetica", "bold");
                         doc.text(`Appointments for ${month}`, 14, y);
-                        y += 7;
+                        doc.setFontSize(10);
+                        y += 10;
 
-                        // Table data
                         let tableData = [
-                            ["Code", "Student", "Time", "Agenda", "Status"]
+                            ["Code", "Faculty", "Student", "Start", "End", "Agenda", "Status"]
                         ];
 
                         groupedAppointments[month].forEach(appointment => {
                             tableData.push([
                                 appointment.appointment_code || "N/A",
+                                `${appointment.prof_fname || ""} ${appointment.prof_lname || ""}`.trim(), // ✅ Updated faculty name
                                 `${appointment.stud_fname || ""} ${appointment.stud_lname || ""}`.trim(),
-                                `${formatTime(appointment.start_time)} - ${formatTime(appointment.end_time)}`,
+                                formatTime(appointment.start_time),
+                                formatTime(appointment.end_time),
                                 appointment.agenda || "N/A",
                                 appointment.status || "N/A"
                             ]);
                         });
 
-                        // Generate table
                         doc.autoTable({
                             startY: y,
                             head: [tableData[0]],
                             body: tableData.slice(1),
                             theme: "grid",
-                            styles: { fontSize: 8 }
+                            styles: { fontSize: 7 },
+                            margin: { bottom: 20 }, // Ensure space for footer
+                            didParseCell: function (data) {
+                                if ([0, 3, 4, 5, 6].includes(data.column.index)) {
+                                    data.cell.styles.fontSize = 7;
+                                }
+                            }
                         });
 
-                        y = doc.autoTable.previous.finalY + 5;
-
-                        // Add page numbers after each page
-                        addPageNumbers(doc);
                     });
 
-                    // Add summary page
+                    // Add Summary Section
                     doc.addPage();
-                    addReportHeaderApt(doc, "Appointment Report", `Yearly Summary - ${selectedYear}`);
-
-                    let y = 65;
+                    y = 20;
                     doc.setFontSize(12);
                     doc.setFont("helvetica", "bold");
-                    doc.text("Appointment Statistics", 14, y);
-                    y += 10;
+                    doc.text("Appointment Status Count", 14, y);
+                    doc.setFont("helvetica", "normal");
+                    y += 8;
+                    Object.entries(data.statusCounts).forEach(([status, count]) => {
+                        doc.text(`${status}: ${count}`, 20, y);
+                        y += 6;
+                    });
 
-                    // Status counts
-                    if (data.statusCounts) {
-                        doc.setFontSize(11);
-                        doc.text("Status Summary:", 14, y);
-                        y += 7;
+                    y += 12;
+                    doc.setFontSize(12);
+                    doc.setFont("helvetica", "bold");
+                    doc.text("Appointment Agenda Count", 14, y);
+                    doc.setFont("helvetica", "normal");
+                    y += 8;
+                    Object.entries(data.agendaCounts).forEach(([agenda, count]) => {
+                        doc.text(`${agenda}: ${count}`, 20, y);
+                        y += 6;
+                    });
 
-                        Object.entries(data.statusCounts).forEach(([status, count]) => {
-                            doc.text(`• ${status}: ${count}`, 20, y);
-                            y += 7;
-                        });
-                        y += 5;
-                    }
-
-                    // Agenda counts
-                    if (data.agendaCounts) {
-                        doc.setFontSize(11);
-                        doc.text("Agenda Summary:", 14, y);
-                        y += 7;
-
-                        Object.entries(data.agendaCounts).forEach(([agenda, count]) => {
-                            doc.text(`• ${agenda}: ${count}`, 20, y);
-                            y += 7;
-                        });
-                        y += 5;
-                    }
-
-                    // Total appointments
-                    doc.setFontSize(11);
-                    doc.text(`Total Appointments: ${data.appointments.length}`, 14, y);
-
-                    // Add footer
-                    addReportFooter(doc, y + 15);
-
-                    // Save PDF
-                    const fileName = `Yearly_Appointment_Report_${selectedYear}.pdf`;
-                    doc.save(fileName);
-
-                    showModal(
-                        `<strong style="color:#333;font-weight:600">Yearly Report Generated!</strong><br>
-                    Report for year <i>${selectedYear}</i> has been downloaded.<br>
-                    <code>${fileName}</code>`,
-                        true
-                    );
+                    addPageNumbers(doc);
+                    doc.save(`Yearly_Appointment_Report_${selectedYear}.pdf`);
                 })
                 .catch(error => {
                     console.error("Error fetching data:", error);
-                    showModal("Error generating yearly report. Please try again.", false);
+                    alert("Error generating yearly report.");
                 });
         }
 
-        // ------------------------ CUSTOM DATE RANGE REPORT FUNCTION ------------------------
-        function generateAppointmentCustomReport(facultyId) {
+        // ------------------------ APPOINTMENT FACULTY REPORT FUNCTION ------------------------
+        function generateAppointmentFacultyReport() {
+            // Get modal elements
+            const modal = document.getElementById("exportModal");
+            const modalMessage = document.getElementById("exportModalMessage");
+            const closeBtn = document.querySelector(".close-modal-1");
+
+            // Modal control functions
+            function showModal(message, isSuccess) {
+                // Clear any existing timeout
+                if (modal.timeoutId) clearTimeout(modal.timeoutId);
+
+                modalMessage.innerHTML = message;
+                modal.style.display = "block";
+                modalMessage.style.color = isSuccess ? "#333" : "#F44336";
+
+                // Auto-close after 5 seconds
+                modal.timeoutId = setTimeout(() => {
+                    modal.style.display = "none";
+                }, 5000);
+            }
+
+            function closeModal() {
+                if (modal.timeoutId) clearTimeout(modal.timeoutId);
+                modal.style.display = "none";
+            }
+
+            // Set up event listeners
+            closeBtn?.addEventListener("click", closeModal);
+            modal?.addEventListener("click", (e) => e.target === modal && closeModal());
             const { jsPDF } = window.jspdf;
             let doc = new jsPDF();
-            let startDate = document.getElementById("appointmentStartDate")?.value;
-            let endDate = document.getElementById("appointmentEndDate")?.value;
+            let facultyId = document.getElementById("prof_rfid_no")?.value;
 
-            if (!startDate || !endDate) {
-                showModal("Please select both start and end dates.", false);
+            if (!facultyId) {
+                alert("Please select a faculty member.");
                 return;
             }
 
-            if (new Date(startDate) > new Date(endDate)) {
-                showModal("Start date must be before end date.", false);
-                return;
-            }
-
-            showModal("Generating custom report... Please wait.", true);
-
-            fetch(`../functions/fetch-appointment-by-range.php?start=${startDate}&end=${endDate}&faculty=${facultyId}`)
+            fetch(`../functions/fetch-appointment-by-faculty.php?faculty=${facultyId}`)
                 .then(response => response.json())
                 .then(data => {
                     if (!data.appointments || data.appointments.length === 0) {
-                        showModal("No appointments found for this date range.", false);
+                        alert("No appointments found for this faculty.");
                         return;
                     }
 
-                    // Format dates for display
-                    const formattedStart = new Date(startDate).toLocaleDateString('en-PH', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    });
-                    const formattedEnd = new Date(endDate).toLocaleDateString('en-PH', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    });
+                    let facultyName = `${data.faculty.fname} ${data.faculty.lname}`;
+                    addReportHeaderApt(doc, "Appointment Report", `Faculty - ${facultyName}`);
 
-                    addReportHeaderApt(doc, "Appointment Report", `Custom Report - ${formattedStart} to ${formattedEnd}`);
-
-                    // Group appointments by date
-                    let groupedAppointments = {};
+                    // Group appointments by month
+                    const appointmentsByMonth = {};
                     data.appointments.forEach(appointment => {
-                        let date = appointment.date_logged;
-                        if (!groupedAppointments[date]) {
-                            groupedAppointments[date] = [];
+                        const date = new Date(appointment.date_logged);
+                        const monthYear = `${date.toLocaleString('default', { month: 'long', year: 'numeric' })} Appointments`;
+                        if (!appointmentsByMonth[monthYear]) {
+                            appointmentsByMonth[monthYear] = [];
                         }
-                        groupedAppointments[date].push(appointment);
+                        appointmentsByMonth[monthYear].push(appointment);
                     });
 
-                    let firstPage = true;
-                    Object.keys(groupedAppointments).forEach((date, index) => {
-                        if (index > 0) {
+                    let currentY = 68;
+
+                    // Loop through each month and generate a table
+                    for (const month in appointmentsByMonth) {
+                        if (currentY > 250) {
                             doc.addPage();
-                            firstPage = false;
+                            currentY = 20;
                         }
 
-                        let y = firstPage ? 65 : 20;
-                        firstPage = false;
-
-                        // Date header
-                        doc.setFontSize(12);
                         doc.setFont("helvetica", "bold");
-                        doc.text(`Appointments for ${date}`, 14, y);
-                        y += 7;
+                        doc.setFontSize(10);
+                        doc.text(month, 15, currentY);
+                        currentY += 5;
 
-                        // Table data
                         let tableData = [
-                            ["Code", "Student", "Time", "Agenda", "Status"]
+                            ["Date", "Student", "Time", "Agenda", "Status"]
                         ];
 
-                        groupedAppointments[date].forEach(appointment => {
+                        appointmentsByMonth[month].forEach(appointment => {
+                            let timeRange = `${formatTime(appointment.start_time)} - ${formatTime(appointment.end_time)}`;
                             tableData.push([
-                                appointment.appointment_code || "N/A",
+                                appointment.date_logged || "N/A",
                                 `${appointment.stud_fname || ""} ${appointment.stud_lname || ""}`.trim(),
-                                `${formatTime(appointment.start_time)} - ${formatTime(appointment.end_time)}`,
+                                timeRange,
                                 appointment.agenda || "N/A",
                                 appointment.status || "N/A"
                             ]);
                         });
 
-                        // Generate table
                         doc.autoTable({
-                            startY: y,
+                            startY: currentY,
                             head: [tableData[0]],
                             body: tableData.slice(1),
                             theme: "grid",
-                            styles: { fontSize: 8 }
+                            headStyles: {
+                                fillColor: [240, 240, 240],
+                                textColor: [0, 0, 0],
+                                fontStyle: 'bold',
+                                halign: 'left',
+                                lineWidth: 0.1,
+                                lineColor: [0, 0, 0]
+                            },
+                            bodyStyles: {
+                                textColor: [0, 0, 0],
+                                lineWidth: 0.1,
+                                lineColor: [0, 0, 0]
+                            },
+                            styles: {
+                                fontSize: 8.5
+                            }
                         });
 
-                        y = doc.autoTable.previous.finalY + 5;
+                        currentY = doc.autoTable.previous.finalY + 10;
+                    }
 
-                        // Add page numbers after each page
-                        addPageNumbers(doc);
+                    // ========== AGENDA AND STATUS SUMMARY ==========
+                    if (currentY > 240) {
+                        doc.addPage();
+                        currentY = 20;
+                    }
+
+                    let agendaCounts = data.agendaCounts || {};
+                    let statusCounts = data.statusCounts || {};
+
+                    const summaryTable = {
+                        startY: currentY,
+                        head: [["Agenda Summary", " ", "Status Summary", " "]],
+                        body: [],
+                        theme: 'grid',
+                        headStyles: {
+                            fillColor: [240, 240, 240],
+                            textColor: [0, 0, 0],
+                            fontStyle: 'bold',
+                            halign: 'right',
+                            lineWidth: 0.1,
+                            lineColor: [0, 0, 0]
+                        },
+                        styles: {
+                            fontSize: 9
+                        },
+                        bodyStyles: {
+                            fillColor: [255, 255, 255],
+                            textColor: [0, 0, 0],
+                            fontStyle: 'normal',
+                            lineWidth: 0.1,
+                            lineColor: [0, 0, 0],
+                            halign: 'right'
+                        }
+                    };
+
+                    const maxRows = Math.max(Object.keys(agendaCounts).length, Object.keys(statusCounts).length);
+
+                    for (let i = 0; i < maxRows; i++) {
+                        const agendaKey = Object.keys(agendaCounts)[i] || "";
+                        const agendaVal = agendaKey ? agendaCounts[agendaKey] : "";
+
+                        const statusKey = Object.keys(statusCounts)[i] || "";
+                        const statusVal = statusKey ? statusCounts[statusKey] : "";
+
+                        summaryTable.body.push([
+                            agendaKey, agendaVal?.toString() || "",
+                            statusKey, statusVal?.toString() || ""
+                        ]);
+                    }
+
+                    doc.autoTable(summaryTable);
+                    currentY = doc.autoTable.previous.finalY + 5;
+
+                    // ========== RATING SUMMARY ==========
+                    const ratingAverage = data.ratings?.average;
+                    const ratingCount = data.ratings?.count;
+
+                    if (currentY > 240) {
+                        doc.addPage();
+                        currentY = 20;
+                    }
+
+                    doc.autoTable({
+                        startY: currentY,
+                        head: [["Rating Summary"]],
+                        body: [
+                            ["Total Ratings Given: " + (ratingCount ?? "0")],
+                            ["Average Rating: " + (ratingAverage !== null && ratingAverage !== undefined ? ratingAverage.toFixed(2) : "No ratings yet")]
+                        ],
+                        theme: 'grid',
+                        headStyles: {
+                            fillColor: [240, 240, 240],
+                            textColor: [0, 0, 0],
+                            fontStyle: 'bold',
+                            halign: 'left',
+                            lineWidth: 0.1,
+                            lineColor: [0, 0, 0]
+                        },
+                        bodyStyles: {
+                            fillColor: [255, 255, 255],
+                            textColor: [0, 0, 0],
+                            halign: 'left',
+                            lineWidth: 0.1,
+                            lineColor: [0, 0, 0],
+                            fontSize: 9
+                        },
+                        styles: {
+                            fontSize: 9,
+                        }
                     });
 
-                    // Add summary page
-                    doc.addPage();
-                    addReportHeaderApt(doc, "Appointment Report", `Summary - ${formattedStart} to ${formattedEnd}`);
+                    currentY = doc.autoTable.previous.finalY + 5;
 
-                    let y = 65;
-                    doc.setFontSize(12);
+                    // ========== FOOTER (Prepared By) ==========
+                    const footerHeight = 30;
+                    const pageHeight = doc.internal.pageSize.height;
+                    let footerY = currentY + 10;
+
+                    if (footerY + footerHeight > pageHeight) {
+                        doc.addPage();
+                        footerY = 20;
+                    }
+
+                    doc.text("Prepared by:", 15, footerY);
                     doc.setFont("helvetica", "bold");
-                    doc.text("Appointment Statistics", 14, y);
-                    y += 10;
+                    doc.text("HAROLD R. LUCERO, MIT", 15, footerY + 10);
+                    doc.setFont("helvetica", "normal");
+                    doc.line(15, footerY + 11, 75, footerY + 11);
+                    doc.text("Dean", 15, footerY + 17);
 
-                    // Status counts
-                    if (data.statusCounts) {
-                        doc.setFontSize(11);
-                        doc.text("Status Summary:", 14, y);
-                        y += 7;
-
-                        Object.entries(data.statusCounts).forEach(([status, count]) => {
-                            doc.text(`• ${status}: ${count}`, 20, y);
-                            y += 7;
-                        });
-                        y += 5;
-                    }
-
-                    // Agenda counts
-                    if (data.agendaCounts) {
-                        doc.setFontSize(11);
-                        doc.text("Agenda Summary:", 14, y);
-                        y += 7;
-
-                        Object.entries(data.agendaCounts).forEach(([agenda, count]) => {
-                            doc.text(`• ${agenda}: ${count}`, 20, y);
-                            y += 7;
-                        });
-                        y += 5;
-                    }
-
-                    // Total appointments
-                    doc.setFontSize(11);
-                    doc.text(`Total Appointments: ${data.appointments.length}`, 14, y);
-
-                    // Add footer
-                    addReportFooter(doc, y + 15);
-
-                    // Save PDF
-                    const fileName = `Custom_Appointment_Report_${startDate}_to_${endDate}.pdf`;
+                    addPageNumbers(doc);
+                    const fileName = `Faculty_Appointment_Report_${facultyName.replace(/\s+/g, '_')}.pdf`;
                     doc.save(fileName);
 
                     showModal(
-                        `<strong style="color:#333;font-weight:600">Custom Report Generated!</strong><br>
-                    Report from <i>${formattedStart}</i> to <i>${formattedEnd}</i> has been downloaded.<br>
-                    <code>${fileName}</code>`,
+                        `<strong style="color:#333;font-weight:600">Faculty Report Generated!</strong><br>
+                 Report for <i>${facultyName}</i> has been downloaded.<br>
+                 <code>${fileName}</code>`,
                         true
                     );
                 })
                 .catch(error => {
-                    console.error("Error fetching data:", error);
-                    showModal("Error generating custom report. Please try again.", false);
+                    console.error("Error:", error);
+                    showModal("Error generating faculty report. Please try again.", false);
                 });
         }
 
-        // ------------------------ HELPER FUNCTIONS ------------------------
+        // ------------------------ APPOINTMENT HELPER FUNCTIONS ------------------------
         function addReportHeaderApt(doc, title, subtitle = "") {
             const pageWidth = doc.internal.pageSize.getWidth();
 
-            // Header
+            // === HEADER ===
             doc.setFont("times", "bold");
             doc.setFontSize(18);
-            doc.text("COLEGIO DE STA. TERESA DE AVILA", pageWidth / 2, 15, { align: "center" });
+            doc.text("COLEGIO DE STA. TERESA DE AVILA", pageWidth / 2, 15, null, null, "center");
 
             doc.setFont("helvetica", "normal");
             doc.setFontSize(10);
-            doc.text("6 Kingfisher St. cor. Skylark St., Zabarte Subd., Novaliches, Quezon City",
-                pageWidth / 2, 20, { align: "center" });
+            doc.text("6 Kingfisher St. cor. Skylark St., Zabarte Subd., Novaliches, Quezon City", pageWidth / 2, 20, null, null, "center");
 
             doc.setFont("helvetica", "bold");
             doc.setFontSize(16);
-            doc.text("COLLEGE OF INFORMATION TECHNOLOGY", pageWidth / 2, 30, { align: "center" });
+            doc.text("COLLEGE OF INFORMATION TECHNOLOGY", pageWidth / 2, 30, null, null, "center");
 
-            // Black bar with title
-            doc.setFillColor(0, 0, 0);
-            doc.rect(15, 35, pageWidth - 30, 10, 'F');
-            doc.setTextColor(255, 255, 255);
+            // === Black Bar for "APPOINTMENT REPORT" ===
+            doc.setFillColor(0, 0, 0); // Black background
+            doc.rect(15, 35, pageWidth - 30, 10, 'F'); // Black bar
+
             doc.setFontSize(14);
-            doc.text("APPOINTMENT REPORT", pageWidth / 2, 41.5, { align: "center" });
+            doc.setTextColor(255, 255, 255); // White text
+            doc.text("APPOINTMENT REPORT", pageWidth / 2, 41.5, null, null, "center");
 
-            // Academic info
+            // === Academic Year and Term ===
             doc.setTextColor(0, 0, 0);
             doc.setFont("helvetica", "bold");
             doc.setFontSize(10);
-            doc.text("AY: 2024-2025", pageWidth / 2, 50, { align: "center" });
-            doc.text("TERM : SECOND SEMESTER", pageWidth / 2, 55, { align: "center" });
+            doc.text("AY: 2024-2025", pageWidth / 2, 55, null, null, "center");
+            doc.text("TERM : SECOND SEMESTER", pageWidth / 2, 60, null, null, "center");
 
-            // Subtitle and generated date
+            // === Subtitle on left, Generated on right ===
             doc.setFont("helvetica", "italic");
             doc.setFontSize(10);
 
@@ -1282,64 +1216,10 @@ $attendanceData = json_encode($attendanceCounts);
             const generatedTextWidth = doc.getTextWidth(generatedText);
 
             if (subtitle) {
-                doc.text(subtitle, 15, 60);
+                doc.text(subtitle, 15, 60); // Subtitle on left
             }
 
-            doc.text(generatedText, pageWidth - 15 - generatedTextWidth, 60);
-        }
-
-        function addSummaryTables(doc, agendaCounts = {}, statusCounts = {}, startY) {
-            const summaryTable = {
-                startY: startY,
-                head: [["Agenda Summary", " ", "Status Summary", " "]],
-                body: [],
-                theme: 'grid',
-                headStyles: {
-                    fillColor: [240, 240, 240],
-                    textColor: [0, 0, 0],
-                    fontStyle: 'bold',
-                    halign: 'left'
-                },
-                styles: { fontSize: 9 }
-            };
-
-            const maxRows = Math.max(
-                Object.keys(agendaCounts).length,
-                Object.keys(statusCounts).length
-            );
-
-            for (let i = 0; i < maxRows; i++) {
-                const agendaKey = Object.keys(agendaCounts)[i] || "";
-                const agendaVal = agendaKey ? agendaCounts[agendaKey] : "";
-
-                const statusKey = Object.keys(statusCounts)[i] || "";
-                const statusVal = statusKey ? statusCounts[statusKey] : "";
-
-                summaryTable.body.push([
-                    agendaKey, agendaVal?.toString() || "",
-                    statusKey, statusVal?.toString() || ""
-                ]);
-            }
-
-            doc.autoTable(summaryTable);
-        }
-
-        function addReportFooter(doc, currentY) {
-            const pageHeight = doc.internal.pageSize.height;
-            const footerHeight = 30;
-            let footerY = currentY + 10;
-
-            if (footerY + footerHeight > pageHeight) {
-                doc.addPage();
-                footerY = 20;
-            }
-
-            doc.text("Prepared by:", 15, footerY);
-            doc.setFont("helvetica", "bold");
-            doc.text("HAROLD R. LUCERO, MIT", 15, footerY + 10);
-            doc.setFont("helvetica", "normal");
-            doc.line(15, footerY + 11, 75, footerY + 11);
-            doc.text("Dean", 15, footerY + 17);
+            doc.text(generatedText, pageWidth - 15 - generatedTextWidth, 60); // Generated on right
         }
 
         function addPageNumbers(doc) {
@@ -1356,9 +1236,7 @@ $attendanceData = json_encode($attendanceCounts);
 
             if (typeof time === "object") {
                 if (time.hours !== undefined && time.minutes !== undefined) {
-                    const period = time.hours >= 12 ? 'PM' : 'AM';
-                    const hours12 = time.hours % 12 || 12;
-                    return `${hours12}:${time.minutes.toString().padStart(2, '0')} ${period}`;
+                    return `${time.hours}:${time.minutes.toString().padStart(2, '0')} ${time.hours >= 12 ? 'PM' : 'AM'}`;
                 } else if (time.toISOString) {
                     return new Date(time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
                 }
@@ -1367,38 +1245,12 @@ $attendanceData = json_encode($attendanceCounts);
                 return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
             }
 
-            return time;
-        }
-
-        function showModal(message, isSuccess) {
-            const modal = document.getElementById("exportModal");
-            const modalMessage = document.getElementById("exportModalMessage");
-
-            // Clear any existing timeout
-            if (modal.timeoutId) {
-                clearTimeout(modal.timeoutId);
-            }
-
-            modalMessage.innerHTML = message;
-            modal.style.display = "block";
-            modalMessage.style.color = isSuccess ? "#333" : "#F44336";
-
-            // Auto-hide after 5 seconds
-            modal.timeoutId = setTimeout(() => {
-                modal.style.display = "none";
-            }, 5000);
-
-            // Manual closing
-            const closeBtn = document.querySelector(".close-modal-1");
-            if (closeBtn) {
-                closeBtn.onclick = () => {
-                    clearTimeout(modal.timeoutId);
-                    modal.style.display = "none";
-                };
-            }
+            return time; // Return as-is if it's already in a correct format
         }
     });
+
 </script>
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const modal = document.getElementById("customModal1");

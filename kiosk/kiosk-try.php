@@ -332,21 +332,56 @@ date_default_timezone_set('Asia/Manila');
             }
         }
 
-        /* Error Message */
-        .error-message {
+        .modal-overlay {
             position: fixed;
-            top: 1rem;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: var(--danger-color);
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 50px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            z-index: 1001;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
             display: flex;
+            justify-content: center;
             align-items: center;
-            gap: 0.5rem;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #ffffff 0%, #f5f7fa 100%);
+            border-radius: 20px;
+            padding: 2.5rem;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-content p {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 2rem;
+            font-family: 'Poppins', sans-serif;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
 
         .modal-options {
@@ -384,6 +419,114 @@ date_default_timezone_set('Asia/Manila');
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
             border: 4px solid #3498db;
             /* thicker and colored on hover */
+        }
+
+        .modal-option:active {
+            transform: translateY(0);
+        }
+
+        .modal-option i {
+            font-size: 2.5rem;
+            margin-right: 1.5rem;
+            color: #3498db;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .modal-option div {
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .hows {
+            background: linear-gradient(145deg, #2196F3, #0b7dda);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+            margin-top: 1rem;
+        }
+
+        .hows:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            background: linear-gradient(145deg, #0b7dda, #2196F3);
+        }
+
+        .hows:active {
+            transform: translateY(0);
+        }
+
+        #modalClose {
+            width: 100%;
+        }
+
+
+        /* Animation for options when they appear */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-option {
+            animation: fadeInUp 0.4s ease forwards;
+        }
+
+        .modal-option:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .modal-option:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .modal-content {
+                padding: 1.5rem;
+            }
+
+            .modal-title {
+                font-size: 1.8rem;
+            }
+
+            .modal-option i {
+                font-size: 2rem;
+                margin-right: 1rem;
+            }
+
+            .modal-option div {
+                font-size: 1.1rem;
+            }
+        }
+
+        /* Error Message */
+        .error-message {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--danger-color);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         /* Animation */
@@ -680,402 +823,6 @@ date_default_timezone_set('Asia/Manila');
                 transform: translateY(-10px);
             }
         }
-
-        /* Updated Modal Styles for Tile Layout */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        /* Updated Modal Sizes */
-        .modal-content {
-            background: linear-gradient(135deg, #ffffff 0%, #f5f7fa 100%);
-            border-radius: 25px;
-            padding: 3rem;
-            width: 90%;
-            max-width: 700px;
-            /* Increased from 600px */
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-            text-align: center;
-            transform: scale(0.9);
-            transition: transform 0.3s ease;
-        }
-
-
-        .modal-overlay.active .modal-content {
-            transform: scale(1);
-        }
-
-        .modal-title {
-            font-size: 1.7rem;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 2rem;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        /* Tile Grid Layout */
-        .tile-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .tile {
-            background: white;
-            border-radius: 20px;
-            /* Increased from 15px */
-            padding: 2.5rem 1.5rem;
-            /* Increased padding */
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-            border: 3px solid transparent;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 220px;
-            /* Increased from 180px */
-            position: relative;
-            overflow: hidden;
-        }
-
-        .tile::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 5px;
-            background: linear-gradient(90deg, #4361ee, #4cc9f0);
-            transition: all 0.3s ease;
-        }
-
-        .tile:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
-            border-color: #4361ee;
-        }
-
-        .tile:hover::before {
-            height: 8px;
-        }
-
-        .tile i {
-            font-size: 3.5rem;
-            /* Increased from 2.8rem */
-            margin-bottom: 1.5rem;
-            /* Increased from 1rem */
-            color: #4361ee;
-            transition: all 0.3s ease;
-        }
-
-
-        .tile:hover i {
-            transform: scale(1.1);
-            color: #3f37c9;
-        }
-
-        .tile div {
-            font-size: 1.5rem;
-            /* Increased from 1.2rem */
-            font-weight: 600;
-            color: #2c3e50;
-            transition: all 0.3s ease;
-        }
-
-
-        .tile:hover div {
-            color: #3f37c9;
-        }
-
-        /* Full-width RFID tile in student modal */
-        #studentModal .tile-grid {
-            grid-template-columns: 1fr;
-            /* Single column */
-        }
-
-        #studentModal .tile {
-            width: 100%;
-            height: 250px;
-            /* Even taller for student modal */
-        }
-
-        /* Student Tile Specific */
-        .student-tile {
-            background: linear-gradient(135deg, rgba(67, 97, 238, 0.1) 0%, rgba(76, 201, 240, 0.1) 100%);
-        }
-
-        .student-tile i {
-            color: #4361ee;
-        }
-
-        /* Faculty Tile Specific */
-        .faculty-tile {
-            background: linear-gradient(135deg, rgba(244, 67, 54, 0.1) 0%, rgba(255, 152, 0, 0.1) 100%);
-        }
-
-        .faculty-tile i {
-            color: #f44336;
-        }
-
-        .faculty-tile:hover i {
-            color: #d32f2f;
-        }
-
-        .faculty-tile:hover div {
-            color: #d32f2f;
-        }
-
-        /* RFID Tile Specific */
-        .rfid-tile {
-            background: linear-gradient(135deg, rgba(75, 181, 67, 0.1) 0%, rgba(140, 234, 133, 0.1) 100%);
-        }
-
-        .rfid-tile i {
-            color: #4bb543;
-        }
-
-        .rfid-tile:hover i {
-            color: #3a9a32;
-        }
-
-        .rfid-tile:hover div {
-            color: #3a9a32;
-        }
-
-        /* Facial Recognition Tile Specific */
-        .face-tile {
-            background: linear-gradient(135deg, rgba(156, 39, 176, 0.1) 0%, rgba(233, 30, 99, 0.1) 100%);
-        }
-
-        .face-tile i {
-            color: #9c27b0;
-        }
-
-        .face-tile:hover i {
-            color: #7b1fa2;
-        }
-
-        .face-tile:hover div {
-            color: #7b1fa2;
-        }
-
-        /* Active RFID Mode */
-        .rfid-active {
-            background: linear-gradient(135deg, rgba(75, 181, 67, 0.2) 0%, rgba(140, 234, 133, 0.2) 100%);
-            border: 3px solid #4bb543;
-            box-shadow: 0 0 0 3px rgba(75, 181, 67, 0.3);
-            width: 100%;
-        }
-
-        .rfid-active div {
-            color: #4bb543;
-            font-weight: 700;
-        }
-
-        /* Modal Buttons */
-        .modal-button {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-            margin-top: 1rem;
-        }
-
-        .back-button {
-            background: linear-gradient(135deg, #6c757d, #495057);
-            color: white;
-        }
-
-        .back-button:hover {
-            background: linear-gradient(135deg, #495057, #6c757d);
-            transform: translateY(-2px);
-        }
-
-        .close-button {
-            background: linear-gradient(135deg, #f44336, #e53935);
-            color: white;
-        }
-
-        .close-button:hover {
-            background: linear-gradient(135deg, #e53935, #f44336);
-            transform: translateY(-2px);
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .tile-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .tile {
-                height: 150px;
-                padding: 1.5rem 1rem;
-            }
-
-            .tile i {
-                font-size: 2.5rem;
-            }
-
-            .tile div {
-                font-size: 1.1rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .modal-content {
-                padding: 1.5rem;
-            }
-
-            .modal-title {
-                font-size: 1.5rem;
-                margin-bottom: 1.5rem;
-            }
-
-            .tile {
-                height: 130px;
-            }
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .modal-content {
-                padding: 2.5rem;
-                max-width: 90%;
-            }
-
-            .modal-title {
-                font-size: 2rem;
-            }
-
-            .tile {
-                height: 200px;
-                padding: 2rem 1rem;
-            }
-
-            .tile i {
-                font-size: 3rem;
-            }
-
-            .tile div {
-                font-size: 1.3rem;
-            }
-
-            #studentModal .tile {
-                height: 220px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .modal-content {
-                padding: 2rem;
-            }
-
-            .modal-title {
-                font-size: 1.8rem;
-            }
-
-            .tile {
-                height: 180px;
-            }
-
-            #studentModal .tile {
-                height: 200px;
-            }
-        }
-
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-            display: none;
-        }
-
-        .custom-modal {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: white;
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-            display: none;
-            text-align: center;
-        }
-
-        .scan-me {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 1rem;
-            color: #4361ee;
-        }
-
-        .qr-image {
-            width: 200px;
-            height: 200px;
-            margin: 0 auto;
-            display: block;
-        }
-
-        .hows {
-            background: linear-gradient(145deg, #2196F3, #0b7dda);
-            color: white;
-            border: none;
-            border-radius: 15px;
-            font-size: 1.1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
-            margin-top: 1rem;
-        }
-
-        .hows:hover {
-            background: #2980b9;
-            transform: translateY(-2px);
-            background: linear-gradient(145deg, #0b7dda, #2196F3);
-        }
-
-        .hows:active {
-            transform: translateY(0);
-        }
-
-        #modalClose {
-            width: 100%;
-        }
     </style>
 </head>
 
@@ -1136,6 +883,7 @@ date_default_timezone_set('Asia/Manila');
     <nav class="navi-bar" role="banner">
         <a id="current-time"></a>
         <a id="live-date"></a>
+
     </nav>
 
     <div id="title-container">
@@ -1157,58 +905,53 @@ date_default_timezone_set('Asia/Manila');
 
     <div class="overlay" id="overlay" onclick="toggleModal()"></div>
 
-    <!-- Updated Main Modal with Tile Layout -->
     <div class="modal-overlay" id="mainModal">
         <div class="modal-content">
             <h2 class="modal-title">Select Your User Type</h2>
-            <div class="tile-grid">
-                <div class="tile student-tile" onclick="showStudentModal()">
-                    <i class="bi bi-mortarboard"></i>
-                    <div>Student</div>
+            <div class="modal-options">
+                <div class="modal-option" onclick="showStudentModal()">
+                    <i class="bi bi-mortarboard"></i> Student
                 </div>
-                <div class="tile faculty-tile" onclick="showFacultyModal()">
-                    <i class="bi bi-person-badge"></i>
-                    <div>Faculty Member</div>
+                <div class="modal-option" onclick="showFacultyModal()">
+                    <i class="bi bi-person-badge"></i> Faculty Member
                 </div>
             </div>
+            <!-- Added Close Button (matches your existing style) -->
             <button class="hows" id="modalClose" onclick="hideModal('mainModal')">
                 <i class="bi bi-x-lg"></i> Close
             </button>
         </div>
     </div>
 
-    <!-- Updated Student Modal with full-width RFID tile -->
+    <!-- Student Modal -->
     <div class="modal-overlay" id="studentModal">
         <div class="modal-content">
-            <h2 class="modal-title">Student Verification</h2>
-            <div class="tile-grid">
-                <div class="tile rfid-tile rfid-active">
-                    <i class="bi bi-upc-scan"></i>
-                    <div>Tap your RFID card to proceed</div>
+            <p>Student Verification</p>
+            <div class="modal-options">
+                <div class="modal-option">
+                    <i class="bi bi-upc-scan"></i> Tap your RFID card to proceed
                 </div>
             </div>
             <!-- Hidden Input Field -->
             <form id="rfid-form" method="POST" action="functions/check-student.php">
                 <input type="hidden" id="rfid-id" name="rfid_id" value="">
             </form>
-            <button  class="how" id="modalClose" onclick="backToMainModal()">
+            <button class="how" id="modalClose" onclick="backToMainModal()">
                 <i class="bi bi-arrow-left"></i> Back
             </button>
         </div>
     </div>
 
-    <!-- Updated Faculty Modal -->
+    <!-- Faculty Modal -->
     <div class="modal-overlay" id="facultyModal">
         <div class="modal-content">
-            <h2 class="modal-title">Faculty Verification</h2>
-            <div class="tile-grid">
-                <div class="tile rfid-tile" id="facultyRfidOption">
-                    <i class="bi bi-upc-scan"></i>
-                    <div>RFID Card</div>
+            <p>Choose your verification method</p>
+            <div class="modal-options">
+                <div class="modal-option" id="facultyRfidOption">
+                    <i class="bi bi-upc-scan"></i> RFID Card
                 </div>
-                <div class="tile face-tile" onclick="window.location.href='./faculty/kiosk-detect-face.php'">
-                    <i class="bi bi-camera"></i>
-                    <div>Facial Recognition</div>
+                <div class="modal-option" onclick="window.location.href='./faculty/kiosk-detect-face.php'">
+                    <i class="bi bi-camera"></i> Open Facial Recognition
                 </div>
             </div>
             <!-- Hidden Input Field -->
@@ -1221,15 +964,31 @@ date_default_timezone_set('Asia/Manila');
         </div>
     </div>
 
-    <div class="custom-modal" id="customModal">
-        <p class="scan-me">SCAN ME</p>
-        <img class="qr-image" src="../assets/images/bit.ly_4bq5MUR.png" alt="QR Code">
-    </div>
 
     <footer>
         <button class="footer-button" onclick="toggleModal()"><i
                 class="custom-i bi bi-cloud-arrow-down-fill"></i></button>
     </footer>
+
+    <div class="custom-modal" id="customModal">
+        <p class="scan-me">SCAN ME</p>
+        <img class="qr-image" src="../assets/images/bit.ly_4bq5MUR.png" alt="QR Code">
+    </div>
+
+    <script>
+        function toggleModal() {
+            var modal = document.getElementById("customModal");
+            var overlay = document.getElementById("overlay");
+
+            if (modal.style.display === "block") {
+                modal.style.display = "none";
+                overlay.style.display = "none";
+            } else {
+                modal.style.display = "block";
+                overlay.style.display = "block";
+            }
+        }
+    </script>
 
     <!-- Scripts -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -1311,41 +1070,14 @@ date_default_timezone_set('Asia/Manila');
             });
         }
     </script>
-
     <script>
         /** Faculty RFID Input Handling */
         const facultyRfidInput = document.getElementById('faculty-rfid-id');
         const facultyRfidForm = document.getElementById('faculty-rfid-form');
         const facultyModal = document.getElementById('facultyModal');
+        const facultyRfidOption = document.getElementById('facultyRfidOption');
         let isFacultyModalOpen = false;
         let isRfidModeActive = false;
-
-        // Update the RFID option display function for the new tile design
-        function updateRfidOptionDisplay() {
-            const facultyRfidOption = document.getElementById('facultyRfidOption');
-
-            if (isRfidModeActive) {
-                facultyRfidOption.innerHTML = '<i class="bi bi-upc-scan"></i><div>Tap your RFID card now</div>';
-                facultyRfidOption.classList.add('rfid-active');
-                facultyRfidInput.focus();
-            } else {
-                facultyRfidOption.innerHTML = '<i class="bi bi-upc-scan"></i><div>RFID Card</div>';
-                facultyRfidOption.classList.remove('rfid-active');
-            }
-        }
-
-        // Update the faculty RFID option click handler
-        document.getElementById('facultyRfidOption').addEventListener('click', function () {
-            if (!isRfidModeActive) {
-                isRfidModeActive = true;
-                updateRfidOptionDisplay();
-            } else {
-                // If already in RFID mode, clicking should submit if there's input
-                if (facultyRfidInput.value.trim() !== '') {
-                    facultyRfidForm.submit();
-                }
-            }
-        });
 
         // Track modal state
         facultyModal.addEventListener('click', function (e) {
@@ -1364,6 +1096,28 @@ date_default_timezone_set('Asia/Manila');
             }
             facultyRfidInput.value = ''; // Clear input when modal state changes
         }
+
+        function updateRfidOptionDisplay() {
+            if (isRfidModeActive) {
+                facultyRfidOption.innerHTML = '<i class="bi bi-upc-scan"></i> Tap your RFID card now';
+                facultyRfidOption.style.backgroundColor = '#f0f8ff';
+                facultyRfidOption.style.border = '4px solid #3498db';
+            } else {
+                facultyRfidOption.innerHTML = '<i class="bi bi-upc-scan"></i> RFID Card';
+                facultyRfidOption.style.backgroundColor = '';
+                facultyRfidOption.style.border = '2px solid transparent';
+                facultyRfidOption.style.boxShadow = 'none';
+            }
+        }
+
+        // Handle RFID option click
+        facultyRfidOption.addEventListener('click', function () {
+            if (!isRfidModeActive) {
+                isRfidModeActive = true;
+                updateRfidOptionDisplay();
+                facultyRfidInput.focus(); // Set focus for RFID input
+            }
+        });
 
         // Only process input when modal is open and in RFID mode
         if (facultyRfidInput && facultyRfidForm) {
@@ -1386,13 +1140,11 @@ date_default_timezone_set('Asia/Manila');
             });
         }
     </script>
-
     <script>
         window.addEventListener('load', () => {
             document.getElementById('logoContainer').classList.add('loaded');
         });
     </script>
-
     <script>
         // Array of possible messages that will cycle
         const messages = [
@@ -1429,7 +1181,6 @@ date_default_timezone_set('Asia/Manila');
         // Also change message on click/tap
         messageElement.addEventListener('click', cycleMessages);
     </script>
-
     <script>
         // Modal functions
         function showModal(modalId) {
@@ -1474,7 +1225,6 @@ date_default_timezone_set('Asia/Manila');
             }
         });
     </script>
-
     <script>
         // Show the modal immediately
         document.addEventListener('DOMContentLoaded', function () {
@@ -1496,21 +1246,6 @@ date_default_timezone_set('Asia/Manila');
                 setTimeout(() => {
                     infoModal.remove();
                 }, 300);
-            }
-        }
-    </script>
-
-    <script>
-        function toggleModal() {
-            var modal = document.getElementById("customModal");
-            var overlay = document.getElementById("overlay");
-
-            if (modal.style.display === "block") {
-                modal.style.display = "none";
-                overlay.style.display = "none";
-            } else {
-                modal.style.display = "block";
-                overlay.style.display = "block";
             }
         }
     </script>

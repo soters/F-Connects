@@ -7,17 +7,55 @@ if (!isset($_GET['date']) || empty($_GET['date'])) {
 }
 
 $date = $_GET['date'];
+$facultyId = isset($_GET['faculty']) ? $_GET['faculty'] : null;
 
+// Define all possible values based on your schema
+$possibleAgendas = [
+    "Internship or Practical Experience Advice",
+    "Project Or Research Discussion",
+    "Mentorship",
+    "Personal Academic Concerns",
+    "Others"
+];
+
+$possibleStatuses = [
+    "Pending",
+    "Accepted",
+    "Completed",
+    "Declined",
+    "Cancelled"
+];
+
+// Initialize counts with all possible values set to 0
+$statusCounts = array_fill_keys($possibleStatuses, 0);
+$agendaCounts = array_fill_keys($possibleAgendas, 0);
+
+// Add "Unknown" category for any unexpected values
+$statusCounts['Unknown'] = 0;
+$agendaCounts['Unknown'] = 0;
+
+// Initialize grand total counter
+$grandTotal = 0;
+
+// Base query
 $sql = "SELECT a.appointment_code, f.rfid_no AS faculty_rfid, f.fname, f.lname, 
                s.fname AS stud_fname, s.lname AS stud_lname, 
                a.start_time, a.end_time, a.agenda, a.status 
         FROM Appointments a
         JOIN Faculty f ON a.prof_rfid_no = f.rfid_no
         JOIN Students s ON a.stud_rfid_no = s.rfid_no
-        WHERE a.date_logged = ?
-        ORDER BY a.start_time ASC";
+        WHERE a.date_logged = ?";
 
-$params = array($date);
+// Add faculty filter if provided
+if ($facultyId) {
+    $sql .= " AND a.prof_rfid_no = ?";
+    $params = array($date, $facultyId);
+} else {
+    $params = array($date);
+}
+
+$sql .= " ORDER BY a.start_time ASC";
+
 $stmt = sqlsrv_query($conn, $sql, $params);
 
 if ($stmt === false) {
@@ -25,67 +63,62 @@ if ($stmt === false) {
 }
 
 $appointments = [];
-$statusCounts = ["Completed" => 0, "Cancelled" => 0, "Declined" => 0];
-$agendaCounts = [
-    "Internship or Practical Experience Advice" => 0,
-    "Personal Academic Concerns" => 0,
-    "Project/Research Discussion" => 0,
-    "Mentorship" => 0
-];
-
-// Track completed appointments by faculty RFID
-$completedPerFaculty = [];
 
 while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
     $row['start_time'] = $row['start_time']->format('H:i:s');
     $row['end_time'] = $row['end_time']->format('H:i:s');
 
-    // Count status
-    if (isset($statusCounts[$row['status']])) {
-        $statusCounts[$row['status']]++;
+    // Process status
+    $status = $row['status'] ?? 'Unknown';
+    if (isset($statusCounts[$status])) {
+        $statusCounts[$status]++;
+    } else {
+        $statusCounts['Unknown']++;
     }
 
-    // Count agenda
-    if (isset($agendaCounts[$row['agenda']])) {
-        $agendaCounts[$row['agenda']]++;
+    // Process agenda
+    $agenda = $row['agenda'] ?? 'Unknown';
+    if (isset($agendaCounts[$agenda])) {
+        $agendaCounts[$agenda]++;
+    } else {
+        $agendaCounts['Unknown']++;
     }
 
-    // Count completed per faculty
-    if ($row['status'] === "Completed") {
-        $facultyKey = $row['faculty_rfid'];
-        if (!isset($completedPerFaculty[$facultyKey])) {
-            $completedPerFaculty[$facultyKey] = [
-                "count" => 0,
-                "name" => $row['fname'] . " " . $row['lname']
-            ];
-        }
-        $completedPerFaculty[$facultyKey]["count"]++;
-    }
+    // Increment grand total
+    $grandTotal++;
 
     $appointments[] = $row;
 }
 
-// Determine the faculty member(s) with most completed appointments
-$mostCompleted = [];
-$maxCompleted = 0;
+// Prepare counts in the required format
+$formattedStatusCounts = [];
+foreach ($statusCounts as $status => $count) {
+    if ($count > 0) { // Only include statuses with counts > 0
+        $formattedStatusCounts[] = [
+            'status' => $status,
+            'count' => $count
+        ];
+    }
+}
 
-foreach ($completedPerFaculty as $faculty) {
-    if ($faculty['count'] > $maxCompleted) {
-        $maxCompleted = $faculty['count'];
-        $mostCompleted = [$faculty['name']];
-    } elseif ($faculty['count'] === $maxCompleted) {
-        $mostCompleted[] = $faculty['name'];
+$formattedAgendaCounts = [];
+foreach ($agendaCounts as $agenda => $count) {
+    if ($count > 0) { // Only include agendas with counts > 0
+        $formattedAgendaCounts[] = [
+            'agenda' => $agenda,
+            'count' => $count
+        ];
     }
 }
 
 $response = [
     "appointments" => $appointments,
-    "statusCounts" => $statusCounts,
-    "agendaCounts" => $agendaCounts,
-    "topCompletedFaculty" => $mostCompleted,
-    "maxCompletedCount" => $maxCompleted
+    "statusCounts" => $formattedStatusCounts,
+    "agendaCounts" => $formattedAgendaCounts,
+    "grandTotal" => $grandTotal
 ];
 
+header('Content-Type: application/json');
 echo json_encode($response);
 
 // Clean up
