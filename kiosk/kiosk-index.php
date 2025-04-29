@@ -1221,15 +1221,15 @@ date_default_timezone_set('Asia/Manila');
         </div>
     </div>
 
-    <div class="custom-modal" id="customModal">
+    <!--<div class="custom-modal" id="customModal">
         <p class="scan-me">SCAN ME</p>
         <img class="qr-image" src="../assets/images/bit.ly_4bq5MUR.png" alt="QR Code">
-    </div>
+    </div>-->
 
-    <footer>
+    <!--<footer>
         <button class="footer-button" onclick="toggleModal()"><i
                 class="custom-i bi bi-cloud-arrow-down-fill"></i></button>
-    </footer>
+    </footer>-->
 
     <!-- Scripts -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
