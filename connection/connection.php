@@ -3,7 +3,7 @@ declare(strict_types=1);
 date_default_timezone_set('Asia/Manila');
 
 try {
-    $serverName = "DESKTOP-EH9A851";       // Your local SQL Server hostname (e.g., ".", "localhost", or "J5L")
+    $serverName = "DESKTOP-SQ1PDO1";       // Your local SQL Server hostname (e.g., ".", "localhost", or "J5L")
     $database = "fconnect-newdb"; // Your database name
     $username = "sa";           // SQL Server username
     $password = "root12345";    // SQL Server password
