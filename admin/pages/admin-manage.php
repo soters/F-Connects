@@ -100,7 +100,7 @@ if ($stmt_table === false) {
 
         <div id="nav-content">
             <!-- Dashboard -->
-            <div class="nav-button">
+            <div class="nav-button" data-nav-id="dashboard">
                 <a href="admin-index.php">
                 <i class="fas bi-arrow-left-short"></i>
                     <span>To Dashboard</span>
@@ -108,7 +108,7 @@ if ($stmt_table === false) {
             </div>
 
             <!-- Logout -->
-            <div class="nav-button">
+            <div class="nav-button" data-nav-id="logout">
                 <a href="../authentication/admin-logout.php">
                     <i class="fas fa-sign-out-alt"></i>
                     <span>Logout</span>
@@ -118,6 +118,8 @@ if ($stmt_table === false) {
             <div id="nav-content-highlight"></div>
         </div>
     </div>
+
+    <script src="../../assets/js/nav-highlight.js"></script>
 
     <!-- Main Content -->
     <div id="main-content" class="main-content">
@@ -285,6 +287,7 @@ if ($stmt_table === false) {
 
     <!-- Scroll to Top Button -->
     <button id="scrollToTopBtn" onclick="scrollToTop()">↑</button>
+    <script src="../../assets/js/nav-highlight.js"></script>
 </body>
 
 <script>

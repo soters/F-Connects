@@ -102,7 +102,7 @@ if ($stmt_table === false) {
 
         <div id="nav-content">
             <!-- Dashboard -->
-            <div class="nav-button">
+            <div class="nav-button" data-nav-id="dashboard">
                 <a href="admin-index.php">
                 <i class="fas bi-arrow-left-short"></i>
                     <span>To Dashboard</span>
@@ -110,7 +110,7 @@ if ($stmt_table === false) {
             </div>
 
             <!-- Logout -->
-            <div class="nav-button">
+            <div class="nav-button" data-nav-id="logout">
                 <a href="../authentication/admin-logout.php">
                     <i class="fas fa-sign-out-alt"></i>
                     <span>Logout</span>

@@ -221,81 +221,81 @@ $agendaHasData = count($agendaCounts) > 0 ? 'true' : 'false';
         </div>
         <div id="nav-content">
             <!-- Dashboard -->
-            <div class="nav-button">
+            <div class="nav-button" data-nav-id="dashboard">
                 <a href="admin-index.php">
                     <i class="fas fa-chart-line"></i>
                     <span>Dashboard</span>
                 </a>
             </div>
             <!-- Attendance Records -->
-            <div class="nav-button">
+            <div class="nav-button" data-nav-id="attendance">
                 <a href="admin-attendance-records.php">
                     <i class="fas fa-clipboard"></i>
                     <span>Attendance Records</span>
                 </a>
             </div>
             <!-- Appointment -->
-            <div class="nav-button">
+            <div class="nav-button" data-nav-id="appointment">
                 <a href="admin-appointment.php">
                     <i class="fas fa-calendar-check"></i>
                     <span>Appointment</span>
                 </a>
             </div>
             <!-- Announcement -->
-            <div class="nav-button">
+            <div class="nav-button" data-nav-id="announcement">
                 <a href="admin-announcement.php">
                     <i class="fas fa-bullhorn"></i>
                     <span>Announcement</span>
                 </a>
             </div>
             <!-- Faculty -->
-            <div class="nav-button">
+            <div class="nav-button" data-nav-id="faculty">
                 <a href="admin-faculty.php">
                     <i class="fas fa-user"></i>
                     <span>Faculty Members</span>
                 </a>
             </div>
             <!-- Schedule -->
-            <div class="nav-button">
+            <div class="nav-button" data-nav-id="schedule">
                 <a href="admin-schedule.php">
                     <i class="fas fa-calendar"></i>
                     <span>Schedule</span>
                 </a>
             </div>
             <!-- Sections -->
-            <div class="nav-button">
+            <div class="nav-button" data-nav-id="sections">
                 <a href="admin-sections.php">
                     <i class="fas fa-users"></i>
                     <span>Sections</span>
                 </a>
             </div>
             <!-- Student -->
-            <div class="nav-button">
+            <div class="nav-button" data-nav-id="student">
                 <a href="admin-student.php">
                     <i class="fas fa-users"></i>
                     <span>Student</span>
                 </a>
             </div>
             <!-- Subjects -->
-            <div class="nav-button">
+            <div class="nav-button" data-nav-id="subjects">
                 <a href="admin-subjects.php">
                     <i class="fas fa-book"></i>
                     <span>Subjects</span>
                 </a>
             </div>
             <!-- Admin Panel -->
-            <div class="nav-button">
+            <div class="nav-button" data-nav-id="admin">
                 <a href="admin-manage.php">
                     <i class="fas fa-user-tie"></i>
                     <span>Admin Panel</span>
                 </a>
             </div>
             <!-- Logout -->
-            <div class="nav-button">
+            <div class="nav-button" data-nav-id="logout">
                 <a href="../authentication/admin-logout.php">
                     <i class="fas fa-sign-out-alt"></i>
                     <span>Logout</span>
-                </a>
+                </a>    
             </div>
             <div id="nav-content-highlight"></div>
         </div>
@@ -583,6 +583,7 @@ $agendaHasData = count($agendaCounts) > 0 ? 'true' : 'false';
             </div>
         </div>
     </div>
+    <script src="../../assets/js/nav-highlight.js"></script>
 </body>
 
 <script>

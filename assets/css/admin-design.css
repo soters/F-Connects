@@ -266,95 +266,37 @@ label[for="nav-toggle"] {
 .nav-button .fas {
   transition: min-width 0.2s;
 }
-.nav-button:nth-of-type(1):hover {
-  color: var(--navbar-dark-primary);
-}
-.nav-button:nth-of-type(1):hover ~ #nav-content-highlight {
-  top: 16px;
-}
-.nav-button:nth-of-type(2):hover {
-  color: var(--navbar-dark-primary);
-}
-.nav-button:nth-of-type(2):hover ~ #nav-content-highlight {
-  top: 70px;
-}
-.nav-button:nth-of-type(3):hover {
-  color: var(--navbar-dark-primary);
-}
-.nav-button:nth-of-type(3):hover ~ #nav-content-highlight {
-  top: 124px;
-}
-.nav-button:nth-of-type(4):hover {
-  color: var(--navbar-dark-primary);
-}
-.nav-button:nth-of-type(4):hover ~ #nav-content-highlight {
-  top: 178px;
-}
-.nav-button:nth-of-type(5):hover {
-  color: var(--navbar-dark-primary);
-}
-.nav-button:nth-of-type(5):hover ~ #nav-content-highlight {
-  top: 232px;
-}
-.nav-button:nth-of-type(6):hover {
-  color: var(--navbar-dark-primary);
-}
-.nav-button:nth-of-type(6):hover ~ #nav-content-highlight {
-  top: 286px;
-}
-.nav-button:nth-of-type(7):hover {
-  color: var(--navbar-dark-primary);
-}
-.nav-button:nth-of-type(7):hover ~ #nav-content-highlight {
-  top: 340px;
-}
-/* New Announcement section */
-.nav-button:nth-of-type(8):hover {
-  color: var(--navbar-dark-primary);
-}
-.nav-button:nth-of-type(8):hover ~ #nav-content-highlight {
-  top: 394px;
-}
-/* Shift everything below Announcement down */
-.nav-button:nth-of-type(9):hover {
-  color: var(--navbar-dark-primary);
-}
-.nav-button:nth-of-type(9):hover ~ #nav-content-highlight {
-  top: 448px;
-}
-.nav-button:nth-of-type(10):hover {
-  color: var(--navbar-dark-primary);
-}
-.nav-button:nth-of-type(10):hover ~ #nav-content-highlight {
-  top: 502px;
-}
-.nav-button:nth-of-type(11):hover {
-  color: var(--navbar-dark-primary);
-}
-.nav-button:nth-of-type(11):hover ~ #nav-content-highlight {
-  top: 556px;
-}
-.nav-button:nth-of-type(12):hover {
-  color: var(--navbar-dark-primary);
-}
-.nav-button:nth-of-type(12):hover ~ #nav-content-highlight {
-  top: 610px;
-}
-.nav-button:nth-of-type(13):hover {
-  color: var(--navbar-dark-primary);
-}
-.nav-button:nth-of-type(13):hover ~ #nav-content-highlight {
-  top: 664px;
-}
-.nav-button:nth-of-type(14):hover {
-  color: var(--navbar-dark-primary);
-}
-.nav-button:nth-of-type(14):hover ~ #nav-content-highlight {
-  top: 718px;
-}
+
 #nav-bar .fas {
   min-width: 3rem;
   text-align: center;
+}
+
+/* Active state styles */
+.nav-button.active {
+  color: var(--navbar-dark-primary) !important;
+}
+
+/* Highlight positions for each nav item */
+.nav-button[data-nav-id="dashboard"].active ~ #nav-content-highlight { top: 16px; }
+.nav-button[data-nav-id="attendance"].active ~ #nav-content-highlight { top: 70px; }
+.nav-button[data-nav-id="appointment"].active ~ #nav-content-highlight { top: 124px; }
+.nav-button[data-nav-id="announcement"].active ~ #nav-content-highlight { top: 178px; }
+.nav-button[data-nav-id="faculty"].active ~ #nav-content-highlight { top: 232px; }
+.nav-button[data-nav-id="schedule"].active ~ #nav-content-highlight { top: 286px; }
+.nav-button[data-nav-id="sections"].active ~ #nav-content-highlight { top: 340px; }
+.nav-button[data-nav-id="student"].active ~ #nav-content-highlight { top: 394px; }
+.nav-button[data-nav-id="subjects"].active ~ #nav-content-highlight { top: 448px; }
+.nav-button[data-nav-id="admin"].active ~ #nav-content-highlight { top: 502px; }
+.nav-button[data-nav-id="logout"].active ~ #nav-content-highlight { top: 556px; }
+
+/* Ensure highlight stays behind buttons */
+#nav-content-highlight {
+  z-index: 0;
+}
+.nav-button {
+  z-index: 1;
+  position: relative;
 }
 
 #nav-footer {
